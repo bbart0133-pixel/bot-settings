@@ -5,168 +5,475 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Настройки бота</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:var(--tg-theme-bg-color,#17212b);--sec:var(--tg-theme-secondary-bg-color,#0e1621);
-  --text:var(--tg-theme-text-color,#f5f5f5);--hint:var(--tg-theme-hint-color,#7f91a4);
-  --accent:var(--tg-theme-button-color,#5288c1);--accent-text:var(--tg-theme-button-text-color,#fff);
-  --link:var(--tg-theme-link-color,#6ab3f3);--sep:color-mix(in srgb,var(--hint) 22%,transparent);
+  --bg:#050607; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
+  --text:#eef2f2; --hint:#8a9696; --dim:#6b7878; --mute:#4b5858;
+  --acc:#2dd4bf; --acc-l:#5eead4; --acc-xl:#ccfbf1; --acc-ink:#032622;
+  --bad:#f87171; --bad-l:#fca5a5; --warn:#fbbf24;
+  --hd:"Space Grotesk",Inter,system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--sec);color:var(--text);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
-.wrap{padding:12px 12px 90px;max-width:640px;margin:0 auto}
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 4px 12px}
-.top h1{font-size:20px;font-weight:600;margin:0}
-.chip{font-size:12px;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--link);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
-.card{background:var(--bg);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none}
-.head .em{font-size:20px;width:26px;text-align:center}
-.head .tt{flex:1;min-width:0}
-.head .t{font-weight:600}
-.head .s{font-size:12.5px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.head .chev{color:var(--hint);transition:transform .2s}
-.card.open .chev{transform:rotate(90deg)}
-.body{display:none;border-top:1px solid var(--sep)}
-.card.open .body{display:block}
-.desc{font-size:12.5px;color:var(--hint);padding:8px 14px 2px}
-.row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--sep);position:relative}
+html,body{overflow-x:hidden}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.38 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:560px;margin:0 auto;padding:18px 16px 170px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top .tt{flex:1;min-width:0}
+.h1{font-family:var(--hd);font-size:27px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
+.st{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--hint);margin-top:3px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);display:inline-block}
+.dot.busy{background:var(--warn)}
+.pill{position:relative;height:38px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:#99f6e4;padding:0 13px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;max-width:48%}
+.pill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill select{position:absolute;inset:0;opacity:0;width:100%;font-size:16px}
+.iconbtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hero{position:relative;border-radius:26px;border:1px solid #16312e;background:#070b0b;overflow:hidden;padding:18px;display:flex;flex-direction:column;gap:14px;margin-bottom:12px}
+.hero .glow{position:absolute;inset:0;background-image:radial-gradient(ellipse 55% 60% at 85% 0%,rgba(45,212,191,.45),transparent 70%)}
+.hero .dots{position:absolute;inset:0;background-image:radial-gradient(circle,transparent 1px,#070b0b 1.6px);background-size:5px 5px}
+.hero>*:not(.glow):not(.dots){position:relative}
+.lbl{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--acc-l)}
+.big{font-family:var(--hd);font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.5);color:var(--hint);font-size:12.5px;white-space:nowrap}
+.chip.on{border-color:var(--acc);background:rgba(45,212,191,.14);color:var(--acc-xl);font-weight:600}
+.vsep{width:1px;background:var(--line);align-self:stretch}
+.cta{height:52px;border-radius:16px;border:0;background:var(--acc);color:var(--acc-ink);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.cta.ghost{background:var(--card);border:1px solid var(--line);color:#99f6e4;font-weight:600;font-size:14.5px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.tile{text-align:left;border-radius:18px;border:1px solid var(--line);background:var(--card);padding:12px;display:flex;flex-direction:column;gap:3px}
+.tile .a{font-size:11.5px;color:var(--hint)}
+.tile .b{font-family:var(--hd);font-size:24px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .c{font-size:11.5px;color:var(--acc-l)}
+.tile.bad .b{color:var(--bad-l)}
+.list{border-radius:20px;border:1px solid var(--line);background:var(--card);overflow:hidden;margin-bottom:12px}
+.li{display:flex;align-items:center;gap:12px;padding:13px 14px;border:0;border-bottom:1px solid var(--line2);background:none;width:100%;text-align:left}
+.li:last-child{border-bottom:0}
+.ic{width:36px;height:36px;border-radius:11px;background:var(--chip);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--acc-l)}
+.li .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.li .t b{font-size:14.5px;font-weight:600}
+.li .t span{font-size:12px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{color:var(--mute)}
+.sec{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--dim);margin:16px 4px 8px;display:flex;justify-content:space-between}
+.sec i{font-style:normal;font-weight:500;letter-spacing:0;color:var(--acc-l)}
+.sdesc{font-size:12.5px;color:var(--hint);margin:-4px 4px 8px}
+.subtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 4px;padding:0 16px 4px}
+.subtabs::-webkit-scrollbar{display:none}
+.card{border-radius:22px;border:1px solid var(--line);background:var(--card);overflow:hidden}
+.row{position:relative;padding:14px 16px;border-bottom:1px solid var(--line2)}
 .row:last-child{border-bottom:0}
-.row.ch::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--accent)}
-.lab{flex:1;min-width:0}
-.lab .l{font-size:15px}
-.lab .h{font-size:12px;color:var(--hint)}
-.inp{display:flex;align-items:center;gap:4px;flex-shrink:0}
-.inp input{width:84px;padding:7px 8px;border-radius:10px;border:1px solid var(--sep);background:var(--sec);color:var(--text);font-size:15px;text-align:right;outline:none}
-.inp input:focus{border-color:var(--accent)}
-.inp input::placeholder{color:var(--hint)}
-.u{font-size:12.5px;color:var(--hint);min-width:22px}
-.sw{position:relative;width:48px;height:28px;flex-shrink:0}
+.row.ch::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--acc)}
+.rh{display:flex;align-items:center;gap:12px}
+.rl{flex:1;min-width:0}
+.rl b{display:block;font-size:15px;font-weight:700}
+.rl span{display:block;font-size:12px;color:var(--hint);margin-top:1px}
+.was{font-size:12px;color:var(--acc-l);margin-top:6px}
+.warn{font-size:12px;color:var(--warn);margin-top:6px}
+.warn.bad{color:var(--bad-l)}
+.fld{height:44px;min-width:0;border-radius:13px;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:6px;font-size:12px;color:var(--dim);white-space:nowrap}
+.fld:focus-within{border-color:var(--acc)}
+.fld.err{border-color:var(--bad)}
+.fld input{flex:1;min-width:0;border:0;background:none;color:var(--text);font-size:15px;font-weight:600;text-align:right;outline:none;padding:0}
+.fld input::placeholder{color:#55625f;font-weight:400}
+.one{width:112px;flex-shrink:0}
+.two{display:flex;align-items:center;gap:8px;margin-top:10px}
+.two .fld{flex:1 1 0}
+.two .dash{color:var(--mute)}
+.bigv{font-family:var(--hd);font-size:20px;font-weight:700;color:var(--acc-l);white-space:nowrap}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:none;margin:10px 0 2px}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--acc) 0 var(--p,0%),#1a2423 var(--p,0%) 100%)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:#1a2423}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-9px;border-radius:50%;background:#fff;border:4px solid var(--acc)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:4px solid var(--acc)}
+.seg{display:flex;padding:3px;gap:3px;border-radius:13px;background:var(--card2);border:1px solid var(--line);margin-top:10px}
+.seg button{flex:1;height:36px;border-radius:10px;border:0;background:none;color:var(--hint);font-size:13px;white-space:nowrap}
+.seg button.on{background:var(--chip);color:var(--acc-xl);font-weight:700}
+.sw{position:relative;width:50px;height:30px;flex-shrink:0}
 .sw input{opacity:0;width:0;height:0;position:absolute}
-.sw span{position:absolute;inset:0;border-radius:999px;background:color-mix(in srgb,var(--hint) 45%,transparent);transition:.2s}
-.sw span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
-.sw input:checked+span{background:var(--accent)}
+.sw span{position:absolute;inset:0;border-radius:999px;background:#1d2a2a;transition:background .2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw input:checked+span{background:var(--acc)}
 .sw input:checked+span::after{transform:translateX(20px)}
-.swl{font-size:12px;color:var(--hint);margin-right:2px}
-.bar{display:flex;gap:8px;justify-content:center;margin:6px 0 4px}
-.lnk{background:none;border:0;color:var(--link);font-size:14px;padding:8px;cursor:pointer}
-.err{padding:30px 16px;text-align:center;color:var(--hint)}
-.fb{position:fixed;left:12px;right:12px;bottom:12px;padding:14px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-text);font-size:16px;font-weight:600;display:none}
+.swt{font-size:12.5px;color:var(--hint)}
+.qk{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pc{padding:14px 16px;border-bottom:1px solid var(--line2)}
+.pc:last-child{border-bottom:0}
+.pc .pt{display:flex;align-items:center;gap:8px}
+.pc .nm{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--acc);color:var(--acc-xl);background:rgba(45,212,191,.12);white-space:nowrap}
+.badge.del{border-color:var(--bad);color:var(--bad-l);background:rgba(248,113,113,.1)}
+.pc .sm{font-size:12.5px;color:var(--hint);margin-top:3px}
+.acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.btn{height:36px;border-radius:11px;padding:0 13px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:13px;font-weight:600}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.red{border-color:#3d2422;color:var(--bad-l);background:#150c0b}
+.ti{width:100%;height:44px;border-radius:13px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:15px;padding:0 12px;outline:none}
+.ti:focus{border-color:var(--acc)}
+.irow{display:flex;gap:8px;align-items:center;width:100%}
+.ferr{font-size:12.5px;color:var(--bad-l);margin-top:6px}
+.empty{padding:60px 18px;text-align:center;color:var(--hint)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none}
+.dock>*{pointer-events:auto}
+.dockin{max-width:560px;margin:0 auto;padding:0 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.abar{display:none;gap:8px}
+.abar.on{display:flex}
+.abar .cta{height:50px;white-space:nowrap;font-size:15px}
+.nav{height:62px;border-radius:22px;border:1px solid var(--line);background:rgba(11,17,17,.96);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;padding:5px}
+.nav button{position:relative;height:50px;border-radius:17px;border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px}
+.nav button.on{background:var(--chip);color:var(--acc-l);font-weight:600}
+.nav .n{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;padding:0 4px;background:var(--acc);color:var(--acc-ink);font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
+.sheet{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sh{background:#0a0f0f;border:1px solid var(--line);border-bottom:0;width:100%;max-width:560px;max-height:84vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.sh h2{font-family:var(--hd);font-size:21px;margin:0 0 4px}
+.sh .d{font-size:12.5px;color:var(--hint);margin-bottom:12px}
+.ci{display:flex;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line2);font-size:14px}
+.ci:last-child{border-bottom:0}
+.ci .o{color:var(--dim);text-decoration:line-through;margin-right:6px}
+.ci .n{color:var(--acc-l);font-weight:600}
+.shb{display:flex;gap:8px;margin-top:14px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top"><h1>⚙️ Фильтры</h1><span class="chip" id="preset"></span></div>
-  <div id="list"></div>
-  <div class="bar"><button class="lnk" id="openall">Развернуть всё</button><button class="lnk" id="undo" style="display:none">Отменить изменения</button></div>
-</div>
-<button class="fb" id="fallback">Сохранить</button>
+<div class="app" id="app"></div>
+<div class="dock"><div class="dockin">
+  <div class="abar" id="abar"><button class="cta ghost" id="bfind" style="width:auto;padding:0 16px">Найти токены</button><button class="cta" id="bsave"></button></div>
+  <nav class="nav" id="nav"></nav>
+</div></div>
+<div class="sheet" id="sheet"><div class="sh" id="sh"></div></div>
 <script>
-const SCHEMA = [{"id": "profit", "e": "📈", "t": "Прибыль", "d": "насколько он прибыльный за период", "items": [{"k": "min_pnl_usd", "l": "PnL от", "h": "заработал за период, $", "t": "num", "u": "$", "e": "нет"}, {"k": "max_pnl_usd", "l": "PnL до", "h": "отсечь китов", "t": "num", "u": "$", "e": "нет"}, {"k": "min_winrate_pct", "l": "WR от", "h": "доля прибыльных токенов", "t": "num", "u": "%", "e": "нет"}, {"k": "max_winrate_pct", "l": "WR до", "h": "100% винрейт часто = дев/бот", "t": "num", "u": "%", "e": "нет"}, {"k": "min_median_roi_pct", "l": "Мед. ROI от", "h": "обычная сделка в плюсе, а не только редкие иксы", "t": "num", "u": "%", "e": "нет"}, {"k": "max_median_roi_pct", "l": "Мед. ROI до", "h": "", "t": "num", "u": "%", "e": "нет"}, {"k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "t": "num", "u": "%", "e": "нет"}, {"k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "t": "num", "u": "%", "e": "нет"}]}, {"id": "activity", "e": "🔁", "t": "Активность", "d": "сколько и как часто торгует", "items": [{"k": "min_tokens_traded", "l": "Токенов от", "h": "меньше — ничего не понять", "t": "num", "u": "", "e": "нет"}, {"k": "max_tokens_traded", "l": "Токенов до", "h": "больше — спамер/бот", "t": "num", "u": "", "e": "нет"}, {"k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "t": "num", "u": "$", "e": "нет"}, {"k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "t": "num", "u": "$", "e": "нет"}, {"k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "t": "num", "u": "", "e": "нет"}]}, {"id": "wallet", "e": "👛", "t": "Кошелёк", "d": "сам кошелёк и размер его входов", "items": [{"k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "t": "num", "u": "дн", "e": "нет"}, {"k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "t": "num", "u": "SOL/BNB", "e": "нет"}, {"k": "min_median_buy_usd", "l": "Медиана от", "h": "обычный размер входа", "t": "num", "u": "$", "e": "нет"}, {"k": "max_median_buy_usd", "l": "Медиана до", "h": "", "t": "num", "u": "$", "e": "нет"}]}, {"id": "style", "e": "⏱", "t": "Стиль", "d": "как долго держит и продаёт ли", "items": [{"k": "min_hold_min", "l": "Холд от", "h": "до первой продажи", "t": "num", "u": "мин", "e": "нет"}, {"k": "max_hold_min", "l": "Холд до", "h": "", "t": "num", "u": "мин", "e": "нет"}, {"k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "t": "num", "u": "%", "e": "нет"}]}, {"id": "scam", "e": "🛡", "t": "Скам", "d": "девы, бандлы, раггеры, спам", "items": [{"k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет", "t": "toggle", "u": "", "e": "нет"}, {"k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа", "t": "toggle", "u": "", "e": "нет"}, {"k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "t": "num", "u": "%", "e": "нет"}, {"k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "t": "num", "u": "%", "e": "нет"}, {"k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "t": "num", "u": "%", "e": "нет"}]}, {"id": "cc", "e": "🎯", "t": "Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "items": [{"k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия", "t": "toggle", "u": "", "e": "нет"}, {"k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "t": "num", "u": "$", "e": "любая"}, {"k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "t": "num", "u": "мин", "e": "любой"}, {"k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "t": "num", "u": "SOL/BNB", "e": "любая"}, {"k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку", "t": "toggle", "u": "", "e": "нет"}, {"k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "t": "num", "u": "", "e": "нет"}, {"k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "t": "num", "u": "%", "e": "нет"}]}, {"id": "collect", "e": "📥", "t": "Сбор", "d": "откуда берём кошельки", "items": [{"k": "traders_per_token", "l": "Покуп./токен", "h": "сколько покупателей брать с токена", "t": "num", "u": "", "e": "нет"}, {"k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "t": "toggle", "u": "", "e": "нет", "on": "по GMGN", "off": "по истории"}]}];
+const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL/BNB", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL/BNB", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "num", "k": "traders_per_token", "l": "Покуп./токен", "h": "сколько покупателей брать с токена", "u": "", "e": "нет"}, {"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «🧠 Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "на SOL обычно $0.1–0.3", "u": "$", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
 const tg = window.Telegram && window.Telegram.WebApp;
-let base = null, cur = {};
+const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
+const SLIDERS = {min_winrate_pct: [30, 40, 50, 60]};
+const IC = {
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" stroke-linejoin="round"/>',
+  filt: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" stroke-linecap="round"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  layers: '<path d="M12 3l9 5-9 5-9-5 9-5z" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" stroke-linejoin="round"/>',
+  more: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4" stroke-linecap="round"/>',
+  chart: '<path d="M3 17l5-5 4 4 8-8" stroke-linecap="round"/>',
+  grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
+  coins: '<circle cx="9" cy="9" r="5"/><path d="M14.5 6.5A5 5 0 1 1 9 18" stroke-linecap="round"/>',
+  back: '<path d="M15 5l-7 7 7 7" stroke-linecap="round"/>',
+};
+const svg = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${IC[n]}</svg>`;
+let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, saveAsName = "";
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function decode(h){
-  try{
-    h = h.replace(/^#/, "").replace(/-/g, "+").replace(/_/g, "/");
-    while (h.length % 4) h += "=";
-    const bin = atob(h), bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    return JSON.parse(new TextDecoder().decode(bytes));
-  }catch(e){ return null; }
-}
-const fmt = v => { const n = Number(v); return Number.isInteger(n) ? n.toLocaleString("ru-RU") : String(+n.toFixed(4)); };
-function valText(it, v){
-  if (it.t === "toggle") return it.on ? (v ? it.on : it.off) : (v ? "вкл" : "выкл");
-  if (!v) return it.e;
-  return (it.u === "$" ? "$" + fmt(v) : fmt(v) + (it.u ? (it.u === "%" ? "%" : " " + it.u) : ""));
-}
-function changed(){ return Object.keys(cur).filter(k => Number(cur[k]) !== Number(base[k])); }
-function summary(sec){
-  const on = sec.items.filter(it => it.t === "num" ? Number(cur[it.k]) : false);
-  const parts = sec.items.filter(it => (it.t === "num" && Number(cur[it.k])) || it.t === "toggle").slice(0, 4)
-    .map(it => it.l + " " + valText(it, cur[it.k]));
-  return parts.join(" · ") || "без ограничений";
-}
-function render(){
-  const list = document.getElementById("list"); list.innerHTML = "";
-  SCHEMA.forEach(sec => {
-    const items = sec.items.filter(it => it.k in base);
-    if (!items.length) return;
-    const card = document.createElement("div"); card.className = "card"; card.dataset.id = sec.id;
-    card.innerHTML = `<div class="head"><div class="em">${sec.e}</div><div class="tt"><div class="t">${sec.t}</div><div class="s"></div></div><div class="chev">›</div></div><div class="body"><div class="desc">${sec.d}</div></div>`;
-    const body = card.querySelector(".body");
-    items.forEach(it => {
-      const row = document.createElement("div"); row.className = "row"; row.dataset.k = it.k;
-      let ctl;
-      if (it.t === "toggle"){
-        ctl = `<div class="inp">${it.on ? `<span class="swl"></span>` : ""}<label class="sw"><input type="checkbox"><span></span></label></div>`;
-      } else {
-        ctl = `<div class="inp">${it.u === "$" ? '<span class="u" style="min-width:0">$</span>' : ""}<input type="text" inputmode="decimal" placeholder="${it.e}">${it.u && it.u !== "$" ? `<span class="u">${it.u}</span>` : ""}</div>`;
-      }
-      row.innerHTML = `<div class="lab"><div class="l">${it.l}</div>${it.h ? `<div class="h">${it.h}</div>` : ""}</div>${ctl}`;
-      const inp = row.querySelector("input");
-      if (it.t === "toggle"){
-        inp.checked = !!Number(cur[it.k]);
-        const swl = row.querySelector(".swl"); if (swl) swl.textContent = valText(it, cur[it.k]);
-        inp.addEventListener("change", () => { cur[it.k] = inp.checked ? 1 : 0; if (swl) swl.textContent = valText(it, cur[it.k]); tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); update(); });
-      } else {
-        inp.value = Number(cur[it.k]) ? String(cur[it.k]) : "";
-        inp.addEventListener("input", () => {
-          const s = inp.value.replace(",", ".").replace(/[^\d.]/g, "");
-          if (s !== inp.value.replace(",", ".")) inp.value = s;
-          cur[it.k] = s === "" || isNaN(Number(s)) ? 0 : Number(s); update();
-        });
-      }
-      body.appendChild(row);
-    });
-    card.querySelector(".head").addEventListener("click", () => card.classList.toggle("open"));
-    list.appendChild(card);
-  });
-  update();
-}
-function update(){
-  const ch = changed();
-  document.querySelectorAll(".row").forEach(r => r.classList.toggle("ch", ch.includes(r.dataset.k)));
-  document.querySelectorAll(".card").forEach(c => {
-    const sec = SCHEMA.find(s => s.id === c.dataset.id);
-    c.querySelector(".s").textContent = summary(sec);
-  });
-  document.getElementById("undo").style.display = ch.length ? "" : "none";
-  const label = ch.length ? `Сохранить изменения (${ch.length})` : "";
-  if (tg && tg.initData !== undefined && tg.MainButton){
-    if (ch.length){ tg.MainButton.setText(label); tg.MainButton.show(); } else tg.MainButton.hide();
-  } else {
-    const fb = document.getElementById("fallback"); fb.textContent = label; fb.style.display = ch.length ? "block" : "none";
-  }
-}
-function save(){
-  const ch = changed(); if (!ch.length) return;
-  const out = {v: 1, set: {}}; ch.forEach(k => out.set[k] = cur[k]);
-  if (tg && tg.sendData) tg.sendData(JSON.stringify(out));
-  else alert(JSON.stringify(out));
+  try{ h = h.replace(/-/g, "+").replace(/_/g, "/"); while (h.length % 4) h += "=";
+    const bin = atob(h), b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(b)); }catch(e){ return null; }
 }
 function payload(){
-  const q = new URLSearchParams(location.search).get("d");
-  if (q) return decode(q);
+  const q = new URLSearchParams(location.search).get("d"); if (q) return decode(q);
   const h = (location.hash || "").replace(/^#/, "").split(/[&?]/)[0];
   return h && !h.startsWith("tgWebApp") ? decode(h) : null;
 }
-const p = payload();
-if (!p || !p.s){
-  document.getElementById("list").innerHTML = '<div class="err">Открой это окно кнопкой «📱 Настройки» в боте.<br>Если открыл её, а видишь это — отправь боту /app и нажми новую кнопку.</div>';
-  document.getElementById("openall").style.display = "none";
-  document.getElementById("preset").style.display = "none";
-} else {
-  base = p.s; cur = Object.assign({}, base);
-  document.getElementById("preset").textContent = p.p ? "📦 " + p.p : "пресет не выбран";
-  render();
-  document.getElementById("undo").addEventListener("click", () => { cur = Object.assign({}, base); render(); });
-  document.getElementById("openall").addEventListener("click", e => {
-    const cards = [...document.querySelectorAll(".card")], open = cards.some(c => !c.classList.contains("open"));
-    cards.forEach(c => c.classList.toggle("open", open)); e.target.textContent = open ? "Свернуть всё" : "Развернуть всё";
-  });
+function norm(x){
+  if (!x) return null;
+  if (Array.isArray(x.k)){
+    const obj = a => { const o = {}; x.k.forEach((k, i) => o[k] = (a || [])[i]); return o; };
+    const ps = {}; Object.keys(x.ps || {}).forEach(n => ps[n] = obj(x.ps[n]));
+    return Object.assign({}, x, {s: obj(x.s), ps});
+  }
+  return Object.assign({ps: {}}, x);
 }
-if (tg){ tg.ready(); tg.expand(); tg.MainButton && tg.MainButton.onClick(save); }
-document.getElementById("fallback").addEventListener("click", save);
+const num = v => Number(v) || 0;
+const fmtN = v => { const n = num(v); return Number.isInteger(n) ? n.toLocaleString("ru-RU") : String(+n.toFixed(4)); };
+function money(v){ const n = num(v); if (!n) return null; if (n >= 1e6) return "$" + +(n/1e6).toFixed(1) + "M"; if (n >= 1e3) return "$" + +(n/1e3).toFixed(1) + "K"; return "$" + fmtN(n); }
+
+const T = id => SCHEMA.find(t => t.id === id) || {groups: []};
+const FILTER_GROUPS = T("filters").groups;
+const MORE_GROUPS = T("search").groups.slice(1).concat(T("strat").groups, T("excel").groups);
+const ROWS = [];
+T("search").groups.forEach((g, i) => g.rows.forEach(r => ROWS.push(Object.assign({scr: i === 0 ? "home" : "more"}, r))));
+FILTER_GROUPS.forEach(g => g.rows.forEach(r => ROWS.push(Object.assign({scr: "filters"}, r))));
+T("strat").groups.concat(T("excel").groups).forEach(g => g.rows.forEach(r => ROWS.push(Object.assign({scr: "more"}, r))));
+const findRow = k => ROWS.find(r => r.k === k || r.k2 === k);
+function optsOf(r){
+  if (r.opts === "chains") return (P.ch || []).map(([v, l]) => [v, l]);
+  if (r.opts === "periods") return (P.pr || []).map(p => [p, p.replace("h", "ч")]);
+  return r.opts;
+}
+function valText(k, v){
+  const r = findRow(k); if (!r) return String(v);
+  if (r.t === "toggle") return r.on ? (num(v) ? r.on : r.off) : (num(v) ? "вкл" : "выкл");
+  if (r.t === "seg"){ const o = optsOf(r).find(o => String(o[0]) === String(v)); return o ? o[1] : String(v); }
+  if (!num(v)) return r.e || "нет";
+  if (r.u === "$") return money(v);
+  return fmtN(v) + (r.u ? (r.u === "%" ? "%" : " " + r.u) : "");
+}
+const labelOf = k => { const r = findRow(k); if (!r) return k; if (r.t === "range") return r.l + (k === r.k ? " от" : " до"); return r.l; };
+const changedKeys = () => Object.keys(cur).filter(k => String(cur[k]) !== String(base[k]));
+const presetChanged = () => sel !== (P.p || "");
+function changeList(){
+  const out = [];
+  ops.forEach(o => out.push(["Удалить пресет", o[1], null]));
+  Object.keys(renames).forEach(o => out.push(["Переименовать", o, renames[o]]));
+  if (presetChanged()) out.push(["Пресет", P.p || "без пресета", sel ? (renames[sel] || sel) : "без пресета"]);
+  changedKeys().forEach(k => out.push([labelOf(k), valText(k, base[k]), valText(k, cur[k])]));
+  if (saveAsName) out.push(["Новый пресет", null, saveAsName]);
+  return out;
+}
+function scrCount(s){
+  return changedKeys().filter(k => (findRow(k) || {}).scr === s).length
+    + (s === "presets" ? ops.length + Object.keys(renames).length + (presetChanged() ? 1 : 0) + (saveAsName ? 1 : 0) : 0);
+}
+const groupCount = g => changedKeys().filter(k => g.rows.some(r => r.k === k || r.k2 === k)).length;
+const activeIn = g => g.rows.filter(r => r.t === "range" ? (num(cur[r.k]) || num(cur[r.k2])) : r.t === "num" ? num(cur[r.k]) : false).length;
+
+function warnings(r){
+  const w = [];
+  if (r.t === "range"){ const a = num(cur[r.k]), b = num(cur[r.k2]); if (a && b && a > b) w.push(["bad", "«от» больше «до» — никто не пройдёт"]); }
+  if (r.k === "strat_gas_usd" && num(cur[r.k]) > 1) w.push(["bad", "Больше $1 — на SOL обычно $0.1–0.3, стратегии будут выглядеть хуже"]);
+  if (r.k === "min_winrate_pct" && num(cur[r.k]) >= 85) w.push(["", "Очень жёстко — пройдут единицы"]);
+  if (r.k === "min_pnl_usd" && num(cur[r.k]) >= 5000) w.push(["", "Очень жёстко — останутся только киты"]);
+  if (r.k === "min_tokens_traded" && num(cur.max_tokens_traded) && num(cur.max_tokens_traded) < 4) w.push(["", "Меньше 4 токенов — по кошельку ничего не понять"]);
+  if (r.k === "excel_cards_max" && num(cur[r.k]) > 300) w.push(["", "Больше 300 досье — Excel будет собираться долго"]);
+  if (r.k === "sol_pumpfun" && !num(cur.sol_pumpfun) && !num(cur.sol_meteora) && ["sol", "all"].includes(cur["m.chain"])) w.push(["bad", "На Solana не выбрана ни одна площадка — токенов не будет"]);
+  if (r.k === "cc_enabled" && !num(cur.cc_enabled)) w.push(["", "Выключено — кошельки оцениваются по всем сделкам, а не по тем, что ты бы скопировал"]);
+  return w;
+}
+const warnHTML = r => warnings(r).map(([c, t]) => `<div class="warn ${c}">${esc(t)}</div>`).join("");
+function wasLine(r){
+  const ks = r.t === "range" ? [r.k, r.k2] : [r.k];
+  if (!ks.some(k => String(cur[k]) !== String(base[k]))) return "";
+  return `<div class="was">было: ${esc(r.t === "range" ? valText(r.k, base[r.k]) + " – " + valText(r.k2, base[r.k2]) : valText(r.k, base[r.k]))}</div>`;
+}
+function fld(k, u, ph, pfx, cls){
+  const v = num(cur[k]) ? String(cur[k]) : "";
+  const bad = k === "strat_gas_usd" && num(cur[k]) > 1;
+  return `<label class="fld ${cls || ""}${bad ? " err" : ""}">${pfx ? esc(pfx) : ""}${u === "$" ? "$" : ""}<input data-k="${k}" type="text" inputmode="decimal" placeholder="${esc(ph || "нет")}" value="${esc(v)}" aria-label="${esc(labelOf(k))}">${u && u !== "$" ? esc(u) : ""}</label>`;
+}
+function rowHTML(r){
+  const ch = (r.t === "range" ? [r.k, r.k2] : [r.k]).some(k => String(cur[k]) !== String(base[k]));
+  const head = (right) => `<div class="rh"><div class="rl"><b>${esc(r.l)}</b>${r.h ? `<span>${esc(r.h)}</span>` : ""}</div>${right || ""}</div>`;
+  let body = "";
+  if (r.t === "num"){
+    body = head(fld(r.k, r.u, r.e, "", "one"));
+    if (r.quick) body += `<div class="qk">${r.quick.map(q => `<button class="chip${num(cur[r.k]) === q ? " on" : ""}" data-q="${r.k}" data-v="${q}">${q || "выкл"}</button>`).join("")}</div>`;
+  } else if (r.t === "range"){
+    const sl = SLIDERS[r.k];
+    body = head(sl ? `<span class="bigv" data-big="${r.k}">${num(cur[r.k]) ? "от " + fmtN(cur[r.k]) + "%" : "любой"}</span>` : "");
+    if (sl) body += `<input type="range" min="0" max="100" step="5" value="${num(cur[r.k])}" data-sl="${r.k}" style="--p:${num(cur[r.k])}%" aria-label="${esc(r.l)} от">
+      <div class="qk">${sl.map(q => `<button class="chip${num(cur[r.k]) === q ? " on" : ""}" data-q="${r.k}" data-v="${q}">${q}%</button>`).join("")}</div>`;
+    body += `<div class="two">${fld(r.k, r.u, r.e, "от ")}<span class="dash">–</span>${fld(r.k2, r.u, r.e, "до ")}</div>`;
+  } else if (r.t === "toggle"){
+    body = head(`${r.on ? `<span class="swt" data-swt="${r.k}">${esc(num(cur[r.k]) ? r.on : r.off)}</span>` : ""}<label class="sw"><input type="checkbox" data-k="${r.k}"${num(cur[r.k]) ? " checked" : ""} aria-label="${esc(r.l)}"><span></span></label>`);
+  } else if (r.t === "seg"){
+    body = head("") + `<div class="seg">${optsOf(r).map(([v, l]) => `<button data-s="${r.k}" data-v="${esc(v)}" class="${String(cur[r.k]) === String(v) ? "on" : ""}">${esc(l)}</button>`).join("")}</div>`;
+  }
+  return `<div class="row${ch ? " ch" : ""}" data-row="${r.k}">${body}<div data-wx>${wasLine(r)}</div><div data-wr>${warnHTML(r)}</div></div>`;
+}
+const groupHTML = (g, cnt) => `<div class="sec">${esc(g.t.replace(/^\S+\s/, m => /[A-Za-zА-Яа-я]/.test(m) ? m : "").toUpperCase())}${cnt ? `<i>${cnt}</i>` : ""}</div>${g.d ? `<div class="sdesc">${esc(g.d)}</div>` : ""}<div class="card">${g.rows.map(rowHTML).join("")}</div>`;
+
+function topHTML(title, back){
+  const when = P.t ? new Date(P.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
+  return `<div class="top">${back ? `<button class="iconbtn" data-go="home" aria-label="Назад">${svg("back")}</button>` : ""}
+    <div class="tt"><div class="h1">${esc(title)}</div>${back ? "" : `<div class="st"><span class="dot${P.busy ? " busy" : ""}"></span>${P.busy ? "бот сейчас парсит" : "бот свободен"}${when ? " · данные на " + when : ""}</div>`}</div>
+    <label class="pill"><span id="pname">${esc(sel ? (renames[sel] || sel) : "без пресета")}</span>▾<select id="psel" aria-label="Пресет"><option value="">без пресета</option>${Object.keys(P.ps || {}).map(n => `<option value="${esc(n)}"${n === sel ? " selected" : ""}>${esc(renames[n] || n)}</option>`).join("")}</select></label></div>`;
+}
+function homeHTML(){
+  const chains = optsOf(findRow("m.chain")), periods = optsOf(findRow("m.period"));
+  const cName = {sol: "Solana", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium", all: "Все сети"}[cur["m.chain"]] || cur["m.chain"];
+  const nf = FILTER_GROUPS.reduce((a, g) => a + activeIn(g), 0);
+  const gas = num(cur.strat_gas_usd);
+  const plat = [num(cur.sol_pumpfun) ? "Pump.fun" : "", num(cur.sol_meteora) ? (num(cur.sol_meteora) === 2 ? "Meteora etchy" : "Meteora") : ""].filter(Boolean).join(" + ") || "ни одной";
+  return topHTML("Настройки") + `
+  <div class="hero"><div class="glow"></div><div class="dots"></div>
+    <div><div class="lbl">ГДЕ ИЩЕМ</div><div class="big">${esc(cName)} · ${esc(String(cur["m.period"]).replace("h", "ч"))}</div></div>
+    <div class="chips">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}<span class="vsep"></span>${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div>
+    <button class="cta" data-act="find">${svg("search")}Найти токены</button>
+  </div>
+  <div class="tiles">
+    <button class="tile" data-go="filters"><span class="a">Фильтры</span><span class="b">${nf}</span><span class="c">активно ›</span></button>
+    <button class="tile${gas > 1 ? " bad" : ""}" data-go="more" data-to="strat_gas_usd"><span class="a">Газ</span><span class="b">$${fmtN(gas)}</span><span class="c">издержки ›</span></button>
+    <button class="tile" data-go="more" data-to="excel_cards_max"><span class="a">Досье</span><span class="b">${num(cur.excel_cards_max) || "выкл"}</span><span class="c">Excel ›</span></button>
+  </div>
+  <div class="list">
+    <button class="li" data-go="presets"><span class="ic">${svg("layers")}</span><span class="t"><b>Пресеты</b><span>${Object.keys(P.ps || {}).length} сохранено · ${esc(sel ? "выбран " + (renames[sel] || sel) : "пресет не выбран")}</span></span><span class="chev">›</span></button>
+    <button class="li" data-go="more" data-to="sol_pumpfun"><span class="ic">${svg("coins")}</span><span class="t"><b>Площадки и капа токенов</b><span>${esc(plat)} · капа ${esc(valText("min_token_market_cap", cur.min_token_market_cap))}–${esc(valText("max_token_market_cap", cur.max_token_market_cap))}</span></span><span class="chev">›</span></button>
+    <button class="li" data-go="more" data-to="strat_slip_in_pct"><span class="ic">${svg("chart")}</span><span class="t"><b>Поиск стратегии</b><span>издержки копировщика</span></span><span class="chev">›</span></button>
+  </div>`;
+}
+function filtersHTML(){
+  if (!fsub) fsub = FILTER_GROUPS[0] && FILTER_GROUPS[0].t;
+  const g = FILTER_GROUPS.find(x => x.t === fsub) || FILTER_GROUPS[0];
+  const name = t => t.replace(/^\S+\s/, "");
+  return topHTML("Фильтры", true) + `<div class="subtabs">${FILTER_GROUPS.map(x => { const c = groupCount(x);
+      return `<button class="chip${x.t === g.t ? " on" : ""}" data-sub="${esc(x.t)}">${esc(name(x.t))}${c ? ` · ${c}` : ""}</button>`; }).join("")}</div>` + groupHTML(g, activeIn(g) ? activeIn(g) + " активно" : "");
+}
+function moreHTML(){ return topHTML("Ещё", true) + MORE_GROUPS.map(g => groupHTML(g, "")).join(""); }
+function presetSummary(v){
+  const parts = [];
+  if (num(v.min_pnl_usd)) parts.push("PnL от " + money(v.min_pnl_usd));
+  if (num(v.min_winrate_pct)) parts.push("WR от " + fmtN(v.min_winrate_pct) + "%");
+  if (num(v.min_tokens_traded) || num(v.max_tokens_traded)) parts.push("токенов " + (fmtN(v.min_tokens_traded) || "0") + "–" + (num(v.max_tokens_traded) ? fmtN(v.max_tokens_traded) : "∞"));
+  if (num(v.cc_max_mc)) parts.push("капа до " + money(v.cc_max_mc));
+  return parts.join(" · ") || "без ограничений";
+}
+function presetsHTML(){
+  const names = Object.keys(P.ps || {});
+  let h = topHTML("Пресеты", true) + `<div class="sec">СОХРАНИТЬ ТЕКУЩИЕ КАК НОВЫЙ</div><div class="card"><div class="pc">
+    <input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета">
+    <div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div></div></div>
+    <div class="sec">МОИ ПРЕСЕТЫ<i>${names.length}</i></div><div class="card">`;
+  if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — сохрани текущие настройки как новый.</div></div>`;
+  names.forEach(n => {
+    const del = ops.some(o => o[0] === "delete" && o[1] === n), ren = renames[n], isCur = sel === n;
+    h += `<div class="pc" data-p="${esc(n)}"><div class="pt"><div class="nm"${del ? ' style="text-decoration:line-through;color:var(--dim)"' : ""}>${esc(ren || n)}</div>
+      ${isCur ? '<span class="badge">выбран</span>' : ""}${n === P.p && !isCur ? '<span class="badge">сейчас в боте</span>' : ""}${del ? '<span class="badge del">удалится</span>' : ""}${ren ? '<span class="badge">новое имя</span>' : ""}</div>
+      <div class="sm">${esc(presetSummary(P.ps[n]))}</div>
+      <div class="acts" data-acts="${esc(n)}">${del ? `<button class="btn" data-a="undel">Не удалять</button>`
+        : `${isCur ? "" : `<button class="btn pri" data-a="use">Выбрать</button>`}<button class="btn" data-a="ren">Переименовать</button><button class="btn red" data-a="del">Удалить</button>`}</div></div>`;
+  });
+  return h + `</div>`;
+}
+function navHTML(){
+  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
+  return it.map(([s, i, l]) => { const n = scrCount(s);
+    return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
+}
+function render(keepScroll){
+  const y = window.scrollY;
+  const html = screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
+  document.getElementById("app").innerHTML = html;
+  const ps = document.getElementById("psel"); if (ps) ps.onchange = () => pickPreset(ps.value);
+  updateDock();
+  if (keepScroll) window.scrollTo(0, y);
+}
+function refreshRow(k){
+  const r = findRow(k);
+  if (screen === "home"){ render(true); return; }
+  const el = r && document.querySelector(`[data-row="${r.k}"]`);
+  if (el){
+    el.classList.toggle("ch", (r.t === "range" ? [r.k, r.k2] : [r.k]).some(x => String(cur[x]) !== String(base[x])));
+    el.querySelector("[data-wr]").innerHTML = warnHTML(r);
+    el.querySelector("[data-wx]").innerHTML = wasLine(r);
+    const big = el.querySelector(`[data-big="${r.k}"]`); if (big) big.textContent = num(cur[r.k]) ? "от " + fmtN(cur[r.k]) + "%" : "любой";
+    const sl = el.querySelector(`[data-sl="${r.k}"]`); if (sl && document.activeElement !== sl){ sl.value = num(cur[r.k]); } if (sl) sl.style.setProperty("--p", num(cur[r.k]) + "%");
+    el.querySelectorAll(`[data-q="${r.k}"]`).forEach(c => c.classList.toggle("on", Number(c.dataset.v) === num(cur[r.k])));
+    const inp = el.querySelector(`input[data-k="${r.k}"]`); if (inp && document.activeElement !== inp && inp.type !== "checkbox") inp.value = num(cur[r.k]) ? String(cur[r.k]) : "";
+    const f = el.querySelector(`input[data-k="strat_gas_usd"]`); if (f) f.closest(".fld").classList.toggle("err", num(cur.strat_gas_usd) > 1);
+  }
+  const pf = document.querySelector('[data-row="sol_pumpfun"] [data-wr]'); if (pf) pf.innerHTML = warnHTML(findRow("sol_pumpfun"));
+  document.querySelectorAll("[data-sub]").forEach(b => { const g = FILTER_GROUPS.find(x => x.t === b.dataset.sub), c = groupCount(g); b.textContent = g.t.replace(/^\S+\s/, "") + (c ? ` · ${c}` : ""); });
+  updateDock();
+}
+function updateDock(){
+  const n = changeList().length;
+  document.getElementById("nav").innerHTML = navHTML();
+  const ab = document.getElementById("abar"); ab.classList.toggle("on", n > 0);
+  document.getElementById("bsave").textContent = `Сохранить (${n})`;
+  document.getElementById("app").style.paddingBottom = n ? "230px" : "170px";
+}
+function openReview(kind){
+  const list = changeList();
+  if (!list.length){ send(kind); return; }
+  review = kind;
+  document.getElementById("sh").innerHTML = `<h2>${kind === "find" ? "Сохранить и найти токены" : "Сохранить изменения"}</h2>
+    <div class="d">Проверь, что меняется${saveAsName ? ` — правки уйдут в новый пресет «${esc(saveAsName)}», старый не изменится` : sel ? ` — запишется в пресет «${esc(renames[sel] || sel)}»` : " — пресет не выбран"}.</div>
+    <div class="card">${list.map(([l, o, n]) => `<div class="ci"><span>${esc(l)}</span><span>${o !== null ? `<span class="o">${esc(o)}</span>` : ""}${n !== null ? `<span class="n">${esc(n)}</span>` : ""}</span></div>`).join("")}</div>
+    <div class="shb"><button class="cta ghost" id="cb" style="width:auto;padding:0 18px">Назад</button><button class="cta" id="cf">${kind === "find" ? "Сохранить и найти" : "Подтвердить"}</button></div>`;
+  document.getElementById("sheet").classList.add("on");
+  document.getElementById("cf").onclick = () => send(kind);
+  document.getElementById("cb").onclick = closeReview;
+  if (inTG){ tg.BackButton.show(); tg.HapticFeedback && tg.HapticFeedback.impactOccurred("light"); }
+}
+function closeReview(){ review = null; document.getElementById("sheet").classList.remove("on"); if (inTG) tg.BackButton.hide(); }
+function send(kind){
+  const out = {v: 3, preset: sel, set: {}, ops: []};
+  Object.keys(renames).forEach(o => out.ops.push(["rename", o, renames[o]]));
+  ops.forEach(o => out.ops.push(o.slice()));
+  changedKeys().forEach(k => { if (!k.startsWith("m.")) out.set[k] = cur[k]; });
+  out.m = {chain: cur["m.chain"], period: cur["m.period"]};
+  if (saveAsName) out.save_as = saveAsName;
+  if (kind === "find") out.run = "find";
+  if (inTG && tg.sendData){ tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); tg.sendData(JSON.stringify(out)); }
+  else alert(JSON.stringify(out));
+}
+function pickPreset(name){
+  sel = name;
+  const keep = {"m.chain": cur["m.chain"], "m.period": cur["m.period"]};
+  base = Object.assign({}, start, name && P.ps[name] ? P.ps[name] : {}, {"m.chain": start["m.chain"], "m.period": start["m.period"]});
+  cur = Object.assign({}, base, keep);
+  render(true);
+}
+function go(s, to){
+  screen = s; render(); window.scrollTo(0, 0);
+  if (to){ const el = document.querySelector(`[data-row="${to}"]`); if (el) el.scrollIntoView({block: "center"}); }
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go, g.dataset.to); return; }
+  const sb = e.target.closest("[data-sub]"); if (sb){ fsub = sb.dataset.sub; render(); return; }
+  const ac = e.target.closest("[data-act]"); if (ac){ openReview("find"); return; }
+  const s = e.target.closest("[data-s]");
+  if (s){
+    const k = s.dataset.s, o = optsOf(findRow(k)).find(o => String(o[0]) === s.dataset.v);
+    cur[k] = o ? o[0] : s.dataset.v;
+    s.parentNode.querySelectorAll(`[data-s="${k}"]`).forEach(b => b.classList.toggle("on", b === s));
+    tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); refreshRow(k); return;
+  }
+  const q = e.target.closest("[data-q]"); if (q){ cur[q.dataset.q] = Number(q.dataset.v); refreshRow(q.dataset.q); return; }
+  const a = e.target.closest("[data-a]");
+  if (a){
+    const n = a.closest("[data-p]").dataset.p, act = a.dataset.a;
+    if (act === "use") pickPreset(n);
+    else if (act === "del"){ if (a.dataset.sure){ ops.push(["delete", n]); delete renames[n]; if (sel === n) pickPreset(""); else render(true); } else { a.dataset.sure = "1"; a.textContent = "Точно удалить?"; } }
+    else if (act === "undel"){ ops = ops.filter(o => !(o[0] === "delete" && o[1] === n)); render(true); }
+    else if (act === "ren"){ const box = a.closest("[data-acts]"); box.innerHTML = `<div class="irow"><input class="ti" maxlength="40" value="${esc(renames[n] || n)}" aria-label="Новое имя"><button class="btn pri" data-a="renok">OK</button></div>`; box.querySelector("input").focus(); }
+    else if (act === "renok"){
+      const v = a.parentNode.querySelector("input").value.trim();
+      const taken = Object.keys(P.ps).filter(x => x !== n).map(x => renames[x] || x);
+      if (v && v !== n && !taken.includes(v)) renames[n] = v; else delete renames[n];
+      render(true);
+    }
+  }
+});
+document.addEventListener("input", e => {
+  const i = e.target;
+  if (i.id === "saname"){
+    const v = i.value.trim(), err = document.getElementById("saerr"), taken = Object.keys(P.ps).map(x => renames[x] || x).includes(v);
+    err.style.display = taken ? "" : "none"; err.textContent = taken ? "Такой пресет уже есть — выбери другое имя" : "";
+    saveAsName = taken ? "" : v; updateDock(); return;
+  }
+  if (i.dataset && i.dataset.sl){ cur[i.dataset.sl] = Number(i.value); refreshRow(i.dataset.sl); return; }
+  const k = i.dataset && i.dataset.k; if (!k) return;
+  if (i.type === "checkbox"){
+    cur[k] = i.checked ? 1 : 0;
+    const r = findRow(k), sw = document.querySelector(`[data-swt="${k}"]`); if (r && r.on && sw) sw.textContent = i.checked ? r.on : r.off;
+    tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged();
+  } else {
+    let s = i.value.replace(",", ".").replace(/[^\d.]/g, ""); const p = s.split("."); if (p.length > 2) s = p[0] + "." + p.slice(1).join("");
+    if (s !== i.value) i.value = s;
+    cur[k] = s === "" || isNaN(Number(s)) ? 0 : Number(s);
+  }
+  refreshRow(k);
+});
+document.getElementById("bsave").onclick = () => openReview("save");
+document.getElementById("bfind").onclick = () => openReview("find");
+document.getElementById("sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeReview(); });
+
+P = norm(payload());
+if (!P || !P.s){
+  document.getElementById("app").innerHTML = '<div class="empty">Открой это окно кнопкой «📱 Настройки» в боте.<br><br>Если открыл ею, а видишь это — отправь боту /app и нажми новую кнопку.</div>';
+  document.querySelector(".dock").style.display = "none";
+} else {
+  start = Object.assign({}, P.s, {"m.chain": (P.m || {}).chain || "sol", "m.period": (P.m || {}).period || "6h"});
+  sel = P.p || ""; base = Object.assign({}, start); cur = Object.assign({}, start);
+  render();
+}
+if (tg){
+  tg.ready(); tg.expand();
+  try { tg.setHeaderColor && tg.setHeaderColor("#050607"); tg.setBackgroundColor && tg.setBackgroundColor("#050607"); } catch (e) {}
+  if (inTG) tg.BackButton.onClick(closeReview);
+}
 </script>
 </body>
 </html>
