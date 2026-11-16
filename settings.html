@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Настройки бота</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:var(--tg-theme-bg-color,#17212b);--sec:var(--tg-theme-secondary-bg-color,#0e1621);
+  --text:var(--tg-theme-text-color,#f5f5f5);--hint:var(--tg-theme-hint-color,#7f91a4);
+  --accent:var(--tg-theme-button-color,#5288c1);--accent-text:var(--tg-theme-button-text-color,#fff);
+  --link:var(--tg-theme-link-color,#6ab3f3);--sep:color-mix(in srgb,var(--hint) 22%,transparent);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sec);color:var(--text);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+.wrap{padding:12px 12px 90px;max-width:640px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 4px 12px}
+.top h1{font-size:20px;font-weight:600;margin:0}
+.chip{font-size:12px;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--link);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.card{background:var(--bg);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none}
+.head .em{font-size:20px;width:26px;text-align:center}
+.head .tt{flex:1;min-width:0}
+.head .t{font-weight:600}
+.head .s{font-size:12.5px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.head .chev{color:var(--hint);transition:transform .2s}
+.card.open .chev{transform:rotate(90deg)}
+.body{display:none;border-top:1px solid var(--sep)}
+.card.open .body{display:block}
+.desc{font-size:12.5px;color:var(--hint);padding:8px 14px 2px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--sep);position:relative}
+.row:last-child{border-bottom:0}
+.row.ch::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--accent)}
+.lab{flex:1;min-width:0}
+.lab .l{font-size:15px}
+.lab .h{font-size:12px;color:var(--hint)}
+.inp{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.inp input{width:84px;padding:7px 8px;border-radius:10px;border:1px solid var(--sep);background:var(--sec);color:var(--text);font-size:15px;text-align:right;outline:none}
+.inp input:focus{border-color:var(--accent)}
+.inp input::placeholder{color:var(--hint)}
+.u{font-size:12.5px;color:var(--hint);min-width:22px}
+.sw{position:relative;width:48px;height:28px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw span{position:absolute;inset:0;border-radius:999px;background:color-mix(in srgb,var(--hint) 45%,transparent);transition:.2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+span{background:var(--accent)}
+.sw input:checked+span::after{transform:translateX(20px)}
+.swl{font-size:12px;color:var(--hint);margin-right:2px}
+.bar{display:flex;gap:8px;justify-content:center;margin:6px 0 4px}
+.lnk{background:none;border:0;color:var(--link);font-size:14px;padding:8px;cursor:pointer}
+.err{padding:30px 16px;text-align:center;color:var(--hint)}
+.fb{position:fixed;left:12px;right:12px;bottom:12px;padding:14px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-text);font-size:16px;font-weight:600;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1>⚙️ Фильтры</h1><span class="chip" id="preset"></span></div>
+  <div id="list"></div>
+  <div class="bar"><button class="lnk" id="openall">Развернуть всё</button><button class="lnk" id="undo" style="display:none">Отменить изменения</button></div>
+</div>
+<button class="fb" id="fallback">Сохранить</button>
+<script>
+const SCHEMA = [{"id": "profit", "e": "📈", "t": "Прибыль", "d": "насколько он прибыльный за период", "items": [{"k": "min_pnl_usd", "l": "PnL от", "h": "заработал за период, $", "t": "num", "u": "$", "e": "нет"}, {"k": "max_pnl_usd", "l": "PnL до", "h": "отсечь китов", "t": "num", "u": "$", "e": "нет"}, {"k": "min_winrate_pct", "l": "WR от", "h": "доля прибыльных токенов", "t": "num", "u": "%", "e": "нет"}, {"k": "max_winrate_pct", "l": "WR до", "h": "100% винрейт часто = дев/бот", "t": "num", "u": "%", "e": "нет"}, {"k": "min_median_roi_pct", "l": "Мед. ROI от", "h": "обычная сделка в плюсе, а не только редкие иксы", "t": "num", "u": "%", "e": "нет"}, {"k": "max_median_roi_pct", "l": "Мед. ROI до", "h": "", "t": "num", "u": "%", "e": "нет"}, {"k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "t": "num", "u": "%", "e": "нет"}, {"k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "t": "num", "u": "%", "e": "нет"}]}, {"id": "activity", "e": "🔁", "t": "Активность", "d": "сколько и как часто торгует", "items": [{"k": "min_tokens_traded", "l": "Токенов от", "h": "меньше — ничего не понять", "t": "num", "u": "", "e": "нет"}, {"k": "max_tokens_traded", "l": "Токенов до", "h": "больше — спамер/бот", "t": "num", "u": "", "e": "нет"}, {"k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "t": "num", "u": "$", "e": "нет"}, {"k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "t": "num", "u": "$", "e": "нет"}, {"k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "t": "num", "u": "", "e": "нет"}]}, {"id": "wallet", "e": "👛", "t": "Кошелёк", "d": "сам кошелёк и размер его входов", "items": [{"k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "t": "num", "u": "дн", "e": "нет"}, {"k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "t": "num", "u": "SOL/BNB", "e": "нет"}, {"k": "min_median_buy_usd", "l": "Медиана от", "h": "обычный размер входа", "t": "num", "u": "$", "e": "нет"}, {"k": "max_median_buy_usd", "l": "Медиана до", "h": "", "t": "num", "u": "$", "e": "нет"}]}, {"id": "style", "e": "⏱", "t": "Стиль", "d": "как долго держит и продаёт ли", "items": [{"k": "min_hold_min", "l": "Холд от", "h": "до первой продажи", "t": "num", "u": "мин", "e": "нет"}, {"k": "max_hold_min", "l": "Холд до", "h": "", "t": "num", "u": "мин", "e": "нет"}, {"k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "t": "num", "u": "%", "e": "нет"}]}, {"id": "scam", "e": "🛡", "t": "Скам", "d": "девы, бандлы, раггеры, спам", "items": [{"k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет", "t": "toggle", "u": "", "e": "нет"}, {"k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа", "t": "toggle", "u": "", "e": "нет"}, {"k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "t": "num", "u": "%", "e": "нет"}, {"k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "t": "num", "u": "%", "e": "нет"}, {"k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "t": "num", "u": "%", "e": "нет"}]}, {"id": "cc", "e": "🎯", "t": "Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "items": [{"k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия", "t": "toggle", "u": "", "e": "нет"}, {"k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "t": "num", "u": "$", "e": "любая"}, {"k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "t": "num", "u": "мин", "e": "любой"}, {"k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "t": "num", "u": "SOL/BNB", "e": "любая"}, {"k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку", "t": "toggle", "u": "", "e": "нет"}, {"k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "t": "num", "u": "", "e": "нет"}, {"k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "t": "num", "u": "%", "e": "нет"}]}, {"id": "collect", "e": "📥", "t": "Сбор", "d": "откуда берём кошельки", "items": [{"k": "traders_per_token", "l": "Покуп./токен", "h": "сколько покупателей брать с токена", "t": "num", "u": "", "e": "нет"}, {"k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "t": "toggle", "u": "", "e": "нет", "on": "по GMGN", "off": "по истории"}]}];
+const tg = window.Telegram && window.Telegram.WebApp;
+let base = null, cur = {};
+function decode(h){
+  try{
+    h = h.replace(/^#/, "").replace(/-/g, "+").replace(/_/g, "/");
+    while (h.length % 4) h += "=";
+    const bin = atob(h), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }catch(e){ return null; }
+}
+const fmt = v => { const n = Number(v); return Number.isInteger(n) ? n.toLocaleString("ru-RU") : String(+n.toFixed(4)); };
+function valText(it, v){
+  if (it.t === "toggle") return it.on ? (v ? it.on : it.off) : (v ? "вкл" : "выкл");
+  if (!v) return it.e;
+  return (it.u === "$" ? "$" + fmt(v) : fmt(v) + (it.u ? (it.u === "%" ? "%" : " " + it.u) : ""));
+}
+function changed(){ return Object.keys(cur).filter(k => Number(cur[k]) !== Number(base[k])); }
+function summary(sec){
+  const on = sec.items.filter(it => it.t === "num" ? Number(cur[it.k]) : false);
+  const parts = sec.items.filter(it => (it.t === "num" && Number(cur[it.k])) || it.t === "toggle").slice(0, 4)
+    .map(it => it.l + " " + valText(it, cur[it.k]));
+  return parts.join(" · ") || "без ограничений";
+}
+function render(){
+  const list = document.getElementById("list"); list.innerHTML = "";
+  SCHEMA.forEach(sec => {
+    const items = sec.items.filter(it => it.k in base);
+    if (!items.length) return;
+    const card = document.createElement("div"); card.className = "card"; card.dataset.id = sec.id;
+    card.innerHTML = `<div class="head"><div class="em">${sec.e}</div><div class="tt"><div class="t">${sec.t}</div><div class="s"></div></div><div class="chev">›</div></div><div class="body"><div class="desc">${sec.d}</div></div>`;
+    const body = card.querySelector(".body");
+    items.forEach(it => {
+      const row = document.createElement("div"); row.className = "row"; row.dataset.k = it.k;
+      let ctl;
+      if (it.t === "toggle"){
+        ctl = `<div class="inp">${it.on ? `<span class="swl"></span>` : ""}<label class="sw"><input type="checkbox"><span></span></label></div>`;
+      } else {
+        ctl = `<div class="inp">${it.u === "$" ? '<span class="u" style="min-width:0">$</span>' : ""}<input type="text" inputmode="decimal" placeholder="${it.e}">${it.u && it.u !== "$" ? `<span class="u">${it.u}</span>` : ""}</div>`;
+      }
+      row.innerHTML = `<div class="lab"><div class="l">${it.l}</div>${it.h ? `<div class="h">${it.h}</div>` : ""}</div>${ctl}`;
+      const inp = row.querySelector("input");
+      if (it.t === "toggle"){
+        inp.checked = !!Number(cur[it.k]);
+        const swl = row.querySelector(".swl"); if (swl) swl.textContent = valText(it, cur[it.k]);
+        inp.addEventListener("change", () => { cur[it.k] = inp.checked ? 1 : 0; if (swl) swl.textContent = valText(it, cur[it.k]); tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); update(); });
+      } else {
+        inp.value = Number(cur[it.k]) ? String(cur[it.k]) : "";
+        inp.addEventListener("input", () => {
+          const s = inp.value.replace(",", ".").replace(/[^\d.]/g, "");
+          if (s !== inp.value.replace(",", ".")) inp.value = s;
+          cur[it.k] = s === "" || isNaN(Number(s)) ? 0 : Number(s); update();
+        });
+      }
+      body.appendChild(row);
+    });
+    card.querySelector(".head").addEventListener("click", () => card.classList.toggle("open"));
+    list.appendChild(card);
+  });
+  update();
+}
+function update(){
+  const ch = changed();
+  document.querySelectorAll(".row").forEach(r => r.classList.toggle("ch", ch.includes(r.dataset.k)));
+  document.querySelectorAll(".card").forEach(c => {
+    const sec = SCHEMA.find(s => s.id === c.dataset.id);
+    c.querySelector(".s").textContent = summary(sec);
+  });
+  document.getElementById("undo").style.display = ch.length ? "" : "none";
+  const label = ch.length ? `Сохранить изменения (${ch.length})` : "";
+  if (tg && tg.initData !== undefined && tg.MainButton){
+    if (ch.length){ tg.MainButton.setText(label); tg.MainButton.show(); } else tg.MainButton.hide();
+  } else {
+    const fb = document.getElementById("fallback"); fb.textContent = label; fb.style.display = ch.length ? "block" : "none";
+  }
+}
+function save(){
+  const ch = changed(); if (!ch.length) return;
+  const out = {v: 1, set: {}}; ch.forEach(k => out.set[k] = cur[k]);
+  if (tg && tg.sendData) tg.sendData(JSON.stringify(out));
+  else alert(JSON.stringify(out));
+}
+const p = decode(location.hash || "");
+if (!p || !p.s){
+  document.getElementById("list").innerHTML = '<div class="err">Открой это окно кнопкой «📱 Настройки» в боте.</div>';
+} else {
+  base = p.s; cur = Object.assign({}, base);
+  document.getElementById("preset").textContent = p.p ? "📦 " + p.p : "пресет не выбран";
+  render();
+  document.getElementById("undo").addEventListener("click", () => { cur = Object.assign({}, base); render(); });
+  document.getElementById("openall").addEventListener("click", e => {
+    const cards = [...document.querySelectorAll(".card")], open = cards.some(c => !c.classList.contains("open"));
+    cards.forEach(c => c.classList.toggle("open", open)); e.target.textContent = open ? "Свернуть всё" : "Развернуть всё";
+  });
+}
+if (tg){ tg.ready(); tg.expand(); tg.MainButton && tg.MainButton.onClick(save); }
+document.getElementById("fallback").addEventListener("click", save);
+</script>
+</body>
+</html>
