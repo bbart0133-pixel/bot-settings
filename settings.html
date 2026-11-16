@@ -144,9 +144,17 @@ function save(){
   if (tg && tg.sendData) tg.sendData(JSON.stringify(out));
   else alert(JSON.stringify(out));
 }
-const p = decode(location.hash || "");
+function payload(){
+  const q = new URLSearchParams(location.search).get("d");
+  if (q) return decode(q);
+  const h = (location.hash || "").replace(/^#/, "").split(/[&?]/)[0];
+  return h && !h.startsWith("tgWebApp") ? decode(h) : null;
+}
+const p = payload();
 if (!p || !p.s){
-  document.getElementById("list").innerHTML = '<div class="err">Открой это окно кнопкой «📱 Настройки» в боте.</div>';
+  document.getElementById("list").innerHTML = '<div class="err">Открой это окно кнопкой «📱 Настройки» в боте.<br>Если открыл её, а видишь это — отправь боту /app и нажми новую кнопку.</div>';
+  document.getElementById("openall").style.display = "none";
+  document.getElementById("preset").style.display = "none";
 } else {
   base = p.s; cur = Object.assign({}, base);
   document.getElementById("preset").textContent = p.p ? "📦 " + p.p : "пресет не выбран";
