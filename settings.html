@@ -151,7 +151,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .abar{display:none;gap:8px}
 .abar.on{display:flex}
 .abar .cta{height:50px;white-space:nowrap;font-size:15px}
-.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;padding:5px}
+.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;padding:5px}
 .nav button{position:relative;height:50px;border-radius:17px;border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px}
 .nav button.on{background:var(--chip);color:var(--acc-l);font-weight:600}
 .nav .n{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;padding:0 4px;background:var(--acc);color:var(--acc-ink);font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
@@ -165,6 +165,19 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .pkrow .ck{color:var(--acc);opacity:0;flex-shrink:0}
 .pkrow.on .ck{opacity:1}
 .pkrow+.pkrow{border-top:1px solid rgba(255,255,255,.055)}
+.bars{padding:4px 0}
+.bar{padding:10px 16px;border-bottom:1px solid var(--line2)}
+.bar:last-child{border-bottom:0}
+.bar .bt{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.bar .bt b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .bt span{font-family:var(--hd);font-weight:700;white-space:nowrap}
+.bar .tr{height:6px;border-radius:3px;background:var(--card2);margin-top:7px;overflow:hidden}
+.bar .tr i{display:block;height:100%;border-radius:3px;background:var(--mk)}
+.chg{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:700;background:rgba(var(--rgb),.14);color:var(--acc-l)}
+.chg.dn{background:rgba(248,113,113,.14);color:var(--bad-l)}
+.sub2{font-size:13px;color:var(--hint)}
+.foot{font-size:12px;color:var(--dim);text-align:center;margin:16px 0 4px}
+.tiles.two2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grab{width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:0 auto 12px}
 .fldw{width:100%;margin-top:10px}
 .sheet{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
@@ -201,10 +214,11 @@ const IC = {
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
   coins: '<circle cx="9" cy="9" r="5"/><path d="M14.5 6.5A5 5 0 1 1 9 18" stroke-linecap="round"/>',
   back: '<path d="M15 5l-7 7 7 7" stroke-linecap="round"/>',
+  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
   check: '<path d="M4 12.5l5.5 5.5L20 7" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 const svg = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${IC[n]}</svg>`;
-let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, picker = false, saveAsName = "";
+let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, picker = false, saveAsName = "", ocChain = "";
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function decode(h){
@@ -354,6 +368,40 @@ function filtersHTML(){
   return topHTML("Фильтры", true) + `<div class="subtabs">${FILTER_GROUPS.map(x => { const c = groupCount(x);
       return `<button class="chip${x.t === g.t ? " on" : ""}" data-sub="${esc(x.t)}">${esc(name(x.t))}${c ? ` · ${c}` : ""}</button>`; }).join("")}</div>` + groupHTML(g, activeIn(g) ? activeIn(g) + " активно" : "");
 }
+function usdBig(v){
+  const n = num(v); if (!n) return "—";
+  for (const [lim, suf] of [[1e9, "B"], [1e6, "M"], [1e3, "K"]]) if (n >= lim){ const x = n / lim; return "$" + (x < 10 ? +x.toFixed(1) : Math.round(x)) + suf; }
+  return "$" + Math.round(n);
+}
+function barsHTML(rows, fmt){
+  const mx = Math.max(...rows.map(r => num(r[1])), 1);
+  return `<div class="card bars">${rows.map(([n, v]) => `<div class="bar"><div class="bt"><b>${esc(n)}</b><span>${esc(fmt(v))}</span></div><div class="tr"><i style="width:${Math.max(4, Math.round(num(v) / mx * 100))}%"></i></div></div>`).join("")}</div>`;
+}
+function onchainHTML(){
+  const ch = (P.ch || []).filter(([v]) => v !== "all");
+  ensureOc();
+  const o = (P.oc || {})[ocChain] || {};
+  const tick = {sol: "SOL", bsc: "BNB", robinhood: "RH", arc: "ARC", elysium: "ELY"}[ocChain] || "";
+  const when = o.t ? new Date(o.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
+  let h = topHTML("Ончейн", true) + `<div class="chips" style="margin-bottom:12px">${ch.map(([v, l]) => `<button class="chip${ocChain === v ? " on" : ""}" data-oc="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
+  if (!Object.keys(o).length || (!o.v24 && o.mg === undefined && !(o.bt || []).length)){
+    return h + `<div class="card"><div class="empty" style="padding:40px 20px">По этой сети пока нет данных.<br><br>Бот обновляет их раз в час. Если сеть новая, в DefiLlama её может ещё не быть${o.e ? `<br><br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div></div>`;
+  }
+  const c = o.ch;
+  h += `<div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
+    <div><div class="lbl">ОБЪЁМ DEX · 24Ч</div><div class="big">${esc(usdBig(o.v24))}</div></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${c !== undefined && c !== null ? `<span class="chg${c < 0 ? " dn" : ""}">${c > 0 ? "+" : ""}${(+c).toFixed(1)}% за сутки</span>` : ""}${o.v7 ? `<span class="sub2">за 7 дней ${esc(usdBig(o.v7))}</span>` : ""}</div></div>`;
+  h += `<div class="tiles two2">
+    <div class="tile"><span class="a">Миграций за 24ч</span><span class="b">${o.mg !== undefined ? fmtN(o.mg) : "—"}</span><span class="c">${o.mb ? "до миграции ~" + fmtN(o.mb) + " мин" : "по данным GMGN"}</span></div>
+    ${(o.ml || []).length
+      ? `<div class="tile"><span class="a">Лидер: ${esc(o.ml[0][0])}</span><span class="b">${fmtN(o.ml[0][1])}</span><span class="c">${o.mg ? Math.round(o.ml[0][1] / o.mg * 100) + "% миграций" : "миграций за 24ч"}</span></div>`
+      : `<div class="tile"><span class="a">${esc((o.lp || [])[0] ? o.lp[0][0] : "Лаунчпад")}</span><span class="b">${esc((o.lp || [])[0] ? usdBig(o.lp[0][1]) : "—")}</span><span class="c">комиссии за 24ч</span></div>`}</div>`;
+  if ((o.dx || []).length) h += `<div class="sec">ПЛОЩАДКИ · ОБЪЁМ 24Ч</div>` + barsHTML(o.dx, usdBig);
+  if ((o.bt || []).length) h += `<div class="sec">ТОРГОВЫЕ БОТЫ · КОМИССИИ 24Ч</div><div class="sdesc">сколько пользователи заплатили ботам — чем больше, тем активнее бот</div>` + barsHTML(o.bt, usdBig);
+  if ((o.ml || []).length) h += `<div class="sec">МИГРАЦИИ ПО ЛАУНЧПАДАМ · 24Ч</div>` + barsHTML(o.ml, v => fmtN(v));
+  h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
+  return h;
+}
 function moreHTML(){ return topHTML("Ещё", true) + MORE_GROUPS.map(g => groupHTML(g, "")).join(""); }
 function presetSummary(v){
   const parts = [];
@@ -381,13 +429,17 @@ function presetsHTML(){
   return h + `</div>`;
 }
 function navHTML(){
-  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
+  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
   return it.map(([s, i, l]) => { const n = scrCount(s);
     return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
 }
 const THEME_OF = {sol: "sol", bsc: "bsc", robinhood: "rh"};
+function ensureOc(){
+  if (!ocChain){ const ch = (P.ch || []).filter(([v]) => v !== "all"); ocChain = cur["m.chain"] !== "all" ? cur["m.chain"] : (ch[0] || ["sol"])[0]; }
+}
 function applyTheme(){
-  const t = THEME_OF[cur["m.chain"]] || "def";
+  if (screen === "onchain") ensureOc();
+  const t = THEME_OF[screen === "onchain" ? ocChain : cur["m.chain"]] || "def";
   if (document.documentElement.dataset.theme === t) return;
   document.documentElement.dataset.theme = t;
   const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
@@ -396,7 +448,7 @@ function applyTheme(){
 function render(keepScroll){
   applyTheme();
   const y = window.scrollY;
-  const html = screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
+  const html = screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
   document.getElementById("app").innerHTML = html;
   updateDock();
   if (keepScroll) window.scrollTo(0, y);
@@ -474,6 +526,7 @@ function go(s, to){
   if (to){ const el = document.querySelector(`[data-row="${to}"]`); if (el) el.scrollIntoView({block: "center"}); }
 }
 document.addEventListener("click", e => {
+  const oc = e.target.closest("[data-oc]"); if (oc){ ocChain = oc.dataset.oc; render(true); return; }
   const pk = e.target.closest("[data-pick]"); if (pk){ openPicker(); return; }
   const pv = e.target.closest("[data-pv]"); if (pv){ pickPreset(pv.dataset.pv); closeReview(); return; }
   const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go, g.dataset.to); return; }
