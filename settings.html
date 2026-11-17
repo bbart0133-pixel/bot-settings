@@ -17,6 +17,7 @@
   --rgb:45,212,191; --pill:#99f6e4; --hline:#16312e; --hbg:#070b0b;
   --glow:rgba(var(--rgb),.45); --glow2:transparent;
   --mk:linear-gradient(135deg,#5eead4,#2dd4bf);
+  --g1:#99f6e4; --g2:#2dd4bf; --g3:#0ea5a0;   /* полый заголовок: градиент обводки */
 }
 /* Своя стилистика под сеть: меняется сразу, как выбираешь сеть на главной */
 :root[data-theme="sol"]{
@@ -25,6 +26,7 @@
   --pill:#c4a5ff; --hline:#2f2356; --hbg:#09060f; --hint:#9690a8; --dim:#78718c; --mute:#4f4866;
   --glow:rgba(153,69,255,.6); --glow2:rgba(20,241,149,.32);
   --mk:linear-gradient(135deg,#b07cff 10%,#7a5cff 45%,#14f195 90%);
+  --g1:#b07cff; --g2:#7a5cff; --g3:#14f195;
 }
 :root[data-theme="bsc"]{
   --bg:#070604; --card:#12100a; --card2:#0b0906; --line:#2c2513; --line2:#1d180d; --chip:#251e0b;
@@ -32,6 +34,7 @@
   --pill:#f8d14a; --hline:#3d3112; --hbg:#0a0805; --hint:#9a927e; --dim:#7d7563; --mute:#544d3d;
   --glow:rgba(240,185,11,.42); --glow2:rgba(240,185,11,.12);
   --mk:linear-gradient(135deg,#ffe27a,#f0b90b 60%,#c98f00);
+  --g1:#ffe27a; --g2:#f0b90b; --g3:#d99a00;
 }
 :root[data-theme="rh"]{
   --bg:#030a06; --card:#08140d; --card2:#050e09; --line:#163323; --line2:#0f2418; --chip:#0e2717;
@@ -39,6 +42,23 @@
   --pill:#e7c97e; --hline:#1f4a32; --hbg:#04100a; --hint:#8aa597; --dim:#6b8778; --mute:#47604f;
   --glow:rgba(30,150,80,.55); --glow2:rgba(214,180,106,.28);
   --mk:linear-gradient(135deg,#7aeea6,#3ee07a 50%,#e7c97e);
+  --g1:#b8f7cf; --g2:#3ee07a; --g3:#e7c97e;
+}
+:root[data-theme="arc"]{
+  --bg:#04060c; --card:#0a0f1b; --card2:#070b14; --line:#1a2540; --line2:#121a2e; --chip:#111c36;
+  --acc:#4d8dff; --acc-l:#86b2ff; --acc-xl:#dbe8ff; --acc-ink:#020c22; --rgb:77,141,255;
+  --pill:#9cc0ff; --hline:#1f3363; --hbg:#060a14; --hint:#8c97ad; --dim:#6d7890; --mute:#495368;
+  --glow:rgba(77,141,255,.5); --glow2:rgba(120,220,255,.2);
+  --mk:linear-gradient(135deg,#9cc0ff,#4d8dff 55%,#78dcff);
+  --g1:#c3d8ff; --g2:#4d8dff; --g3:#78dcff;
+}
+:root[data-theme="ely"]{
+  --bg:#09050b; --card:#140b17; --card2:#0d070f; --line:#33193a; --line2:#221126; --chip:#2a1231;
+  --acc:#e06cf5; --acc-l:#ee9ff9; --acc-xl:#fbe3fe; --acc-ink:#24052b; --rgb:224,108,245;
+  --pill:#f0b0fa; --hline:#4a2156; --hbg:#0c060e; --hint:#a291a8; --dim:#83708a; --mute:#5a4a60;
+  --glow:rgba(224,108,245,.5); --glow2:rgba(255,160,120,.2);
+  --mk:linear-gradient(135deg,#f5b8ff,#e06cf5 55%,#ff9f7a);
+  --g1:#f5b8ff; --g2:#e06cf5; --g3:#ff9f7a;
 }
 *{box-sizing:border-box}
 html,body{overflow-x:hidden}
@@ -63,6 +83,9 @@ button{cursor:pointer}
 .hero>*:not(.glow):not(.dots):not(.mark){position:relative}
 .lbl{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--acc-l)}
 .big{font-family:var(--hd);font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1}
+.hollow{display:block;width:100%;height:46px;overflow:visible;filter:drop-shadow(0 0 10px rgba(var(--rgb),.35))}
+.hollow text{font-family:var(--hd);font-size:40px;font-weight:700;letter-spacing:-1px;fill:none;stroke:url(#hg);stroke-width:1.5px;paint-order:stroke}
+.hollow .s1{stop-color:var(--g1)}.hollow .s2{stop-color:var(--g2)}.hollow .s3{stop-color:var(--g3)}
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .chips::-webkit-scrollbar{display:none}
 .chips .chip{flex:0 0 auto}
@@ -365,13 +388,28 @@ function jobHTML(){
   const j = P.job; if (!j) return "";
   const hm = t => t ? new Date(t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
   const pct = j.total ? Math.round((j.done || 0) / j.total * 100) : null;
-  const parts = j.total > 1 ? `часть ${Math.min((j.done || 0) + 1, j.total)} из ${j.total}` : "";
+  const parts = j.kind === "job" ? (j.total ? `${j.done || 0}/${j.total} · ${pct}%` : "")
+    : (j.total > 1 ? `часть ${Math.min((j.done || 0) + 1, j.total)} из ${j.total}` : "");
   return `<div class="job"><div class="jh"><span class="pulse"></span>СЕЙЧАС ИДЁТ</div>
     <div class="jt">${esc(j.title || "Парсинг")}${parts ? " · " + esc(parts) : ""}</div>
     ${j.st ? `<div class="js">${esc(j.st)}</div>` : (j.cur ? `<div class="js">${esc(j.cur)}</div>` : "")}
     ${pct !== null && j.total > 1 ? `<div class="jb"><i style="width:${Math.max(4, pct)}%"></i></div>` : ""}
-    <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}снимок на ${hm(P.t)} — чтобы обновить, отправь боту /app${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
+    ${j.queue ? `<div class="js">в очереди: ${esc(j.queue)}</div>` : ""}
+    <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}данные на ${hm(P.t)} · кнопка обновляется сама раз в 3 мин — переоткрой окно${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
 }
+// Полый заголовок (обводка без заливки) с фирменным градиентом сети — SVG, чтобы одинаково было в iOS и Android
+function hollowHTML(t){
+  return `<svg class="hollow" role="img" aria-label="${esc(t)}"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="0.4">
+    <stop class="s1" offset="0"/><stop class="s2" offset=".5"/><stop class="s3" offset="1"/></linearGradient></defs>
+    <text x="1" y="38">${esc(t)}</text></svg>`;
+}
+function fitHollow(){   // длинное «Robinhood · 24ч» на узком телефоне — уменьшаем, чтобы не обрезалось
+  document.querySelectorAll(".hollow").forEach(sv => { const t = sv.querySelector("text"); if (!t) return;
+    t.style.fontSize = ""; const w = sv.clientWidth - 4, L = t.getComputedTextLength();
+    if (L > w && w > 0) t.style.fontSize = Math.floor(40 * w / L) + "px"; });
+}
+try { document.fonts && document.fonts.ready.then(fitHollow); } catch (e) {}
+window.addEventListener("resize", () => fitHollow());
 function homeHTML(){
   const chains = optsOf(findRow("m.chain")), periods = optsOf(findRow("m.period"));
   const cName = {sol: "Solana", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium", all: "Все сети"}[cur["m.chain"]] || cur["m.chain"];
@@ -381,7 +419,7 @@ function homeHTML(){
   const plat = [num(cur.sol_pumpfun) ? "Pump.fun" : "", num(cur.sol_meteora) ? (num(cur.sol_meteora) === 2 ? "Meteora etchy" : "Meteora") : ""].filter(Boolean).join(" + ") || "ни одной";
   return topHTML("Настройки") + `
   <div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
-    <div><div class="lbl">ГДЕ ИЩЕМ</div><div class="big">${esc(cName)} · ${esc(String(cur["m.period"]).replace("h", "ч"))}</div></div>
+    <div><div class="lbl">ГДЕ ИЩЕМ</div>${hollowHTML(cName + " · " + String(cur["m.period"]).replace("h", "ч"))}</div>
     <div><div class="rowlbl">СЕТЬ</div><div class="chips eq" style="grid-template-columns:repeat(${chains.length},minmax(0,1fr))">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <div><div class="rowlbl">ПЕРИОД</div><div class="chips eq" style="grid-template-columns:repeat(${periods.length},minmax(0,1fr))">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <button class="cta" data-act="find">${svg("search")}Найти токены</button>
@@ -470,7 +508,7 @@ function navHTML(){
   return it.map(([s, i, l]) => { const n = scrCount(s);
     return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
 }
-const THEME_OF = {sol: "sol", bsc: "bsc", robinhood: "rh"};
+const THEME_OF = {sol: "sol", bsc: "bsc", robinhood: "rh", arc: "arc", elysium: "ely"};
 function ensureOc(){
   if (!ocChain){ const ch = (P.ch || []).filter(([v]) => v !== "all"); ocChain = cur["m.chain"] !== "all" ? cur["m.chain"] : (ch[0] || ["sol"])[0]; }
 }
@@ -487,6 +525,7 @@ function render(keepScroll){
   const y = window.scrollY;
   const html = screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
   document.getElementById("app").innerHTML = html;
+  fitHollow();
   updateDock();
   if (keepScroll) window.scrollTo(0, y);
 }
