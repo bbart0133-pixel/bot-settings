@@ -66,6 +66,8 @@ button{cursor:pointer}
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .chips::-webkit-scrollbar{display:none}
 .chips .chip{flex:0 0 auto}
+.chips.eq{display:grid;gap:6px;overflow:visible}
+.chips.eq .chip{height:42px;padding:0 4px;border-radius:13px;font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .rowlbl{font-size:10.5px;font-weight:700;letter-spacing:1.3px;color:var(--dim);margin-bottom:6px}
 .chip{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.5);color:var(--hint);font-size:12.5px;white-space:nowrap}
 .chip.on{border-color:var(--acc);background:rgba(var(--rgb),.14);color:var(--acc-xl);font-weight:600}
@@ -178,6 +180,27 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .sub2{font-size:13px;color:var(--hint)}
 .foot{font-size:12px;color:var(--dim);text-align:center;margin:16px 0 4px}
 .tiles.two2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{display:block;width:100%;text-align:left;border-radius:18px;border:1px solid var(--line);background:var(--card);padding:14px 16px;margin-bottom:10px}
+.opt.main{border-color:var(--acc);background:rgba(var(--rgb),.08)}
+.opt .ot{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700}
+.opt .ot .ic{width:34px;height:34px}
+.opt .od{font-size:12.5px;color:var(--hint);margin-top:6px;line-height:1.45}
+.opt .seg{margin-top:12px}
+.qrow{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line2)}
+.qrow .qi{width:34px;height:34px;border-radius:11px;background:var(--chip);display:flex;align-items:center;justify-content:center;color:var(--acc-l);flex-shrink:0}
+.qrow .qt{flex:1;min-width:0}
+.qrow .qt b{display:block;font-size:14.5px}
+.qrow .qt span{display:block;font-size:12px;color:var(--hint)}
+.job{border-radius:20px;border:1px solid var(--hline);background:var(--card);padding:14px 16px;margin-bottom:12px}
+.job .jh{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:1.3px;color:var(--acc-l)}
+.job .jt{font-size:15px;font-weight:700;margin-top:6px}
+.job .js{font-size:13px;color:var(--hint);margin-top:4px;line-height:1.45;white-space:pre-line}
+.job .jb{height:6px;border-radius:3px;background:var(--card2);margin-top:10px;overflow:hidden}
+.job .jb i{display:block;height:100%;background:var(--mk);border-radius:3px}
+.job .jf{font-size:11.5px;color:var(--dim);margin-top:8px}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 0 rgba(var(--rgb),.6);animation:pl 1.6s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(var(--rgb),.55)}70%{box-shadow:0 0 0 8px rgba(var(--rgb),0)}100%{box-shadow:0 0 0 0 rgba(var(--rgb),0)}}
+.chg-note{font-size:12.5px;color:var(--acc-l);margin:2px 2px 12px}
 .grab{width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:0 auto 12px}
 .fldw{width:100%;margin-top:10px}
 .sheet{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
@@ -200,7 +223,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 </div></div>
 <div class="sheet" id="sheet"><div class="sh glass" id="sh"></div></div>
 <script>
-const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "num", "k": "traders_per_token", "l": "Покуп./токен", "h": "сколько покупателей брать с токена", "u": "", "e": "нет"}, {"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «🧠 Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "на SOL обычно $0.1–0.3", "u": "$", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
+const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «🧠 Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "на SOL обычно $0.1–0.3", "u": "$", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
 const tg = window.Telegram && window.Telegram.WebApp;
 const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
 const SLIDERS = {min_winrate_pct: [30, 40, 50, 60]};
@@ -215,10 +238,11 @@ const IC = {
   coins: '<circle cx="9" cy="9" r="5"/><path d="M14.5 6.5A5 5 0 1 1 9 18" stroke-linecap="round"/>',
   back: '<path d="M15 5l-7 7 7 7" stroke-linecap="round"/>',
   pulse: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
+  belloff: '<path d="M9 18h6M6 16V11a6 6 0 0 1 9.5-4.9M18 11v5l1.5 2H8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3l18 18" stroke-linecap="round"/>',
   check: '<path d="M4 12.5l5.5 5.5L20 7" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 const svg = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${IC[n]}</svg>`;
-let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, picker = false, saveAsName = "", ocChain = "";
+let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, picker = false, saveAsName = "", ocChain = "", runHist = "7d", runQuiet = true;
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function decode(h){
@@ -336,6 +360,17 @@ function topHTML(title, back){
     <div class="tt"><div class="h1">${esc(title)}</div>${back ? "" : `<div class="st"><span class="dot${P.busy ? " busy" : ""}"></span>${P.busy ? "бот сейчас парсит" : "бот свободен"}${when ? " · данные на " + when : ""}</div>`}</div>
     <button class="pill glass" data-pick="1" aria-label="Выбрать пресет"><span>${esc(sel ? (renames[sel] || sel) : "без пресета")}</span>▾</button></div>`;
 }
+function jobHTML(){
+  const j = P.job; if (!j) return "";
+  const hm = t => t ? new Date(t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
+  const pct = j.total ? Math.round((j.done || 0) / j.total * 100) : null;
+  const parts = j.total > 1 ? `часть ${Math.min((j.done || 0) + 1, j.total)} из ${j.total}` : "";
+  return `<div class="job"><div class="jh"><span class="pulse"></span>СЕЙЧАС ИДЁТ</div>
+    <div class="jt">${esc(j.title || "Парсинг")}${parts ? " · " + esc(parts) : ""}</div>
+    ${j.st ? `<div class="js">${esc(j.st)}</div>` : (j.cur ? `<div class="js">${esc(j.cur)}</div>` : "")}
+    ${pct !== null && j.total > 1 ? `<div class="jb"><i style="width:${Math.max(4, pct)}%"></i></div>` : ""}
+    <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}снимок на ${hm(P.t)} — чтобы обновить, отправь боту /app${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
+}
 function homeHTML(){
   const chains = optsOf(findRow("m.chain")), periods = optsOf(findRow("m.period"));
   const cName = {sol: "Solana", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium", all: "Все сети"}[cur["m.chain"]] || cur["m.chain"];
@@ -346,10 +381,11 @@ function homeHTML(){
   return topHTML("Настройки") + `
   <div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
     <div><div class="lbl">ГДЕ ИЩЕМ</div><div class="big">${esc(cName)} · ${esc(String(cur["m.period"]).replace("h", "ч"))}</div></div>
-    <div><div class="rowlbl">СЕТЬ</div><div class="chips">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
-    <div><div class="rowlbl">ПЕРИОД</div><div class="chips">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
+    <div><div class="rowlbl">СЕТЬ</div><div class="chips eq" style="grid-template-columns:repeat(${chains.length},minmax(0,1fr))">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
+    <div><div class="rowlbl">ПЕРИОД</div><div class="chips eq" style="grid-template-columns:repeat(${periods.length},minmax(0,1fr))">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <button class="cta" data-act="find">${svg("search")}Найти токены</button>
   </div>
+  ${jobHTML()}
   <div class="tiles">
     <button class="tile" data-go="filters"><span class="a">Фильтры</span><span class="b">${nf}</span><span class="c">активно ›</span></button>
     <button class="tile${gas > 1 ? " bad" : ""}" data-go="more" data-to="strat_gas_usd"><span class="a">Газ</span><span class="b">$${fmtN(gas)}</span><span class="c">издержки ›</span></button>
@@ -383,7 +419,7 @@ function onchainHTML(){
   const o = (P.oc || {})[ocChain] || {};
   const tick = {sol: "SOL", bsc: "BNB", robinhood: "RH", arc: "ARC", elysium: "ELY"}[ocChain] || "";
   const when = o.t ? new Date(o.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
-  let h = topHTML("Ончейн", true) + `<div class="chips" style="margin-bottom:12px">${ch.map(([v, l]) => `<button class="chip${ocChain === v ? " on" : ""}" data-oc="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
+  let h = topHTML("Ончейн", true) + `<div class="chips eq" style="margin-bottom:12px;grid-template-columns:repeat(${ch.length},minmax(0,1fr))">${ch.map(([v, l]) => `<button class="chip${ocChain === v ? " on" : ""}" data-oc="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
   if (!Object.keys(o).length || (!o.v24 && o.mg === undefined && !(o.bt || []).length)){
     return h + `<div class="card"><div class="empty" style="padding:40px 20px">По этой сети пока нет данных.<br><br>Бот обновляет их раз в час. Если сеть новая, в DefiLlama её может ещё не быть${o.e ? `<br><br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div></div>`;
   }
@@ -478,6 +514,29 @@ function updateDock(){
   document.getElementById("bsave").textContent = `Сохранить (${n})`;
   document.getElementById("app").style.paddingBottom = n ? "230px" : "170px";
 }
+function openRun(){
+  const n = changeList().length;
+  const cName = {sol: "Solana", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium", all: "все сети"}[cur["m.chain"]] || cur["m.chain"];
+  const per = String(cur["m.period"]).replace("h", "ч");
+  const pr = sel ? `пресет «${renames[sel] || sel}»` : "текущие настройки (пресет не выбран)";
+  document.getElementById("sh").innerHTML = `<div class="grab"></div><h2>Что запустить?</h2><div class="d">${esc(cName)} · за ${esc(per)}</div>
+    ${n ? `<div class="chg-note">Сначала сохранятся изменения: ${n}</div>` : ""}
+    <div class="opt main" role="button" tabindex="0" data-run="full">
+      <div class="ot"><span class="ic">${svg("filt")}</span>Полный парс</div>
+      <div class="od">Токены → покупатели → умный фильтр → Excel, как ночной парс. Бот сделает всё сам, файлы придут без звука.<br>Фильтр: <b style="color:var(--text)">${esc(pr)}</b></div>
+      <div class="seg" role="group" aria-label="История кошельков">${[["7d", "История 7 дней"], ["30d", "История 30 дней"]].map(([v, l]) => `<button data-hist="${v}" class="${runHist === v ? "on" : ""}">${l}</button>`).join("")}</div>
+      <div class="qrow" data-quiet="1"><span class="qi">${svg("belloff")}</span><span class="qt"><b>Тихо</b><span>в чат только txt и Excel, ход работы — тут, на главной</span></span><label class="sw" data-quiet="1"><input type="checkbox"${runQuiet ? " checked" : ""} aria-label="Тихий режим"><span></span></label></div>
+    </div>
+    <button class="opt" data-run="find">
+      <div class="ot"><span class="ic">${svg("search")}</span>Только токены</div>
+      <div class="od">Список мигрировавших токенов. Покупателей и фильтр запускаешь потом сам в боте.</div>
+    </button>
+    <div class="shb"><button class="cta ghost" id="cb" style="width:100%">Отмена</button></div>`;
+  picker = true;
+  document.getElementById("sheet").classList.add("on");
+  document.getElementById("cb").onclick = closeReview;
+  if (inTG){ tg.BackButton.show(); tg.HapticFeedback && tg.HapticFeedback.impactOccurred("light"); }
+}
 function openPicker(){
   const names = Object.keys(P.ps || {});
   const row = (v, name, sub) => `<button class="pkrow${sel === v ? " on" : ""}" data-pv="${esc(v)}"><span class="t"><b>${esc(name)}</b>${sub ? `<span>${esc(sub)}</span>` : ""}</span><span class="ck">${svg("check", 20)}</span></button>`;
@@ -510,9 +569,10 @@ function send(kind){
   changedKeys().forEach(k => { if (!k.startsWith("m.")) out.set[k] = cur[k]; });
   out.m = {chain: cur["m.chain"], period: cur["m.period"]};
   if (saveAsName) out.save_as = saveAsName;
-  if (kind === "find") out.run = "find";
+  if (kind === "find" || kind === "full") out.run = kind;
+  if (kind === "full"){ out.hist = runHist; out.quiet = runQuiet; }
   if (inTG && tg.sendData){ tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); tg.sendData(JSON.stringify(out)); }
-  else alert(JSON.stringify(out));
+  else { alert(JSON.stringify(out)); closeReview(); }
 }
 function pickPreset(name){
   sel = name;
@@ -531,7 +591,10 @@ document.addEventListener("click", e => {
   const pv = e.target.closest("[data-pv]"); if (pv){ pickPreset(pv.dataset.pv); closeReview(); return; }
   const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go, g.dataset.to); return; }
   const sb = e.target.closest("[data-sub]"); if (sb){ fsub = sb.dataset.sub; render(); return; }
-  const ac = e.target.closest("[data-act]"); if (ac){ openReview("find"); return; }
+  const ac = e.target.closest("[data-act]"); if (ac){ openRun(); return; }
+  const qq = e.target.closest("[data-quiet]"); if (qq){ e.preventDefault(); runQuiet = !runQuiet; try { localStorage.setItem("runQuiet", runQuiet ? "1" : "0"); } catch (x) {} openRun(); return; }
+  const rh = e.target.closest("[data-hist]"); if (rh){ runHist = rh.dataset.hist; openRun(); return; }
+  const rn = e.target.closest("[data-run]"); if (rn){ send(rn.dataset.run); return; }
   const s = e.target.closest("[data-s]");
   if (s){
     const k = s.dataset.s, o = optsOf(findRow(k)).find(o => String(o[0]) === s.dataset.v);
@@ -576,7 +639,7 @@ document.addEventListener("input", e => {
   refreshRow(k);
 });
 document.getElementById("bsave").onclick = () => openReview("save");
-document.getElementById("bfind").onclick = () => openReview("find");
+document.getElementById("bfind").onclick = () => openRun();
 document.getElementById("sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeReview(); });
 
 P = norm(payload());
@@ -586,6 +649,7 @@ if (!P || !P.s){
 } else {
   start = Object.assign({}, P.s, {"m.chain": (P.m || {}).chain || "sol", "m.period": (P.m || {}).period || "6h"});
   sel = P.p || ""; base = Object.assign({}, start); cur = Object.assign({}, start);
+  try { const q = localStorage.getItem("runQuiet"); if (q !== null) runQuiet = q === "1"; } catch (x) {}
   render();
 }
 if (tg){
