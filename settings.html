@@ -6,14 +6,14 @@
 <title>Настройки бота</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#050607; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
   --text:#eef2f2; --hint:#8a9696; --dim:#6b7878; --mute:#4b5858;
   --acc:#2dd4bf; --acc-l:#5eead4; --acc-xl:#ccfbf1; --acc-ink:#032622;
   --bad:#f87171; --bad-l:#fca5a5; --warn:#fbbf24;
-  --hd:"Space Grotesk",Inter,system-ui,sans-serif;
+  --hd:Onest,system-ui,sans-serif;
   --rgb:45,212,191; --pill:#99f6e4; --hline:#16312e; --hbg:#070b0b;
   --glow:rgba(var(--rgb),.45); --glow2:transparent;
   --mk:linear-gradient(135deg,#5eead4,#2dd4bf);
@@ -62,7 +62,7 @@
 }
 *{box-sizing:border-box}
 html,body{overflow-x:hidden}
-html,body{transition:background-color .35s;margin:0;background:var(--bg);color:var(--text);font:15px/1.38 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{transition:background-color .35s;margin:0;background:var(--bg);color:var(--text);font:15px/1.4 Onest,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 .app{max-width:560px;margin:0 auto;padding:18px 16px 170px}
@@ -83,6 +83,23 @@ button{cursor:pointer}
 .hero>*:not(.glow):not(.dots):not(.mark){position:relative}
 .lbl{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--acc-l)}
 .big{font-family:var(--hd);font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1}
+.ocbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 2px 12px;font-size:12px;color:var(--hint)}
+.ocbar span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ocref{flex:0 0 auto;height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(var(--rgb),.45);background:rgba(var(--rgb),.1);color:var(--acc-l);font:600 13px Onest,system-ui,sans-serif}
+.ocref:disabled{opacity:.6}
+.wk{padding:14px 14px 12px}
+.wkh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.wkv{font-family:var(--hd);font-size:22px;font-weight:700;color:var(--text)}
+.wkd{font-size:12px;color:var(--hint)}
+.wkb{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;height:120px;align-items:end}
+.wkc{all:unset;cursor:pointer;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
+.wkc i{display:block;width:100%;max-width:30px;border-radius:4px 4px 0 0;background:rgba(var(--rgb),.38);transition:background .15s}
+.wkc.on i{background:var(--acc)}
+.wkc.part i{background:repeating-linear-gradient(135deg,rgba(var(--rgb),.5) 0 3px,rgba(var(--rgb),.18) 3px 6px)}
+.wkc.part.on i{background:repeating-linear-gradient(135deg,var(--acc) 0 3px,rgba(var(--rgb),.45) 3px 6px)}
+.wkc span{font-size:11px;color:var(--dim);line-height:1}
+.wkc.on span{color:var(--text);font-weight:600}
+.wkf{margin-top:10px;font-size:12px;color:var(--hint)}
 .hollow{display:block;width:100%;height:46px;overflow:visible;filter:drop-shadow(0 0 10px rgba(var(--rgb),.35))}
 .hollow text{font-family:var(--hd);font-size:40px;font-weight:700;letter-spacing:-1px;fill:none;stroke:url(#hg);stroke-width:1.5px;paint-order:stroke}
 .hollow .s1{stop-color:var(--g1)}.hollow .s2{stop-color:var(--g2)}.hollow .s3{stop-color:var(--g3)}
@@ -236,6 +253,38 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .ci .o{color:var(--dim);text-decoration:line-through;margin-right:6px}
 .ci .n{color:var(--acc-l);font-weight:600}
 .shb{display:flex;gap:8px;margin-top:14px}
+
+/* ===== Спокойный стиль: плоские карточки, один акцентный цвет, стекло только у панели и шторок ===== */
+body{background:transparent!important}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.10),transparent 70%)}
+.card,.tile{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.075);box-shadow:none}
+.hero{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+.hero .glow,.hero .dots{display:none}
+.hero .mark{opacity:.13}
+.glass{background:rgba(16,16,20,.72);-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35)}
+.nav{border-radius:24px}
+.nav button{border-radius:18px}
+.nav button.on{background:rgba(255,255,255,.08);color:var(--text);box-shadow:none}
+.nav button.on svg{color:var(--acc)}
+.chip{background:transparent;border-color:rgba(255,255,255,.1);box-shadow:none;color:var(--hint)}
+.chip.on{background:rgba(var(--rgb),.12);border-color:var(--acc);color:var(--text);box-shadow:none}
+.cta{box-shadow:none}
+.bar .tr i{background:var(--acc)}
+.bar{border-bottom-color:rgba(255,255,255,.05)}
+.hollow{filter:none}
+.hollow text{stroke-width:1.3px}
+.sec{font-size:13px;font-weight:600;letter-spacing:0;color:var(--hint);margin:20px 4px 8px}
+.sdesc{font-size:12.5px;color:var(--dim)}
+.lbl{font-size:12.5px;font-weight:500;letter-spacing:0;color:var(--hint)}
+.rowlbl{font-size:12px;font-weight:500;letter-spacing:0;color:var(--dim)}
+.jh{letter-spacing:0;text-transform:none}
+.tile .c{color:var(--hint)}
+.tile .b,.big,.wkv,.bar .bt span{font-variant-numeric:tabular-nums}
+.chg{background:none;padding:0;height:auto;font-weight:600}
+.wkc i{background:rgba(255,255,255,.14)}
+.wkc.on i{background:var(--acc)}
+.wkc.part i{background:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 3px,rgba(255,255,255,.05) 3px 6px)}
+.sheet{background:rgba(0,0,0,.5);-webkit-backdrop-filter:none;backdrop-filter:none}
 </style>
 </head>
 <body>
@@ -376,7 +425,7 @@ function rowHTML(r){
   }
   return `<div class="row${ch ? " ch" : ""}" data-row="${r.k}">${body}<div data-wx>${wasLine(r)}</div><div data-wr>${warnHTML(r)}</div></div>`;
 }
-const groupHTML = (g, cnt) => `<div class="sec">${esc(g.t.replace(/^\S+\s/, m => /[A-Za-zА-Яа-я]/.test(m) ? m : "").toUpperCase())}${cnt ? `<i>${cnt}</i>` : ""}</div>${g.d ? `<div class="sdesc">${esc(g.d)}</div>` : ""}<div class="card">${g.rows.map(rowHTML).join("")}</div>`;
+const groupHTML = (g, cnt) => `<div class="sec">${esc(g.t.replace(/^\S+\s/, m => /[A-Za-zА-Яа-я]/.test(m) ? m : ""))}${cnt ? `<i>${cnt}</i>` : ""}</div>${g.d ? `<div class="sdesc">${esc(g.d)}</div>` : ""}<div class="card">${g.rows.map(rowHTML).join("")}</div>`;
 
 function topHTML(title, back){
   const when = P.t ? new Date(P.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
@@ -390,7 +439,7 @@ function jobHTML(){
   const pct = j.total ? Math.round((j.done || 0) / j.total * 100) : null;
   const parts = j.kind === "job" ? (j.total ? `${j.done || 0}/${j.total} · ${pct}%` : "")
     : (j.total > 1 ? `часть ${Math.min((j.done || 0) + 1, j.total)} из ${j.total}` : "");
-  return `<div class="job"><div class="jh"><span class="pulse"></span>СЕЙЧАС ИДЁТ</div>
+  return `<div class="job"><div class="jh"><span class="pulse"></span>Сейчас идёт</div>
     <div class="jt">${esc(j.title || "Парсинг")}${parts ? " · " + esc(parts) : ""}</div>
     ${j.st ? `<div class="js">${esc(j.st)}</div>` : (j.cur ? `<div class="js">${esc(j.cur)}</div>` : "")}
     ${pct !== null && j.total > 1 ? `<div class="jb"><i style="width:${Math.max(4, pct)}%"></i></div>` : ""}
@@ -419,9 +468,9 @@ function homeHTML(){
   const plat = [num(cur.sol_pumpfun) ? "Pump.fun" : "", num(cur.sol_meteora) ? (num(cur.sol_meteora) === 2 ? "Meteora etchy" : "Meteora") : ""].filter(Boolean).join(" + ") || "ни одной";
   return topHTML("Настройки") + `
   <div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
-    <div><div class="lbl">ГДЕ ИЩЕМ</div>${hollowHTML(cName + " · " + String(cur["m.period"]).replace("h", "ч"))}</div>
-    <div><div class="rowlbl">СЕТЬ</div><div class="chips eq" style="grid-template-columns:repeat(${chains.length},minmax(0,1fr))">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
-    <div><div class="rowlbl">ПЕРИОД</div><div class="chips eq" style="grid-template-columns:repeat(${periods.length},minmax(0,1fr))">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
+    <div><div class="lbl">Где ищем</div>${hollowHTML(cName + " · " + String(cur["m.period"]).replace("h", "ч"))}</div>
+    <div><div class="rowlbl">Сеть</div><div class="chips eq" style="grid-template-columns:repeat(${chains.length},minmax(0,1fr))">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
+    <div><div class="rowlbl">Период</div><div class="chips eq" style="grid-template-columns:repeat(${periods.length},minmax(0,1fr))">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <button class="cta" data-act="find">${svg("search")}Найти токены</button>
   </div>
   ${jobHTML()}
@@ -452,6 +501,72 @@ function barsHTML(rows, fmt){
   const mx = Math.max(...rows.map(r => num(r[1])), 1);
   return `<div class="card bars">${rows.map(([n, v]) => `<div class="bar"><div class="bt"><b>${esc(n)}</b><span>${esc(fmt(v))}</span></div><div class="tr"><i style="width:${Math.max(4, Math.round(num(v) / mx * 100))}%"></i></div></div>`).join("")}</div>`;
 }
+// «↻ Обновить» на вкладке «Ончейн»: объёмы и комиссии тянем из DefiLlama прямо в окне, без закрытия.
+// Миграции считает бот через GMGN (там нужен ключ) — их обновляет только бот, раз в час.
+const LLAMA_CH = {sol: "solana", bsc: "bsc", robinhood: "robinhood", elysium: "elysium", arc: "arc"};
+const BOT_CATS = ["telegram bot", "trading app", "trading bot", "bot", "trading bots"];
+const BOT_NM = ["axiom", "photon", "bullx", "gmgn", "trojan", "bloom", "maestro", "banana", "bonkbot", "padre",
+  "nova", "sigma", "fomo", "tradewiz", "pepeboost", "unibot", "sol trading bot", "mevx", "okx dex bot"];
+let ocLoading = "", ocMsg = "";
+const pname = p => String(p.displayName || p.name || p.module || "?");
+const topN = (prot, n, pick) => (prot || []).filter(p => p && (!pick || pick(p)) && +p.total24h > 0)
+  .sort((a, b) => b.total24h - a.total24h).slice(0, n).map(p => [pname(p), Math.round(p.total24h)]);
+async function llama(path, chart){
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 20000);
+  try {
+    const r = await fetch("https://api.llama.fi" + path + "?excludeTotalDataChart=" + (chart ? "false" : "true") + "&excludeTotalDataChartBreakdown=true", {signal: ctl.signal});
+    if (r.status === 400 || r.status === 404) throw new Error("DefiLlama пока не отслеживает эту сеть");
+    if (!r.ok) throw new Error("DefiLlama ответил " + r.status);
+    return await r.json();
+  } finally { clearTimeout(tm); }
+}
+async function refreshOc(){
+  const chain = ocChain, ln = LLAMA_CH[chain] || chain;
+  if (ocLoading) return;
+  ocLoading = chain; ocMsg = ""; render(true);
+  const o = Object.assign({}, (P.oc || {})[chain] || {});
+  const errs = [];
+  try {
+    const d = await llama("/overview/dexs/" + ln, true);
+    o.vd = (d.totalDataChart || []).slice(-7).filter(x => Array.isArray(x) && x.length > 1).map(x => [+x[0], Math.round(+x[1] || 0)]);
+    o.v24 = Math.round(+d.total24h || 0) || undefined; o.v7 = Math.round(+d.total7d || 0) || undefined;
+    o.ch = d.change_1d != null ? +d.change_1d : undefined; o.dx = topN(d.protocols, 4);
+  } catch (e) { errs.push("объёмы: " + (e.name === "AbortError" ? "нет ответа" : e.message)); }
+  try {
+    const f = await llama("/overview/fees/" + ln);
+    o.bt = topN(f.protocols, 5, p => BOT_CATS.includes(String(p.category || "").toLowerCase()) || BOT_NM.some(b => pname(p).toLowerCase().includes(b)));
+    o.lp = topN(f.protocols, 3, p => ["launchpad", "launchpads"].includes(String(p.category || "").toLowerCase()));
+  } catch (e) { errs.push("комиссии: " + (e.name === "AbortError" ? "нет ответа" : e.message)); }
+  if (errs.length < 2){ o.t = Math.floor(Date.now() / 1000); delete o.e; P.oc = P.oc || {}; P.oc[chain] = o; }
+  const hm = new Date().toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"});
+  ocMsg = errs.length === 2 ? "не обновилось (" + errs[0] + ") — показаны данные бота"
+        : errs.length ? "частично: " + errs[0] : "обновлено в " + hm + " · миграции — от бота";
+  ocLoading = "";
+  try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(errs.length === 2 ? "error" : "success"); } catch (e) {}
+  if (screen === "onchain") render(true);
+}
+// Неделя по дням: один ряд — один цвет сети, без легенды; тап по столбику — дата и значение
+const WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+let ocTip = {};
+function dayLbl(ts){ const d = new Date(ts * 1000); return WD[d.getUTCDay()]; }
+function dayFull(ts){ const d = new Date(ts * 1000); return WD[d.getUTCDay()] + " " + String(d.getUTCDate()).padStart(2, "0") + "." + String(d.getUTCMonth() + 1).padStart(2, "0"); }
+function weekHTML(id, title, days, fmt){
+  if (!days || days.length < 2) return "";
+  const today = Math.floor(Date.now() / 86400000) * 86400;
+  const max = Math.max(...days.map(x => x[1]), 1);
+  const lastFull = days.map(x => x[0] < today).lastIndexOf(true);
+  const sel = ocTip[id] !== undefined ? ocTip[id] : (lastFull >= 0 ? lastFull : days.length - 1);   // по умолчанию — вчера (полный день)
+  const [ts, v] = days[sel];
+  const partial = ts >= today;
+  const full = days.filter(x => x[0] < today), avg = full.length ? full.reduce((a, x) => a + x[1], 0) / full.length : 0;
+  return `<div class="sec">${esc(title)}</div><div class="card wk">
+    <div class="wkh"><span class="wkv">${esc(fmt(v))}</span><span class="wkd">${esc(dayFull(ts))}${partial ? " · сегодня, день ещё идёт" : ""}</span></div>
+    <div class="wkb" role="img" aria-label="${esc(title)}: ${days.map(x => dayFull(x[0]) + " " + fmt(x[1])).join(", ")}">
+      ${days.map(([t, val], i) => `<button class="wkc${i === sel ? " on" : ""}${t >= today ? " part" : ""}" data-wk="${id}:${i}" aria-label="${esc(dayFull(t))}: ${esc(fmt(val))}">
+        <i style="height:${Math.max(3, Math.round(val / max * 100))}%"></i><span>${esc(dayLbl(t))}</span></button>`).join("")}
+    </div>
+    ${avg ? `<div class="wkf">в среднем за полный день ${esc(fmt(avg))}</div>` : ""}</div>`;
+}
 function onchainHTML(){
   const ch = (P.ch || []).filter(([v]) => v !== "all");
   ensureOc();
@@ -459,21 +574,25 @@ function onchainHTML(){
   const tick = {sol: "SOL", bsc: "BNB", robinhood: "RH", arc: "ARC", elysium: "ELY"}[ocChain] || "";
   const when = o.t ? new Date(o.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
   let h = topHTML("Ончейн", true) + `<div class="chips eq" style="margin-bottom:12px;grid-template-columns:repeat(${ch.length},minmax(0,1fr))">${ch.map(([v, l]) => `<button class="chip${ocChain === v ? " on" : ""}" data-oc="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
+  const busyR = ocLoading === ocChain;
+  h += `<div class="ocbar"><span>${ocMsg ? esc(ocMsg) : (when ? "данные на " + when : "")}</span><button class="ocref" data-ocref="1"${busyR ? " disabled" : ""}>${busyR ? "Обновляю…" : "↻ Обновить"}</button></div>`;
   if (!Object.keys(o).length || (!o.v24 && o.mg === undefined && !(o.bt || []).length)){
     return h + `<div class="card"><div class="empty" style="padding:40px 20px">По этой сети пока нет данных.<br><br>Бот обновляет их раз в час. Если сеть новая, в DefiLlama её может ещё не быть${o.e ? `<br><br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div></div>`;
   }
   const c = o.ch;
   h += `<div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
-    <div><div class="lbl">ОБЪЁМ DEX · 24Ч</div><div class="big">${esc(usdBig(o.v24))}</div></div>
+    <div><div class="lbl">Объём DEX за 24 ч</div><div class="big">${esc(usdBig(o.v24))}</div></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${c !== undefined && c !== null ? `<span class="chg${c < 0 ? " dn" : ""}">${c > 0 ? "+" : ""}${(+c).toFixed(1)}% за сутки</span>` : ""}${o.v7 ? `<span class="sub2">за 7 дней ${esc(usdBig(o.v7))}</span>` : ""}</div></div>`;
   h += `<div class="tiles two2">
     <div class="tile"><span class="a">Миграций за 24ч</span><span class="b">${o.mg !== undefined ? fmtN(o.mg) : "—"}</span><span class="c">${o.mb ? "до миграции ~" + fmtN(o.mb) + " мин" : "по данным GMGN"}</span></div>
     ${(o.ml || []).length
       ? `<div class="tile"><span class="a">Лидер: ${esc(o.ml[0][0])}</span><span class="b">${fmtN(o.ml[0][1])}</span><span class="c">${o.mg ? Math.round(o.ml[0][1] / o.mg * 100) + "% миграций" : "миграций за 24ч"}</span></div>`
       : `<div class="tile"><span class="a">${esc((o.lp || [])[0] ? o.lp[0][0] : "Лаунчпад")}</span><span class="b">${esc((o.lp || [])[0] ? usdBig(o.lp[0][1]) : "—")}</span><span class="c">комиссии за 24ч</span></div>`}</div>`;
-  if ((o.dx || []).length) h += `<div class="sec">ПЛОЩАДКИ · ОБЪЁМ 24Ч</div>` + barsHTML(o.dx, usdBig);
-  if ((o.bt || []).length) h += `<div class="sec">ТОРГОВЫЕ БОТЫ · КОМИССИИ 24Ч</div><div class="sdesc">сколько пользователи заплатили ботам — чем больше, тем активнее бот</div>` + barsHTML(o.bt, usdBig);
-  if ((o.ml || []).length) h += `<div class="sec">МИГРАЦИИ ПО ЛАУНЧПАДАМ · 24Ч</div>` + barsHTML(o.ml, v => fmtN(v));
+  if ((o.dx || []).length) h += `<div class="sec">Биржи, объём за 24 ч</div>` + barsHTML(o.dx, usdBig);
+  if ((o.bt || []).length) h += `<div class="sec">Торговые боты, комиссии за 24 ч</div><div class="sdesc">сколько пользователи заплатили ботам</div>` + barsHTML(o.bt, usdBig);
+  h += weekHTML("vd", "Объём DEX по дням", o.vd, usdBig);
+  h += weekHTML("md", "Миграции по дням", o.md, v => fmtN(Math.round(v)));
+  if ((o.ml || []).length) h += `<div class="sec">Миграции по лаунчпадам, 24 ч</div>` + barsHTML(o.ml, v => fmtN(v));
   h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
   return h;
 }
@@ -488,10 +607,10 @@ function presetSummary(v){
 }
 function presetsHTML(){
   const names = Object.keys(P.ps || {});
-  let h = topHTML("Пресеты", true) + `<div class="sec">СОХРАНИТЬ ТЕКУЩИЕ КАК НОВЫЙ</div><div class="card"><div class="pc">
+  let h = topHTML("Пресеты", true) + `<div class="sec">Сохранить текущие как новый</div><div class="card"><div class="pc">
     <input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета">
     <div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div></div></div>
-    <div class="sec">МОИ ПРЕСЕТЫ<i>${names.length}</i></div><div class="card">`;
+    <div class="sec">Мои пресеты<i>${names.length}</i></div><div class="card">`;
   if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — сохрани текущие настройки как новый.</div></div>`;
   names.forEach(n => {
     const del = ops.some(o => o[0] === "delete" && o[1] === n), ren = renames[n], isCur = sel === n;
@@ -626,7 +745,9 @@ function go(s, to){
   if (to){ const el = document.querySelector(`[data-row="${to}"]`); if (el) el.scrollIntoView({block: "center"}); }
 }
 document.addEventListener("click", e => {
-  const oc = e.target.closest("[data-oc]"); if (oc){ ocChain = oc.dataset.oc; render(true); return; }
+  if (e.target.closest("[data-ocref]")){ refreshOc(); return; }
+  const wk = e.target.closest("[data-wk]"); if (wk){ const [id, i] = wk.dataset.wk.split(":"); ocTip[id] = +i; render(true); return; }
+  const oc = e.target.closest("[data-oc]"); if (oc){ ocChain = oc.dataset.oc; ocMsg = ""; ocTip = {}; render(true); return; }
   const pk = e.target.closest("[data-pick]"); if (pk){ openPicker(); return; }
   const pv = e.target.closest("[data-pv]"); if (pv){ pickPreset(pv.dataset.pv); closeReview(); return; }
   const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go, g.dataset.to); return; }
