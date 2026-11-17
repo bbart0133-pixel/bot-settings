@@ -88,12 +88,24 @@ button{cursor:pointer}
 .ocref{flex:0 0 auto;height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(var(--rgb),.45);background:rgba(var(--rgb),.1);color:var(--acc-l);font:600 13px Onest,system-ui,sans-serif}
 .ocref:disabled{opacity:.6}
 .wk{padding:14px 14px 12px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:-4px 0 12px;font-size:12px;color:var(--hint)}
+.lgi{display:inline-flex;align-items:center;gap:6px}
+.lgi i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.lgi b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.wkc.stk .col{width:100%;max-width:44px;display:flex;flex-direction:column-reverse;gap:2px;opacity:.55;transition:opacity .15s}
+.wkc.stk .col i{display:block;min-height:2px;border-radius:0}
+.wkc.stk .col i:last-child{border-radius:4px 4px 0 0}
+.wkc.stk.on .col{opacity:1}
+.wkc.stk.part .col{opacity:.3}
+.wkc.stk.part.on .col{opacity:.7}
+.wkc.stk .d{font-size:11px;color:var(--dim);line-height:1}
+.wkc.stk.on .d{color:var(--text);font-weight:600}
 .wkh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .wkv{font-family:var(--hd);font-size:22px;font-weight:700;color:var(--text)}
 .wkd{font-size:12px;color:var(--hint)}
-.wkb{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;height:120px;align-items:end}
+.wkb{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;height:120px;align-items:end}
 .wkc{all:unset;cursor:pointer;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
-.wkc i{display:block;width:100%;max-width:30px;border-radius:4px 4px 0 0;background:rgba(var(--rgb),.38);transition:background .15s}
+.wkc i{display:block;width:100%;max-width:44px;border-radius:4px 4px 0 0;background:rgba(var(--rgb),.38);transition:background .15s}
 .wkc.on i{background:var(--acc)}
 .wkc.part i{background:repeating-linear-gradient(135deg,rgba(var(--rgb),.5) 0 3px,rgba(var(--rgb),.18) 3px 6px)}
 .wkc.part.on i{background:repeating-linear-gradient(135deg,var(--acc) 0 3px,rgba(var(--rgb),.45) 3px 6px)}
@@ -497,9 +509,9 @@ function usdBig(v){
   for (const [lim, suf] of [[1e9, "B"], [1e6, "M"], [1e3, "K"]]) if (n >= lim){ const x = n / lim; return "$" + (x < 10 ? +x.toFixed(1) : Math.round(x)) + suf; }
   return "$" + Math.round(n);
 }
-function barsHTML(rows, fmt){
+function barsHTML(rows, fmt, colors){
   const mx = Math.max(...rows.map(r => num(r[1])), 1);
-  return `<div class="card bars">${rows.map(([n, v]) => `<div class="bar"><div class="bt"><b>${esc(n)}</b><span>${esc(fmt(v))}</span></div><div class="tr"><i style="width:${Math.max(4, Math.round(num(v) / mx * 100))}%"></i></div></div>`).join("")}</div>`;
+  return `<div class="card bars">${rows.map(([n, v]) => `<div class="bar"><div class="bt"><b>${esc(n)}</b><span>${esc(fmt(v))}</span></div><div class="tr"><i style="width:${Math.max(4, Math.round(num(v) / mx * 100))}%${colors && colors[n] ? ";background:" + colors[n] : ""}"></i></div></div>`).join("")}</div>`;
 }
 // «↻ Обновить» на вкладке «Ончейн»: объёмы и комиссии тянем из DefiLlama прямо в окне, без закрытия.
 // Миграции считает бот через GMGN (там нужен ключ) — их обновляет только бот, раз в час.
@@ -550,7 +562,17 @@ const WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
 let ocTip = {};
 function dayLbl(ts){ const d = new Date(ts * 1000); return WD[d.getUTCDay()]; }
 function dayFull(ts){ const d = new Date(ts * 1000); return WD[d.getUTCDay()] + " " + String(d.getUTCDate()).padStart(2, "0") + "." + String(d.getUTCMonth() + 1).padStart(2, "0"); }
-function weekHTML(id, title, days, fmt){
+// цвет закреплён за площадкой (не за местом в рейтинге); набор проверен на различимость при дальтонизме
+const LP_COLOR = {"Pump.fun": "#2fae62", "Meteora": "#e0602a", "Raydium LaunchLab": "#8b6cf0", "Bonk": "#b8890f",
+  "four.meme": "#3987e5", "Flap": "#d95926", "другие": "#55555c"};   // фирменные оттенки, приглушены под тёмный фон
+const LP_SPARE = ["#8b6cf0", "#b8890f", "#3987e5", "#d95926"];
+function lpColors(names){
+  const used = new Set(), out = {};
+  names.forEach(n => { if (LP_COLOR[n] && !used.has(LP_COLOR[n])){ out[n] = LP_COLOR[n]; used.add(out[n]); } });
+  names.forEach(n => { if (!out[n]) { out[n] = LP_SPARE.find(c => !used.has(c)) || "#55555c"; used.add(out[n]); } });
+  return out;
+}
+function weekHTML(id, title, days, fmt, stacks){
   if (!days || days.length < 2) return "";
   const today = Math.floor(Date.now() / 86400000) * 86400;
   const max = Math.max(...days.map(x => x[1]), 1);
@@ -559,11 +581,26 @@ function weekHTML(id, title, days, fmt){
   const [ts, v] = days[sel];
   const partial = ts >= today;
   const full = days.filter(x => x[0] < today), avg = full.length ? full.reduce((a, x) => a + x[1], 0) / full.length : 0;
+  if (stacks && stacks.length) return stackHTML(id, title, days, fmt, stacks, sel, today, avg);
   return `<div class="sec">${esc(title)}</div><div class="card wk">
     <div class="wkh"><span class="wkv">${esc(fmt(v))}</span><span class="wkd">${esc(dayFull(ts))}${partial ? " · сегодня, день ещё идёт" : ""}</span></div>
     <div class="wkb" role="img" aria-label="${esc(title)}: ${days.map(x => dayFull(x[0]) + " " + fmt(x[1])).join(", ")}">
       ${days.map(([t, val], i) => `<button class="wkc${i === sel ? " on" : ""}${t >= today ? " part" : ""}" data-wk="${id}:${i}" aria-label="${esc(dayFull(t))}: ${esc(fmt(val))}">
         <i style="height:${Math.max(3, Math.round(val / max * 100))}%"></i><span>${esc(dayLbl(t))}</span></button>`).join("")}
+    </div>
+    ${avg ? `<div class="wkf">в среднем за полный день ${esc(fmt(avg))}</div>` : ""}</div>`;
+}
+function stackHTML(id, title, days, fmt, stacks, sel, today, avg){
+  const max = Math.max(...days.map(x => x[1]), 1);
+  const [ts, tot] = days[sel];
+  const partial = ts >= today;
+  const legend = stacks.map(st => `<span class="lgi"><i style="background:${st.c}"></i>${esc(st.n)} <b>${esc(fmt(st.v[sel] || 0))}</b></span>`).join("");
+  return `<div class="sec">${esc(title)}</div><div class="card wk">
+    <div class="wkh"><span class="wkv">${esc(fmt(tot))}</span><span class="wkd">${esc(dayFull(ts))}${partial ? " · сегодня, день ещё идёт" : ""}</span></div>
+    <div class="lg">${legend}</div>
+    <div class="wkb" role="img" aria-label="${esc(title)} по площадкам">
+      ${days.map(([t, val], i) => `<button class="wkc stk${i === sel ? " on" : ""}${t >= today ? " part" : ""}" data-wk="${id}:${i}" aria-label="${esc(dayFull(t))}: ${esc(stacks.map(st => st.n + " " + fmt(st.v[i] || 0)).join(", "))}">
+        <span class="col" style="height:${Math.max(3, Math.round(val / max * 100))}%">${stacks.map(st => (st.v[i] || 0) > 0 ? `<i style="flex:${st.v[i]} 1 0;background:${st.c}"></i>` : "").join("")}</span><span class="d">${esc(dayLbl(t))}</span></button>`).join("")}
     </div>
     ${avg ? `<div class="wkf">в среднем за полный день ${esc(fmt(avg))}</div>` : ""}</div>`;
 }
@@ -591,8 +628,15 @@ function onchainHTML(){
   if ((o.dx || []).length) h += `<div class="sec">Биржи, объём за 24 ч</div>` + barsHTML(o.dx, usdBig);
   if ((o.bt || []).length) h += `<div class="sec">Торговые боты, комиссии за 24 ч</div><div class="sdesc">сколько пользователи заплатили ботам</div>` + barsHTML(o.bt, usdBig);
   h += weekHTML("vd", "Объём DEX по дням", o.vd, usdBig);
-  h += weekHTML("md", "Миграции по дням", o.md, v => fmtN(Math.round(v)));
-  if ((o.ml || []).length) h += `<div class="sec">Миграции по лаунчпадам, 24 ч</div>` + barsHTML(o.ml, v => fmtN(v));
+  let stacks = null;
+  if (o.md && o.mdl && Object.keys(o.mdl).length){
+    const names = Object.keys(o.mdl), col = lpColors(names);
+    stacks = names.map(n => ({n, c: col[n], v: o.mdl[n]}));
+    const rest = o.md.map(([, tot], i) => Math.max(0, tot - names.reduce((a, n) => a + (o.mdl[n][i] || 0), 0)));
+    if (rest.some(x => x > 0)) stacks.push({n: "другие", c: LP_COLOR["другие"], v: rest});
+  }
+  h += weekHTML("md", "Миграции по дням", o.md, v => fmtN(Math.round(v)), stacks);
+  if ((o.ml || []).length) h += `<div class="sec">Миграции по лаунчпадам, 24 ч</div>` + barsHTML(o.ml, v => fmtN(v), lpColors(o.ml.map(r => r[0])));
   h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
   return h;
 }
