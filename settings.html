@@ -290,7 +290,8 @@ function valText(k, v){
   return fmtN(v) + (r.u ? (r.u === "%" ? "%" : " " + r.u) : "");
 }
 const labelOf = k => { const r = findRow(k); if (!r) return k; if (r.t === "range") return r.l + (k === r.k ? " от" : " до"); return r.l; };
-const changedKeys = () => Object.keys(cur).filter(k => String(cur[k]) !== String(base[k]));
+// сеть и период — не настройка пресета: они уходят боту вместе с «Найти токены» / запуском, кнопку «Сохранить» не вызывают
+const changedKeys = () => Object.keys(cur).filter(k => !k.startsWith("m.") && String(cur[k]) !== String(base[k]));
 const presetChanged = () => sel !== (P.p || "");
 function changeList(){
   const out = [];
