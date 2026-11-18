@@ -205,7 +205,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .abar{display:none;gap:8px}
 .abar.on{display:flex}
 .abar .cta{height:50px;white-space:nowrap;font-size:15px}
-.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;padding:5px}
+.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;padding:5px}
 .nav button{position:relative;height:50px;border-radius:17px;border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px}
 .nav button.on{background:var(--chip);color:var(--acc-l);font-weight:600}
 .nav .n{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;padding:0 4px;background:var(--acc);color:var(--acc-ink);font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
@@ -297,6 +297,73 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .wkc.on i{background:var(--acc)}
 .wkc.part i{background:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 3px,rgba(255,255,255,.05) 3px 6px)}
 .sheet{background:rgba(0,0,0,.5);-webkit-backdrop-filter:none;backdrop-filter:none}
+
+/* ===== 🧠 Стратегия ===== */
+.x{--x-acc:var(--acc);--x-rgb:var(--rgb);--x-flip:#ffb547;--x-fliprgb:255,181,71;--x-warn:#f5c451;--x-bad:#ff6b6b;--x-line:rgba(255,255,255,.075);--x-card:rgba(255,255,255,.028)}
+:root[data-theme="bsc"] .x{--x-flip:#a78bfa;--x-fliprgb:167,139,250}
+.x button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+.x-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.x-back{width:38px;height:38px;border-radius:12px;border:1px solid var(--x-line)!important;display:flex;align-items:center;justify-content:center;color:var(--hint);font-size:20px!important}
+.x-h{font-weight:700;font-size:24px;letter-spacing:-.3px;flex:1;min-width:0;font-family:var(--hd)}
+.x-pill{font-size:12.5px;color:var(--hint);border:1px solid var(--x-line);border-radius:999px;padding:6px 10px;white-space:nowrap}
+.x-card{display:block;width:100%;background:var(--x-card);border:1px solid var(--x-line)!important;border-radius:18px;padding:14px}
+.x-vd.x-w{border-color:rgba(245,196,81,.35)!important;background:rgba(245,196,81,.06)}
+.x-vd.x-g{border-color:rgba(var(--x-rgb),.35)!important;background:rgba(var(--x-rgb),.06)}
+.x-vd.x-b{border-color:rgba(255,107,107,.35)!important;background:rgba(255,107,107,.06)}
+.x-vt{font-weight:700;font-size:16px;display:flex;gap:8px;align-items:flex-start}
+.x-vs{color:var(--hint);font-size:13px;margin-top:6px}
+.x-sec{font-size:13px;font-weight:600;color:var(--hint);margin:18px 4px 8px}
+.x-mode{margin-bottom:10px;position:relative}
+.x-mode.x-win{border-color:rgba(var(--x-rgb),.45)!important}
+.x-mh{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--hint);padding-right:104px;white-space:nowrap;overflow:hidden}
+.x-mh b{color:var(--text);font-size:14.5px}
+.x-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.x-big{font-size:30px;font-weight:700;letter-spacing:-.5px;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.x-row{display:flex;gap:6px 14px;font-size:12.5px;color:var(--hint);flex-wrap:wrap}
+.x-row b{color:var(--text);font-weight:600}
+.x-ok{color:var(--x-acc)!important}.x-bad{color:var(--x-bad)!important}
+.x-tag{display:inline-flex;gap:6px;align-items:center;margin-top:10px;font-size:12px;color:var(--x-warn);background:rgba(245,196,81,.08);border-radius:8px;padding:5px 8px}
+.x-spark{position:absolute;right:14px;top:30px;width:96px;height:40px}
+.x-chev{position:absolute;right:14px;bottom:14px;color:var(--dim)}
+.x-list{padding:2px 14px}
+.x-it{display:grid!important;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:11px 2px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:13.5px;width:100%}
+.x-it:last-child{border-bottom:0!important}
+.x-m{font-size:12px;color:var(--dim)}
+.x-num{font-variant-numeric:tabular-nums;font-weight:600}
+.x-note{font-size:12px;color:var(--dim);margin:10px 4px 0}
+.x-btn{display:flex!important;align-items:center;justify-content:center!important;gap:8px;height:50px;border-radius:14px;font-weight:600;font-size:14.5px;width:100%;text-align:center!important}
+.x-ghost{border:1px solid var(--x-line)!important}
+.x-solid{background:var(--acc)!important;color:var(--acc-ink)!important}
+.x-tabs{display:flex;gap:6px;margin-bottom:12px}
+.x-tab{flex:1 1 0;min-width:0;text-align:center!important;font-size:13px;padding:8px 2px!important;border-radius:11px;border:1px solid var(--x-line)!important;color:var(--hint)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-tab.on{border-color:var(--mc)!important;color:var(--text)!important;background:rgba(var(--mrgb),.10)!important}
+.x-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.x-tile{background:var(--x-card);border:1px solid var(--x-line);border-radius:14px;padding:10px}
+.x-tile .x-k{font-size:11.5px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-tile .x-v{font-size:18px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.x-s{display:grid!important;grid-template-columns:auto minmax(0,1fr) 32px;align-items:center;gap:8px;padding:10px 14px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:13.5px;width:100%}
+.x-s:last-child{border-bottom:0!important}
+.x-s .x-k{color:var(--hint);white-space:nowrap}
+.x-s .x-v{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.x-s .x-v.x-off{color:var(--dim);font-weight:500}
+.x-cp{width:32px;height:32px;border-radius:9px;border:1px solid var(--x-line);display:flex;align-items:center;justify-content:center;color:var(--hint)}
+.x-s.done .x-cp{color:var(--x-acc);border-color:rgba(var(--x-rgb),.5)}
+.x-in{width:100%;height:46px;margin-top:10px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 14px var(--hd);padding:0 12px;outline:none}
+.x-in:focus,.x-fl input:focus{border-color:rgba(var(--x-rgb),.6)}
+.x-chips{display:flex;gap:6px;margin-top:8px}
+.x-chip{flex:1;height:36px;border-radius:11px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:13px}
+.x-chip.on{border-color:var(--acc)!important;color:var(--text)!important;background:rgba(var(--x-rgb),.12)!important}
+.x-link{color:var(--acc)!important;text-decoration:underline}
+.x-f{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.x-fl{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--hint)}
+.x-fl input{height:44px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 15px var(--hd);padding:0 12px;width:100%;outline:none}
+.x-tg{display:flex!important;align-items:center;justify-content:space-between;padding:12px 14px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:14px;width:100%}
+.x-tg:last-child{border-bottom:0!important}
+.x-sw{width:44px;height:26px;border-radius:13px;background:rgba(255,255,255,.12);position:relative;flex:0 0 44px}
+.x-sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+.x-sw.on{background:var(--acc)}.x-sw.on::after{left:21px}
+.x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
+.x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
 </head>
 <body>
@@ -312,6 +379,7 @@ const tg = window.Telegram && window.Telegram.WebApp;
 const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
 const SLIDERS = {min_winrate_pct: [30, 40, 50, 60]};
 const IC = {
+  strat: '<path d="M3 17l5-5 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h5v5" stroke-linecap="round" stroke-linejoin="round"/>',
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" stroke-linejoin="round"/>',
   filt: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" stroke-linecap="round"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
   layers: '<path d="M12 3l9 5-9 5-9-5 9-5z" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" stroke-linejoin="round"/>',
@@ -667,7 +735,7 @@ function presetsHTML(){
   return h + `</div>`;
 }
 function navHTML(){
-  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
+  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["strat", "strat", "Стратегия"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
   return it.map(([s, i, l]) => { const n = scrCount(s);
     return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
 }
@@ -677,7 +745,8 @@ function ensureOc(){
 }
 function applyTheme(){
   if (screen === "onchain") ensureOc();
-  const t = THEME_OF[screen === "onchain" ? ocChain : cur["m.chain"]] || "def";
+  const sc = screen === "strat" && typeof xD === "function" && xD() && ST.v !== "list" ? xD().c : null;
+  const t = THEME_OF[screen === "onchain" ? ocChain : sc || cur["m.chain"]] || "def";
   if (document.documentElement.dataset.theme === t) return;
   document.documentElement.dataset.theme = t;
   const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
@@ -686,7 +755,7 @@ function applyTheme(){
 function render(keepScroll){
   applyTheme();
   const y = window.scrollY;
-  const html = screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
+  const html = screen === "strat" ? stratHTML() : screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
   document.getElementById("app").innerHTML = html;
   fitHollow();
   updateDock();
@@ -862,6 +931,435 @@ if (tg){
   try { tg.setHeaderColor && tg.setHeaderColor("#050607"); tg.setBackgroundColor && tg.setBackgroundColor("#050607"); } catch (e) {}
   if (inTG) tg.BackButton.onClick(closeReview);
 }
+
+// SIM-BEGIN — перенос расчёта бота (_strat_check, _sim_tp, _follow_sim, _net_roi, _risk_stats, _oos_verdict) один в один
+const SIM = (() => {
+  const netRoi = (g, nSells, cost, stake) => !cost ? g - 1
+    : g * (1 - cost.f) ** 2 * (1 - cost.so) / (1 + cost.si) - 1 - cost.gas * (1 + Math.max(1, nSells)) / stake;
+  const cmpC = (a, b) => (a[0] - b[0]) || (a[1] - b[1]) || (a[2] - b[2]);
+  function priceAt(cs, ts){
+    let prev = null;
+    for (let k = 0; k < cs.length; k++){ if (cs[k][0] <= ts) prev = k; else break; }
+    if (prev === null) return null;
+    const tm = cs[prev][0], o = cs[prev][1];
+    if (prev + 1 < cs.length){
+      const tm2 = cs[prev + 1][0], o2 = cs[prev + 1][1];
+      if (tm2 > tm && o && o2) return o + (o2 - o) * Math.min(1, (ts - tm) / (tm2 - tm));
+    }
+    return (o && ts - tm <= 3600) ? o : null;
+  }
+  function followSim(t, p0, tp, candles, hits, timeout, info){
+    const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort((a, b) => (a[0] - b[0]) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) || (a[2] - b[2]) || (a[3] - b[3]));
+    if (!ev.length) return null;
+    let held = +(t.amt || 0);
+    const fi = ev.findIndex(e => e[1] === "buy");
+    if (fi < 0 || held <= 0) return null;
+    let rest = ev.slice(0, fi).concat(ev.slice(fi + 1));
+    if (timeout) rest = rest.concat([[t.fb + timeout[0], "timeout", 0, 0]]).sort((a, b) => a[0] - b[0]);
+    let left = 1, proceeds = 0; const levels = (tp || []).map(x => x.slice());
+    const cs = (candles || []).filter(c => c[0] >= t.fb); let ci = 0;
+    const sorted = (candles || []).slice().sort(cmpC);
+    const runC = until => {
+      while (ci < cs.length && cs[ci][0] < until){
+        const [tm, , h] = cs[ci];
+        while (levels.length && left > 1e-12 && h >= p0 * (1 + levels[0][0] / 100)){
+          const [pct, frac] = levels.shift(); const sell = left * frac / 100;
+          proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
+        }
+        ci++;
+      }
+    };
+    let last = null;
+    for (const [ts, kind, amt, usd] of rest){
+      runC(ts);
+      if (left <= 1e-12) break;
+      if (kind === "timeout"){
+        const px = priceAt(sorted, ts); if (!px) return null;
+        const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell; last = px;
+        if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = ts; }
+        continue;
+      }
+      if (kind === "buy"){ held += amt; continue; }
+      if (amt <= 0 || held <= 0) continue;
+      const price = usd > 0 ? usd / amt : null; if (!price) continue;
+      const frac = Math.min(1, amt / held), sold = left * frac;
+      proceeds += sold * price / p0; left -= sold; held = Math.max(0, held - amt); last = price;
+    }
+    if (left > 1e-9){
+      if (left <= 0.05 && last){ proceeds += left * last / p0; left = 0; } else return null;
+    }
+    return proceeds - 1;
+  }
+  function simGross(t, tp, candles, follow, hits, timeout, info, D){
+    const p0 = t.cp || t.p0; if (!p0) return null;
+    const soldPx = (t.sells && t.sold) ? t.earned / t.sold : null;
+    if (!follow){
+      const win = candles.filter(c => t.fb <= c[0] && c[0] <= t.fb + D.hold_h * 3600);
+      if (!win.length || !((tp && tp.length) || timeout)) return null;
+      let left = 1, proceeds = 0; const levels = (tp || []).map(x => x.slice());
+      let toTs = timeout ? t.fb + timeout[0] : null; const sorted = candles.slice().sort(cmpC);
+      for (const [tm, , h] of win){
+        if (toTs !== null && tm > toTs){
+          const px = priceAt(sorted, toTs); if (!px) return null;
+          const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell; toTs = null;
+          if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = t.fb + timeout[0]; }
+          if (left <= 1e-9) break;
+        }
+        while (levels.length && h >= p0 * (1 + levels[0][0] / 100)){
+          const [pct, frac] = levels.shift(); const sell = left * frac / 100;
+          proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
+        }
+      }
+      if (toTs !== null && left > 1e-9){
+        const px = priceAt(sorted, toTs); if (!px) return null;
+        const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell;
+        if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = toTs; }
+      }
+      if (left > 1e-9) proceeds += left * win[win.length - 1][1] / p0;
+      return proceeds - 1;
+    }
+    if (t.ev && t.ev.length && t.amt){
+      if (((tp && tp.length) || timeout) && !candles.length) return null;
+      return followSim(t, p0, tp, candles, hits, timeout, info);
+    }
+    if (timeout) return null;
+    if (!tp || !tp.length) return soldPx ? soldPx / p0 - 1 : null;
+    if (!candles.length) return null;
+    const end = t.ls ? t.ls : D.now;
+    let left = 1, proceeds = 0; const levels = tp.map(x => x.slice());
+    for (const [tm, , h] of candles){
+      if (tm < t.fb || tm > end || !levels.length) continue;
+      while (levels.length && h >= p0 * (1 + levels[0][0] / 100)){
+        const [pct, frac] = levels.shift(); const sell = left * frac / 100;
+        proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
+      }
+    }
+    if (left > 1e-9){ if (!soldPx) return null; proceeds += left * soldPx / p0; }
+    return proceeds - 1;
+  }
+  function simTp(t, tp, candles, follow, hits, cost, timeout, info, D){
+    if (cost && t.cr) cost = {...cost, si: 0};
+    const before = hits.length;
+    const g = simGross(t, tp, candles, follow, hits, timeout, info, D);
+    if (g === null || g === undefined) return null;
+    const nTp = hits.length - before;
+    const closed = (tp && tp.length && nTp === tp.length && tp[tp.length - 1][1] === 100) || info.to_closed;
+    return netRoi(g + 1, nTp + (info.to_used ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
+  }
+  function check(t, v){
+    if (t.cf) return "копия не исполнилась бы (slippage)";
+    if (v.lp_mode === "only" && t.lp !== v.lp) return "лаунчпад";
+    if (v.lp_mode === "not" && t.lp === v.lp) return "лаунчпад";
+    const mc = t.mc;
+    if ((v.cap || v.cap_min) && mc == null) return "капа неизвестна";
+    if (v.cap && mc > v.cap) return "капа";
+    if (v.cap_min && mc < v.cap_min) return "капа";
+    const ta = t.age;
+    if ((v.age || v.age_min) && ta == null) return "возраст неизвестен";
+    if (v.age && ta > v.age * 60) return "возраст";
+    if (v.age_min && ta < v.age_min * 60) return "возраст";
+    if (v.min_usd && t.usd < v.min_usd) return "вход";
+    if (v.max_usd && t.usd > v.max_usd) return "вход";
+    return "";
+  }
+  const med = a => { const v = a.slice().sort((x, y) => x - y), n = v.length; return !n ? null : n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2; };
+  function riskStats(rows, stake){
+    const seq = rows.slice().sort((a, b) => (a.exit_ts || a.t.fb) - (b.exit_ts || b.t.fb));
+    let cur = 0, peak = 0, maxDd = 0, streak = 0, maxStreak = 0; const eq = [];
+    for (const d of seq){ const pnl = d.roi * stake; cur += pnl; peak = Math.max(peak, cur); maxDd = Math.max(maxDd, peak - cur);
+      streak = pnl <= 0 ? streak + 1 : 0; maxStreak = Math.max(maxStreak, streak); eq.push(cur); }
+    const out = {max_dd: maxDd, loss_streak: maxStreak, equity: eq, one_hit: null};
+    if (rows.length >= 2){
+      let best = rows[0]; for (const d of rows) if (d.roi > best.roi) best = d;
+      const total = rows.reduce((s, d) => s + d.roi, 0) * stake, ex = total - best.roi * stake;
+      if (total > 0 && ex <= 0) out.one_hit = {sym: best.t.sym || "?", roi: best.roi, ex};
+    }
+    return out;
+  }
+  function verdict(v){
+    const t = v.test;
+    if (!t || t.n < 3) return ["⚪", t ? "мало сделок, чтобы судить" : "после разделения сделок нет — не понять"];
+    if (t.total <= 0) return ["⚠️", "на новых сделках в минус — плюс был случайным, повторяться не будет"];
+    if (t.wr < (v.wr != null ? v.wr : t.wr) - 0.2) return ["🟡", "в плюсе, но винрейт заметно ниже, чем на подборе"];
+    return ["✅", "держится на новых сделках"];
+  }
+  function backtest(D, v){
+    const cost = D.cost, split = D.split, stake = D.stake, rows = [];
+    for (const t of D.tokens){
+      if (check(t, v)) continue;
+      const info = {}, hits = [], cs = D.candles[t.a] || [];
+      let roi;
+      if (v.once !== false) roi = simTp(t, v.tp || [], cs, v.follow !== false, hits, cost, v.to || null, info, D);
+      else roi = t.roi != null ? netRoi(1 + t.roi, 1, cost, stake) : null;
+      if (roi === null || roi === undefined) continue;
+      const tp = v.tp || [];
+      let exit = null;
+      if (info.to_closed) exit = info.to_ts;
+      else if (tp.length && hits.length === tp.length && tp[tp.length - 1][1] === 100) exit = hits[hits.length - 1][1];
+      else if (v.follow !== false) exit = t.ls || null;
+      else exit = t.fb + D.hold_h * 3600;
+      rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: exit, hold: exit ? exit - t.fb : null,
+                 tp_all: tp.length > 0 && hits.length === tp.length, to_hit: !!info.to_used});
+    }
+    const out = {...v};
+    if (!rows.length) return Object.assign(out, {n: 0, wr: 0, full_total: 0, test: null, verdict: null, max_dd: 0, loss_streak: 0, equity: [], one_hit: null});
+    const rois = rows.map(d => d.roi), test = rows.filter(d => d.test).map(d => d.roi), train = rows.filter(d => !d.test).map(d => d.roi);
+    const wr = a => a.filter(r => r > 0).length / a.length, sum = a => a.reduce((s, x) => s + x, 0);
+    Object.assign(out, {n: rows.length, wr: wr(rois), full_total: sum(rois) * stake,
+      test: test.length ? {n: test.length, wr: wr(test), total: sum(test) * stake} : null});
+    out.verdict = split != null ? verdict({test: out.test, wr: train.length ? wr(train) : out.wr}) : null;
+    Object.assign(out, riskStats(rows, stake));
+    const holds = rows.filter(d => d.hold != null).map(d => d.hold);
+    out.exits = {n: rows.length, tp: rows.filter(d => d.tp_all).length, to: rows.filter(d => d.to_hit && !d.tp_all).length, hold: holds.length ? med(holds) : null};
+    out.mark = out.test && out.equity.length > 1 ? Math.max(0, out.equity.length - out.test.n) / (out.equity.length - 1) : null;
+    return out;
+  }
+  return {backtest};
+})();
+// SIM-END
+
+// ===== 🧠 Вкладка «Стратегия»: список поисков, сравнение режимов, настройки TradeWiz, бэктест прямо в окне =====
+let ST = {list: null, err: "", loading: false, i: -1, v: "list", m: "n", k: 0, sd: {}, sdErr: "", bt: null, addr: "", per: "30d"};
+const X_MODES = {n: {t: "Обычный", c: "var(--x-acc)", rgb: "var(--x-rgb)"}, f: {t: "Флипы", c: "var(--x-flip)", rgb: "var(--x-fliprgb)"}};
+const xUsd = v => v == null ? "—" : (v < 0 ? "−$" : "+$") + Math.abs(Math.round(v)).toLocaleString("ru-RU");
+const xAbs = v => "$" + Math.abs(Math.round(v || 0)).toLocaleString("ru-RU");
+const xPct = v => Math.round((v || 0) * 100) + "%";
+const xCls = v => v == null ? "" : v > 0 ? "x-ok" : v < 0 ? "x-bad" : "";
+const xShort = a => a ? a.slice(0, 4) + "…" + a.slice(-4) : "";
+const xDur = s => s == null ? null : s < 60 ? Math.round(s) + " с" : s < 3600 ? Math.round(s / 60) + " мин" : Math.round(s / 3600) + " ч";
+const xNice = t => String(t).replace(/^вкл:\s*/, "").replace(/\s*\(\d+м \d+с\)/, "").replace(/продажа /g, "");
+const xCH = {sol: "SOL", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium"};
+function xSpark(eq, color, w, h){
+  if (!eq || eq.length < 2) return "";
+  const mn = Math.min(0, ...eq), mx = Math.max(0, ...eq), r = (mx - mn) || 1;
+  return `<polyline fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${eq.map((v, i) => `${(i / (eq.length - 1) * w).toFixed(1)},${(h - 3 - (v - mn) / r * (h - 6)).toFixed(1)}`).join(" ")}"/>`;
+}
+function xChart(eq, mk, color){
+  const w = 330, h = 120;
+  if (!eq || eq.length < 2) return `<div class="x-m" style="padding:30px 0;text-align:center">мало сделок для графика</div>`;
+  const mn = Math.min(0, ...eq), mx = Math.max(0, ...eq), r = (mx - mn) || 1, y0 = h - 3 - (0 - mn) / r * (h - 6);
+  const m = mk != null ? `<line x1="${mk * w}" y1="0" x2="${mk * w}" y2="${h}" stroke="rgba(255,255,255,.18)"/><text x="${mk * w + 4}" y="12" fill="#8f98a0" font-size="10">новые сделки →</text>` : "";
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="height:120px;margin-top:6px"><line x1="0" y1="${y0}" x2="${w}" y2="${y0}" stroke="rgba(255,255,255,.12)" stroke-dasharray="3 4"/>${m}${xSpark(eq, color, w, h)}</svg>`;
+}
+const xD = () => ST.list && ST.i >= 0 ? ST.list[ST.i] : null;
+async function stLoad(force){
+  if (!P.sa){ ST.err = "nosrv"; return; }
+  if (ST.loading || (ST.list && !force)) return;
+  ST.loading = true; ST.err = "";
+  try {
+    const init = (tg && tg.initData) || "";
+    const r = await fetch(P.sa + "/api/my?init=" + encodeURIComponent(init), {cache: "no-store"});
+    if (r.status === 403) throw new Error("auth");
+    if (!r.ok) throw new Error("http " + r.status);
+    ST.list = await r.json();
+  } catch (e) { ST.err = e.message === "auth" ? "auth" : "net"; }
+  ST.loading = false;
+  if (screen === "strat") render(true);
+}
+async function stLoadSim(d){
+  if (!d || !d.api || ST.sd[d.api]) return;
+  ST.sdErr = "";
+  try { const r = await fetch(d.api, {cache: "no-store"}); if (!r.ok) throw new Error(r.status === 404 ? "old" : "net"); ST.sd[d.api] = await r.json(); }
+  catch (e) { ST.sdErr = e.message === "old" ? "Данные этого поиска устарели (старше недели) — запусти поиск заново." : "Не получилось загрузить сделки с сервера."; }
+  if (screen === "strat") render(true);
+}
+function xVerdict(D){
+  const pk = D.pk, base = D.b != null ? ` Всё подряд без фильтров: <b class="${xCls(D.b)}">${xUsd(D.b)}</b>.` : "";
+  const cap = s => esc(s.replace(/^./, c => c.toUpperCase()));
+  if (pk.w) return `<div class="x-card x-vd x-w"><div class="x-vt"><span style="color:var(--x-warn)">⚠</span>Надёжной стратегии нет</div><div class="x-vs">${cap(pk.y.replace(/^надёжной стратегии нет:\s*/, ""))}.${base}</div></div>`;
+  if (!pk.m) return `<div class="x-card x-vd x-b"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Копировать не стоит</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
+  return `<div class="x-card x-vd x-g"><div class="x-vt"><span style="color:var(--x-acc)">●</span>Больше подходит: ${pk.m === "normal" ? "обычное копирование" : "флипы"}</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
+}
+function xModeCard(D, k){
+  const md = D.m[k], M = X_MODES[k];
+  if (!md || !md.v.length) return `<div class="x-card x-mode"><div class="x-mh"><span class="x-dot" style="background:${M.c}"></span><b>${M.t}</b></div><div class="x-m" style="margin-top:8px">мало закрытых сделок</div></div>`;
+  const v = md.v[md.r || 0], win = (D.pk.m === "normal" && k === "n") || (D.pk.m === "flip" && k === "f");
+  return `<button class="x-card x-mode${win && !D.pk.w ? " x-win" : ""}" data-xo="${k}:${md.r || 0}">
+    <div class="x-mh"><span class="x-dot" style="background:${M.c}"></span><b>${M.t}</b> · ${esc(v.nm)}</div>
+    <svg class="x-spark" viewBox="0 0 96 40">${xSpark(v.eq, M.c, 96, 40)}</svg>
+    <div class="x-big ${xCls(v.tot)}">${xUsd(v.tot)}</div>
+    <div class="x-row"><span>${v.n} сделок · WR <b>${xPct(v.wr)}</b></span><span>просадка <b>−${xAbs(v.dd)}</b></span>${v.h != null ? `<span>холд ~${xDur(v.h)}</span>` : ""}</div>
+    <div class="x-row" style="margin-top:4px"><span>на новых сделках ${v.te != null ? `<b class="${xCls(v.te)}">${xUsd(v.te)}</b>` : "<b>—</b>"}</span></div>
+    ${v.oh ? `<div class="x-tag">⚠ ${esc(v.oh)}</div>` : ""}<div class="x-chev">›</div></button>`;
+}
+function xHead(title, pill, back){
+  return `<div class="x-top">${back ? `<button class="x-back" data-xb="${back}">‹</button>` : ""}<div class="x-h">${esc(title)}</div>${pill ? `<div class="x-pill">${pill}</div>` : ""}</div>`;
+}
+function stList(){
+  const per = ["7d", "30d", "60d", "90d"];
+  let h = topHTML("Стратегия", true);
+  h += `<div class="x-card" style="margin-bottom:6px"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
+    <input class="x-in" id="xaddr" placeholder="адрес кошелька" value="${esc(ST.addr)}" autocomplete="off" spellcheck="false">
+    <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
+    <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">🧠 Найти стратегию</button>
+    <div class="x-note" style="margin:8px 2px 0">Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке.</div></div>`;
+  h += `<div class="x-sec">Мои поиски</div>`;
+  if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
+  if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — открой окно кнопкой «📱 Настройки» из бота.</div>`;
+  if (ST.err === "net") return h + `<div class="x-card x-m">Сервер бота не отвечает (бот выключен или Caddy не запущен). <button class="x-link" data-xre="1">Повторить</button></div>`;
+  if (!ST.list) return h + `<div class="x-card x-m">Загружаю…</div>`;
+  if (!ST.list.length) return h + `<div class="x-card x-m">Пока пусто — найди стратегию первого кошелька.</div>`;
+  return h + `<div class="x-card x-list">${ST.list.map((d, i) => {
+    const pk = d.pk, rk = pk.m === "flip" ? "f" : "n", rep = d.m[rk] && d.m[rk].v[d.m[rk].r || 0];
+    const em = pk.w ? "⚠️" : !pk.m ? "⛔" : pk.m === "flip" ? "⚡" : "🎯";
+    const when = new Date(d.t * 1000).toLocaleDateString("ru-RU", {day: "2-digit", month: "2-digit"});
+    return `<button class="x-it" data-xi="${i}"><span style="font-size:16px">${em}</span><div>${xShort(d.a)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
+      <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}</div></div>
+      <span></span><span class="x-num ${xCls(rep && rep.tot)}">${rep ? xUsd(rep.tot) : "—"}</span></button>`;
+  }).join("")}</div>`;
+}
+function stHome(D){
+  let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
+  h += xVerdict(D) + `<div class="x-sec">Лучшее в каждом режиме</div>` + xModeCard(D, "n") + xModeCard(D, "f");
+  const rows = [];
+  for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
+    <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(v.ex)} · ${v.n} сд.</div></div>
+    <span class="x-m ${xCls(v.te)}">${v.te != null ? (v.vd && v.vd[0] === "✅" ? "✓ " : "") + xUsd(v.te) : "—"}</span><span class="x-num ${xCls(v.tot)}">${xUsd(v.tot)}</span></button>`));
+  if (rows.length) h += `<div class="x-sec">Все варианты</div><div class="x-card x-list">${rows.join("")}</div><div class="x-note">Справа — итог за период ($100 на сделку), рядом — на новых сделках.</div>`;
+  return h;
+}
+function xTiles(v){
+  return `<div class="x-grid">
+    <div class="x-tile"><div class="x-k">Итог</div><div class="x-v ${xCls(v.tot)}">${xUsd(v.tot)}</div></div>
+    <div class="x-tile"><div class="x-k">Новые сделки</div><div class="x-v ${xCls(v.te)}">${v.te != null ? xUsd(v.te) : "—"}</div></div>
+    <div class="x-tile"><div class="x-k">Просадка</div><div class="x-v x-bad">−${xAbs(v.dd)}</div></div>
+    <div class="x-tile"><div class="x-k">Сделок</div><div class="x-v">${v.n}</div></div>
+    <div class="x-tile"><div class="x-k">Винрейт</div><div class="x-v">${xPct(v.wr)}</div></div>
+    <div class="x-tile"><div class="x-k">Минусы подряд</div><div class="x-v">${v.ls != null ? v.ls : "—"}</div></div></div>`;
+}
+function xSettings(rows){
+  return `<div class="x-card" style="padding:0">${rows.map((r, j) => {
+    const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено)/.test(r[1]);
+    return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v${off ? " x-off" : ""}">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>`;
+  }).join("")}</div><button class="x-btn x-solid" data-xcpall="1" style="margin-top:10px">Скопировать все настройки</button>`;
+}
+function stDetail(D){
+  const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
+  let h = xHead(M.t, `${xShort(D.a)} · ${String(D.p).replace("d", " дн")}`, "home");
+  h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
+  h += xTiles(v);
+  if (v.vd) h += `<div class="x-note">${esc(v.vd[0])} ${esc(v.vd[1])}</div>`;
+  h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · $100 на сделку</div>${xChart(v.eq, v.mk, M.c)}</div>`;
+  h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
+  h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
+  h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s);
+  if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
+  return h;
+}
+function btParams(){
+  const B = ST.bt, n = x => +String(x || "").replace(",", ".") || 0;
+  const tp = [[n(B.t1), n(B.s1)], [n(B.t2), n(B.s2)]].filter(([a]) => a > 0).map(([a, b]) => [a, b > 0 ? Math.min(100, b) : 100]);
+  return {cap: n(B.cap), cap_min: n(B.cm), age: n(B.ag), age_min: n(B.am), min_usd: n(B.mn), max_usd: n(B.mx),
+          once: !!B.o, follow: !!B.f, to: n(B.to) ? [n(B.to), Math.min(100, n(B.tp_) || 100)] : null, tp, lp_mode: "all", lp: null};
+}
+function btRows(D, v, base){
+  const sd = ST.sd[D.api] || {}, nat = sd.native, sym = {bsc: "BNB", sol: "SOL", robinhood: "ETH", elysium: "HYPE"}[D.c] || "";
+  const money = x => x ? "$" + Math.round(x).toLocaleString("ru-RU") : "не ставить";
+  const native = x => !x ? "не ставить" : nat ? `${(x / nat).toFixed(3)} ${sym} (~$${Math.round(x)})` : "$" + x;
+  const rows = [["Max MC", money(v.cap)], ["Min MC", money(v.cap_min)], ["Max Token Age", v.age ? v.age + " мин" : "не ставить"],
+    ["Min Token Age", v.age_min ? v.age_min + " мин" : "не ставить"], ["Min Trigger Buy", native(v.min_usd)], ["Max Trigger Buy", native(v.max_usd)],
+    ["Buy Once Only", v.once ? "вкл" : "выкл"], ["Take Profit", v.tp.length ? v.tp.map(([a, b]) => `${a}% → продажа ${b}%`).join(", ") : "нет"],
+    ["Таймаут", v.to ? `${v.to[0]} сек → продажа ${v.to[1]}%` : "выкл"], ["Follow Sell", v.follow ? "вкл" : "ВЫКЛ"], ["Лаунчпады", "все"]];
+  return rows.concat((base.s || []).filter(r => /Fee|Tip|Газ/.test(r[0])));
+}
+function stBt(D){
+  const k = ST.m, M = X_MODES[k], base = D.m[k].v[ST.k];
+  if (!ST.bt){
+    const r = base.raw || [0, 0, 0, 0, 3, 0, 1, 1, [0, 0], []];
+    ST.bt = {cap: r[0] || "", cm: r[1] || "", ag: r[2] || "", am: r[3] || "", mn: r[4] || "", mx: r[5] || "", o: r[6], f: r[7],
+             to: r[8][0] || "", tp_: r[8][1] || 100, t1: (r[9][0] || [])[0] || "", s1: (r[9][0] || [])[1] || "", t2: (r[9][1] || [])[0] || "", s2: (r[9][1] || [])[1] || ""};
+  }
+  let h = xHead("Свой бэктест", M.t, "detail");
+  const sd = ST.sd[D.api];
+  if (!D.api) h += `<div class="x-card x-m">Этот поиск сделан до подключения сервера — запусти поиск заново, тогда бэктест заработает здесь.</div>`;
+  else if (!sd) h += `<div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки кошелька…"}</div>`;
+  else {
+    const v = btParams(), o = SIM.backtest(sd, v);
+    const view = {tot: o.full_total, te: o.test ? o.test.total : null, dd: o.max_dd, n: o.n, wr: o.wr, ls: o.loss_streak};
+    h += `<div id="xres">${xTiles(view)}${o.verdict ? `<div class="x-note">${esc(o.verdict[0])} ${esc(o.verdict[1])}</div>` : ""}
+      ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">⚠ весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
+      <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xChart(o.equity, o.mark, M.c)}</div></div>`;
+  }
+  const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id])}" placeholder="${ph}"></label>`;
+  h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}</div>
+    <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
+      <button class="x-tg" data-xsw="f"><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
+    <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
+    <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
+    <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
+  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
+  return h;
+}
+function stratHTML(){
+  if (!ST.list && !ST.loading && !ST.err) stLoad();
+  const D = xD();
+  let body;
+  if (ST.v === "list" || !D) body = stList();
+  else if (ST.v === "home") body = stHome(D);
+  else if (ST.v === "detail") body = stDetail(D);
+  else { if (D.api && !ST.sd[D.api]) stLoadSim(D); body = stBt(D); }
+  try { if (inTG){ ST.v === "list" ? tg.BackButton.hide() : tg.BackButton.show(); } } catch (e) {}
+  return `<div class="x">${body}</div>`;
+}
+function stCurRows(){
+  const D = xD(); if (!D) return [];
+  const base = D.m[ST.m].v[ST.k];
+  return ST.v === "bt" ? btRows(D, btParams(), base) : base.s;
+}
+async function xCopy(text){
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (_) {} ta.remove(); }
+  try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
+}
+let xToastT;
+function xToast(t){
+  let el = document.getElementById("xtoast");
+  if (!el){ el = document.createElement("div"); el.id = "xtoast"; el.className = "x-toast"; document.body.appendChild(el); }
+  el.textContent = t; el.classList.add("on"); clearTimeout(xToastT); xToastT = setTimeout(() => el.classList.remove("on"), 1400);
+}
+function stBack(){
+  if (screen !== "strat") return false;
+  if (ST.v === "bt") ST.v = "detail"; else if (ST.v === "detail") ST.v = "home"; else if (ST.v === "home") ST.v = "list"; else return false;
+  render(); window.scrollTo(0, 0); return true;
+}
+let xRecalcT;
+document.addEventListener("input", e => {
+  const f = e.target.dataset && e.target.dataset.xf;
+  if (e.target.id === "xaddr"){ ST.addr = e.target.value.trim(); return; }
+  if (!f || !ST.bt) return;
+  ST.bt[f] = e.target.value.replace(",", ".").replace(/[^\d.]/g, "");
+  clearTimeout(xRecalcT);
+  xRecalcT = setTimeout(() => {   // пересчёт без перерисовки формы — фокус и клавиатура остаются
+    const D = xD(); if (!D || !ST.sd[D.api]) return;
+    const tmp = document.createElement("div"); tmp.innerHTML = stBt(D);
+    const nr = tmp.querySelector("#xres"), or = document.getElementById("xres");
+    if (nr && or) or.replaceWith(nr);
+    const ns = tmp.querySelectorAll(".x-card")[tmp.querySelectorAll(".x-card").length - 1], cards = document.querySelectorAll(".x .x-card");
+    if (ns && cards.length) cards[cards.length - 1].replaceWith(ns);
+  }, 120);
+});
+document.addEventListener("click", async e => {
+  if (screen !== "strat") return;
+  const t = e.target;
+  if (t.closest("[data-xre]")){ ST.err = ""; ST.list = null; stLoad(true); render(true); return; }
+  const per = t.closest("[data-xper]"); if (per){ ST.per = per.dataset.xper; render(true); return; }
+  if (t.closest("[data-xrun]")){
+    const a = (document.getElementById("xaddr") || {}).value || ST.addr;
+    if (!/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a.trim())){ xToast("Вставь адрес кошелька"); return; }
+    const out = {v: 3, run: "strategy", addr: a.trim(), period: ST.per, chain: a.trim().startsWith("0x") ? (cur["m.chain"] !== "sol" && cur["m.chain"] !== "all" ? cur["m.chain"] : "bsc") : "sol"};
+    if (inTG && tg.sendData) tg.sendData(JSON.stringify(out)); else alert(JSON.stringify(out));
+    return;
+  }
+  const it = t.closest("[data-xi]"); if (it){ ST.i = +it.dataset.xi; ST.v = "home"; render(); window.scrollTo(0, 0); return; }
+  const o = t.closest("[data-xo]"); if (o){ const [m, k] = o.dataset.xo.split(":"); ST.m = m; ST.k = +k; ST.v = "detail"; ST.bt = null; render(); window.scrollTo(0, 0); return; }
+  const b = t.closest("[data-xb]"); if (b){ ST.v = b.dataset.xb; render(); window.scrollTo(0, 0); return; }
+  if (t.closest("[data-xbt]")){ ST.bt = null; ST.v = "bt"; render(); window.scrollTo(0, 0); return; }
+  const sw = t.closest("[data-xsw]"); if (sw && ST.bt){ ST.bt[sw.dataset.xsw] = ST.bt[sw.dataset.xsw] ? 0 : 1; render(true); return; }
+  const cp = t.closest("[data-xcp]"); if (cp){ const r = stCurRows()[+cp.dataset.xcp]; if (r){ await xCopy(r[1].replace(/\s*\(~\$[^)]*\)/, "").replace(/\s*\(только Jito\)/, "")); cp.classList.add("done"); xToast("Скопировано: " + r[0]); } return; }
+  if (t.closest("[data-xcpall]")){ await xCopy(stCurRows().map(r => r[0] + ": " + r[1]).join("\n")); xToast("Все настройки скопированы"); }
+});
+try { inTG && tg.BackButton.onClick(() => { if (!document.getElementById("sheet").classList.contains("on")) setTimeout(stBack, 0); }); } catch (e) {}
+
 </script>
 </body>
 </html>
