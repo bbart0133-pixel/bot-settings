@@ -376,6 +376,39 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
 .x-ca{width:24px;height:24px;border-radius:7px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
 .x-new{font-style:normal;font-size:10px;font-weight:700;color:var(--x-acc);background:rgba(var(--x-rgb),.12);padding:1px 5px;border-radius:5px}
+@media (min-width:900px){
+  body.wide[data-scr="strat"] .app{max-width:1240px}
+  body.wide .dockin{max-width:1240px}
+  .x-2{display:grid;grid-template-columns:minmax(380px,440px) minmax(0,1fr);gap:22px;align-items:start}
+  .x-r > .x-sec:first-child{margin-top:0}
+  .x-2 > .x-r{position:sticky;top:12px}
+  .x-btl{grid-template-rows:auto 1fr}
+  .x-btl .x-btres{grid-column:2;grid-row:1;position:static}
+  .x-btl .x-btform{grid-column:1;grid-row:1 / span 2}
+  .x-btl .x-bttab{grid-column:2;grid-row:2;position:static}
+  .x-tw{overflow-x:visible}
+  .x-tb{width:100%}
+  .x-tb .x-st{position:static}
+  .x-list{max-height:none}
+}
+.dk,.dl,.dr,.dkg,.dgi{display:block}
+@media (min-width:900px){
+  body.wide .app{max-width:1180px;padding-left:28px;padding-right:28px}
+  body.wide .dockin{max-width:720px}
+  body[data-scr="strat"] .dockin{max-width:720px}
+  .dk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+  .dk > .dr > .sec:first-child,.dk > .dl > .sec:first-child{margin-top:0}
+  .dk > .dr > .tiles:first-child{margin-top:0}
+  .dkf{grid-template-columns:240px minmax(0,1fr)}
+  .dkf .subtabs{flex-direction:column;overflow:visible;margin:0;padding:0;position:sticky;top:12px}
+  .dkf .subtabs .chip{text-align:left;justify-content:flex-start;height:44px;padding:0 14px}
+  .dkf > .dr > .sec:first-child{margin-top:0}
+  .dkg{columns:2;column-gap:22px}
+  .dgi{break-inside:avoid;display:inline-block;width:100%}
+  .dgi > .sec:first-child{margin-top:4px}
+  body[data-scr="home"] .hero{min-height:0}
+}
+@media (min-width:1200px){ .x-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px} .x-modes .x-mode{margin:0} }
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -538,7 +571,7 @@ function jobHTML(){
     ${j.st ? `<div class="js">${esc(j.st)}</div>` : (j.cur ? `<div class="js">${esc(j.cur)}</div>` : "")}
     ${pct !== null && j.total > 1 ? `<div class="jb"><i style="width:${Math.max(4, pct)}%"></i></div>` : ""}
     ${j.queue ? `<div class="js">в очереди: ${esc(j.queue)}</div>` : ""}
-    <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}данные на ${hm(P.t)} · кнопка обновляется сама раз в 3 мин — переоткрой окно${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
+    <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}${P.sa && P.sk ? "обновляется само" : "данные на " + hm(P.t) + " · кнопка обновляется сама раз в 3 мин — переоткрой окно"}${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
 }
 // Полый заголовок (обводка без заливки) с фирменным градиентом сети — SVG, чтобы одинаково было в iOS и Android
 function hollowHTML(t){
@@ -560,14 +593,14 @@ function homeHTML(){
   const tick = {sol: "SOL", bsc: "BNB", robinhood: "RH", arc: "ARC", elysium: "ELY"}[cur["m.chain"]] || "";
   const gas = num(cur.strat_gas_usd);
   const plat = [num(cur.sol_pumpfun) ? "Pump.fun" : "", num(cur.sol_meteora) ? (num(cur.sol_meteora) === 2 ? "Meteora etchy" : "Meteora") : ""].filter(Boolean).join(" + ") || "ни одной";
-  return topHTML("Настройки") + `
+  return topHTML("Настройки") + `<div class="dk"><div class="dl">
   <div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
     <div><div class="lbl">Где ищем</div>${hollowHTML(cName + " · " + String(cur["m.period"]).replace("h", "ч"))}</div>
     <div><div class="rowlbl">Сеть</div><div class="chips eq" style="grid-template-columns:repeat(${chains.length},minmax(0,1fr))">${chains.map(([v, l]) => `<button class="chip${cur["m.chain"] === v ? " on" : ""}" data-s="m.chain" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <div><div class="rowlbl">Период</div><div class="chips eq" style="grid-template-columns:repeat(${periods.length},minmax(0,1fr))">${periods.map(([v, l]) => `<button class="chip${cur["m.period"] === v ? " on" : ""}" data-s="m.period" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div></div>
     <button class="cta" data-act="find">${svg("search")}Найти токены</button>
   </div>
-  ${jobHTML()}
+  ${jobHTML()}</div><div class="dr">
   <div class="tiles">
     <button class="tile" data-go="filters"><span class="a">Фильтры</span><span class="b">${nf}</span><span class="c">активно ›</span></button>
     <button class="tile${gas > 1 ? " bad" : ""}" data-go="more" data-to="strat_gas_usd"><span class="a">Газ</span><span class="b">$${fmtN(gas)}</span><span class="c">издержки ›</span></button>
@@ -577,14 +610,14 @@ function homeHTML(){
     <button class="li" data-go="presets"><span class="ic">${svg("layers")}</span><span class="t"><b>Пресеты</b><span>${Object.keys(P.ps || {}).length} сохранено · ${esc(sel ? "выбран " + (renames[sel] || sel) : "пресет не выбран")}</span></span><span class="chev">›</span></button>
     <button class="li" data-go="more" data-to="sol_pumpfun"><span class="ic">${svg("coins")}</span><span class="t"><b>Площадки и капа токенов</b><span>${esc(plat)} · капа ${esc(valText("min_token_market_cap", cur.min_token_market_cap))}–${esc(valText("max_token_market_cap", cur.max_token_market_cap))}</span></span><span class="chev">›</span></button>
     <button class="li" data-go="more" data-to="strat_slip_in_pct"><span class="ic">${svg("chart")}</span><span class="t"><b>Поиск стратегии</b><span>издержки копировщика</span></span><span class="chev">›</span></button>
-  </div>`;
+  </div></div></div>`;
 }
 function filtersHTML(){
   if (!fsub) fsub = FILTER_GROUPS[0] && FILTER_GROUPS[0].t;
   const g = FILTER_GROUPS.find(x => x.t === fsub) || FILTER_GROUPS[0];
   const name = t => t.replace(/^\S+\s/, "");
-  return topHTML("Фильтры", true) + `<div class="subtabs">${FILTER_GROUPS.map(x => { const c = groupCount(x);
-      return `<button class="chip${x.t === g.t ? " on" : ""}" data-sub="${esc(x.t)}">${esc(name(x.t))}${c ? ` · ${c}` : ""}</button>`; }).join("")}</div>` + groupHTML(g, activeIn(g) ? activeIn(g) + " активно" : "");
+  return topHTML("Фильтры", true) + `<div class="dk dkf"><div class="dl"><div class="subtabs">${FILTER_GROUPS.map(x => { const c = groupCount(x);
+      return `<button class="chip${x.t === g.t ? " on" : ""}" data-sub="${esc(x.t)}">${esc(name(x.t))}${c ? ` · ${c}` : ""}</button>`; }).join("")}</div></div><div class="dr">` + groupHTML(g, activeIn(g) ? activeIn(g) + " активно" : "") + `</div></div>`;
 }
 function usdBig(v){
   const n = num(v); if (!n) return "—";
@@ -699,7 +732,8 @@ function onchainHTML(){
     return h + `<div class="card"><div class="empty" style="padding:40px 20px">По этой сети пока нет данных.<br><br>Бот обновляет их раз в час. Если сеть новая, в DefiLlama её может ещё не быть${o.e ? `<br><br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div></div>`;
   }
   const c = o.ch;
-  h += `<div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
+  let R = "";
+  h += `<div class="dk"><div class="dl"><div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
     <div><div class="lbl">Объём DEX за 24 ч</div><div class="big">${esc(usdBig(o.v24))}</div></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${c !== undefined && c !== null ? `<span class="chg${c < 0 ? " dn" : ""}">${c > 0 ? "+" : ""}${(+c).toFixed(1)}% за сутки</span>` : ""}${o.v7 ? `<span class="sub2">за 7 дней ${esc(usdBig(o.v7))}</span>` : ""}</div></div>`;
   h += `<div class="tiles two2">
@@ -707,8 +741,8 @@ function onchainHTML(){
     ${(o.ml || []).length
       ? `<div class="tile"><span class="a">Лидер: ${esc(o.ml[0][0])}</span><span class="b">${fmtN(o.ml[0][1])}</span><span class="c">${o.mg ? Math.round(o.ml[0][1] / o.mg * 100) + "% миграций" : "миграций за 24ч"}</span></div>`
       : `<div class="tile"><span class="a">${esc((o.lp || [])[0] ? o.lp[0][0] : "Лаунчпад")}</span><span class="b">${esc((o.lp || [])[0] ? usdBig(o.lp[0][1]) : "—")}</span><span class="c">комиссии за 24ч</span></div>`}</div>`;
-  if ((o.dx || []).length) h += `<div class="sec">Биржи, объём за 24 ч</div>` + barsHTML(o.dx, usdBig);
-  if ((o.bt || []).length) h += `<div class="sec">Торговые боты, комиссии за 24 ч</div><div class="sdesc">сколько пользователи заплатили ботам</div>` + barsHTML(o.bt, usdBig);
+  if ((o.dx || []).length) R += `<div class="sec">Биржи, объём за 24 ч</div>` + barsHTML(o.dx, usdBig);
+  if ((o.bt || []).length) R += `<div class="sec">Торговые боты, комиссии за 24 ч</div><div class="sdesc">сколько пользователи заплатили ботам</div>` + barsHTML(o.bt, usdBig);
   h += weekHTML("vd", "Объём DEX по дням", o.vd, usdBig);
   let stacks = null;
   if (o.md && o.mdl && Object.keys(o.mdl).length){
@@ -718,11 +752,12 @@ function onchainHTML(){
     if (rest.some(x => x > 0)) stacks.push({n: "другие", c: LP_COLOR["другие"], v: rest});
   }
   h += weekHTML("md", "Миграции по дням", o.md, v => fmtN(Math.round(v)), stacks);
-  if ((o.ml || []).length) h += `<div class="sec">Миграции по лаунчпадам, 24 ч</div>` + barsHTML(o.ml, v => fmtN(v), lpColors(o.ml.map(r => r[0])));
+  if ((o.ml || []).length) R += `<div class="sec">Миграции по лаунчпадам, 24 ч</div>` + barsHTML(o.ml, v => fmtN(v), lpColors(o.ml.map(r => r[0])));
+  h += `</div><div class="dr">` + R + `</div></div>`;
   h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
   return h;
 }
-function moreHTML(){ return topHTML("Ещё", true) + MORE_GROUPS.map(g => groupHTML(g, "")).join(""); }
+function moreHTML(){ return topHTML("Ещё", true) + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div>`; }
 function presetSummary(v){
   const parts = [];
   if (num(v.min_pnl_usd)) parts.push("PnL от " + money(v.min_pnl_usd));
@@ -733,9 +768,9 @@ function presetSummary(v){
 }
 function presetsHTML(){
   const names = Object.keys(P.ps || {});
-  let h = topHTML("Пресеты", true) + `<div class="sec">Сохранить текущие как новый</div><div class="card"><div class="pc">
+  let h = topHTML("Пресеты", true) + `<div class="dk"><div class="dl"><div class="sec">Сохранить текущие как новый</div><div class="card"><div class="pc">
     <input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета">
-    <div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div></div></div>
+    <div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div></div></div></div><div class="dr">
     <div class="sec">Мои пресеты<i>${names.length}</i></div><div class="card">`;
   if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — сохрани текущие настройки как новый.</div></div>`;
   names.forEach(n => {
@@ -746,7 +781,7 @@ function presetsHTML(){
       <div class="acts" data-acts="${esc(n)}">${del ? `<button class="btn" data-a="undel">Не удалять</button>`
         : `${isCur ? "" : `<button class="btn pri" data-a="use">Выбрать</button>`}<button class="btn" data-a="ren">Переименовать</button><button class="btn red" data-a="del">Удалить</button>`}</div></div>`;
   });
-  return h + `</div>`;
+  return h + `</div></div></div>`;
 }
 function navHTML(){
   const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["strat", "strat", "Стратегия"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
@@ -767,6 +802,7 @@ function applyTheme(){
   try { if (inTG){ tg.setHeaderColor && tg.setHeaderColor(bg); tg.setBackgroundColor && tg.setBackgroundColor(bg); } } catch (e) {}
 }
 function render(keepScroll){
+  document.body.classList.add("wide"); document.body.dataset.scr = screen;
   applyTheme();
   const y = window.scrollY;
   const html = screen === "strat" ? stratHTML() : screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
@@ -857,8 +893,38 @@ function send(kind){
   if (saveAsName) out.save_as = saveAsName;
   if (kind === "find" || kind === "full") out.run = kind;
   if (kind === "full"){ out.hist = runHist; out.quiet = runQuiet; }
+  if (P.sa && P.sk){ sendLive(out); return; }   // через сервер бота — окно не закрывается
+  sendChat(out);
+}
+function sendChat(out){
   if (inTG && tg.sendData){ tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); tg.sendData(JSON.stringify(out)); }
   else { alert(JSON.stringify(out)); closeReview(); }
+}
+let sending = false;
+async function sendLive(out){
+  if (sending) return; sending = true;
+  const cf = document.getElementById("cf"); if (cf){ cf.disabled = true; cf.textContent = "Сохраняю…"; }
+  let r = null;
+  try {
+    const res = await fetch(`${P.sa}/api/apply?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify(out), cache: "no-store"});
+    if (res.status === 403){ sending = false; xToast("Ключ устарел — отправь боту /app", 3000); closeReview(); return; }
+    r = res.ok ? await res.json() : null;
+  } catch (e) { r = null; }
+  sending = false;
+  if (!r || !r.ok){ sendChat(out); return; }   // сервер не ответил — по-старому, через чат
+  const np = norm(r.d && decode(r.d));
+  if (np && np.s){
+    P = np; ops = []; renames = {}; saveAsName = "";
+    start = Object.assign({}, P.s, {"m.chain": (P.m || {}).chain || "sol", "m.period": (P.m || {}).period || "6h"});
+    sel = P.p || ""; base = Object.assign({}, start); cur = Object.assign({}, start);
+  }
+  closeReview(); render(true);
+  try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(r.run === "busy" ? "warning" : "success"); } catch (e) {}
+  const msg = r.run === "busy" ? "Сохранено. Но уже идёт парс — дождись его"
+    : r.run === "find" ? "Ищу токены — файл придёт в чат"
+    : r.run === "full" ? "Полный парс запущен — ход виден на главной, Excel придёт в чат"
+    : r.n ? "✅ Сохранено" : "Ничего не изменилось";
+  xToast(msg, r.run ? 3200 : 1600);
 }
 function pickPreset(name){
   sel = name;
@@ -939,7 +1005,27 @@ if (!P || !P.s){
   sel = P.p || ""; base = Object.assign({}, start); cur = Object.assign({}, start);
   try { const q = localStorage.getItem("runQuiet"); if (q !== null) runQuiet = q === "1"; } catch (x) {}
   render();
+  setTimeout(() => liveState(), 300);   // после загрузки всего скрипта
 }
+// Живой статус: раз в 4 с спрашиваем сервер бота, что он делает, и обновляем «Сейчас идёт» без переоткрытия окна
+let liveT = null, liveFail = 0;
+async function liveState(){
+  clearTimeout(liveT);
+  if (!P || !P.sa || !P.sk || liveFail > 5) return;
+  if (document.hidden){ liveT = setTimeout(liveState, 4000); return; }
+  try {
+    const r = await fetch(`${P.sa}/api/state?k=${encodeURIComponent(P.sk)}`, {cache: "no-store"});
+    if (r.status === 403){ liveFail = 99; return; }
+    const st = await r.json(); liveFail = 0;
+    if (!st.err){
+      const was = JSON.stringify([P.job, P.busy]);
+      P.job = st.job || null; P.busy = !!st.busy; P.t = st.t;
+      if (was !== JSON.stringify([P.job, P.busy]) && screen === "home" && !review && !picker) render(true);
+    }
+  } catch (e) { liveFail++; }
+  liveT = setTimeout(liveState, 4000);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) liveState(); });
 if (tg){
   tg.ready(); tg.expand();
   try { tg.setHeaderColor && tg.setHeaderColor("#050607"); tg.setBackgroundColor && tg.setBackgroundColor("#050607"); } catch (e) {}
@@ -1270,14 +1356,14 @@ function stList(){
 }
 function stHome(D){
   let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
-  h += xVerdict(D) + (P.sa && P.sk ? `<button class="x-btn x-ghost" data-xexcel="1" style="margin-top:10px;height:44px">📊 Excel в чат</button>` : "")
-    + `<div class="x-sec">Лучшее в каждом режиме</div>` + xModeCard(D, "n") + xModeCard(D, "f");
+  h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<button class="x-btn x-ghost" data-xexcel="1" style="margin-top:10px;height:44px">📊 Excel в чат</button>` : "")
+    + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
     <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(v.ex)} · ${v.n} сд.</div></div>
     <span class="x-m ${xCls(v.te)}">${v.te != null ? (v.vd && v.vd[0] === "✅" ? "✓ " : "") + xUsd(v.te) : "—"}</span><span class="x-num ${xCls(v.tot)}">${xUsd(v.tot)}</span></button>`));
   if (rows.length) h += `<div class="x-sec">Все варианты</div><div class="x-card x-list">${rows.join("")}</div><div class="x-note">Справа — итог за период ($100 на сделку), рядом — на новых сделках.</div>`;
-  return h;
+  return h + `</div></div>`;
 }
 function xTiles(v){
   return `<div class="x-grid">
@@ -1340,6 +1426,7 @@ function xTrades(D, o, color){
 function stDetail(D){
   const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
   let h = xHead(M.t, `${xShort(D.a)} · ${String(D.p).replace("d", " дн")}`, "home");
+  h += `<div class="x-2"><div class="x-l">`;
   h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
   h += xTiles(v);
   if (v.vd) h += `<div class="x-note">${esc(v.vd[0])} ${esc(v.vd[1])}</div>`;
@@ -1348,12 +1435,13 @@ function stDetail(D){
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
   h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s);
   if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
+  h += `</div><div class="x-r">`;
   if (D.api){
     const sd = ST.sd[D.api];
     if (!sd){ stLoadSim(D); h += `<div class="x-sec">Сделки копии</div><div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки…"}</div>`; }
     else h += xTrades(D, SIM.backtest(sd, xRawParams(v.raw)), M.c);
   }
-  return h;
+  return h + `</div></div>`;
 }
 function btParams(){
   const B = ST.bt, n = x => +String(x || "").replace(",", ".") || 0;
@@ -1378,7 +1466,7 @@ function stBt(D){
     ST.bt = {cap: r[0] || "", cm: r[1] || "", ag: r[2] || "", am: r[3] || "", mn: r[4] || "", mx: r[5] || "", o: r[6], f: r[7],
              to: r[8][0] || "", tp_: r[8][1] || 100, t1: (r[9][0] || [])[0] || "", s1: (r[9][0] || [])[1] || "", t2: (r[9][1] || [])[0] || "", s2: (r[9][1] || [])[1] || ""};
   }
-  let h = xHead("Свой бэктест", M.t, "detail");
+  let h = xHead("Свой бэктест", M.t, "detail") + `<div class="x-2 x-btl"><div class="x-r x-btres">`;
   const sd = ST.sd[D.api];
   if (!D.api) h += `<div class="x-card x-m">Этот поиск сделан до подключения сервера — запусти поиск заново, тогда бэктест заработает здесь.</div>`;
   else if (!sd) h += `<div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки кошелька…"}</div>`;
@@ -1390,6 +1478,7 @@ function stBt(D){
       <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xChart(o.equity, o.mark, M.c)}</div></div>`;
     ST.btTrades = o;
   }
+  h += `</div><div class="x-l x-btform">`;
   const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id])}" placeholder="${ph}"></label>`;
   h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}</div>
     <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
@@ -1398,8 +1487,9 @@ function stBt(D){
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
   if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
+  h += `</div><div class="x-r x-bttab">`;
   if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c)}</div>`;
-  return h;
+  return h + `</div></div>`;
 }
 let xJobChecked = false;
 function stratHTML(){
@@ -1425,10 +1515,10 @@ async function xCopy(text){
   try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
 }
 let xToastT;
-function xToast(t){
+function xToast(t, ms){
   let el = document.getElementById("xtoast");
   if (!el){ el = document.createElement("div"); el.id = "xtoast"; el.className = "x-toast"; document.body.appendChild(el); }
-  el.textContent = t; el.classList.add("on"); clearTimeout(xToastT); xToastT = setTimeout(() => el.classList.remove("on"), 1400);
+  el.textContent = t; el.classList.add("on"); clearTimeout(xToastT); xToastT = setTimeout(() => el.classList.remove("on"), ms || 1400);
 }
 function stBack(){
   if (screen !== "strat") return false;
