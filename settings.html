@@ -362,6 +362,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-sw{width:44px;height:26px;border-radius:13px;background:rgba(255,255,255,.12);position:relative;flex:0 0 44px}
 .x-sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
 .x-sw.on{background:var(--acc)}.x-sw.on::after{left:21px}
+.x-tw{padding:0!important;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.x-tb{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+.x-tb th{position:sticky;top:0;font-size:11px;font-weight:600;color:var(--dim);text-align:right;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;background:#0c0b12}
+.x-tb th.on{color:var(--text)}
+.x-tb td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.05)}
+.x-tb tr:last-child td{border-bottom:0}
+.x-tb .x-st{position:sticky;left:0;text-align:left;background:#0c0b12;z-index:1;box-shadow:1px 0 0 rgba(255,255,255,.06)}
+.x-tb tr.w .x-st{box-shadow:inset 3px 0 0 rgba(var(--x-rgb),.7),1px 0 0 rgba(255,255,255,.06)}
+.x-tb tr.l .x-st{box-shadow:inset 3px 0 0 rgba(255,107,107,.6),1px 0 0 rgba(255,255,255,.06)}
+.x-tb tr.o td{opacity:.65}
+.x-tk{display:flex;align-items:center;gap:6px}
+.x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+.x-ca{width:24px;height:24px;border-radius:7px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
+.x-new{font-style:normal;font-size:10px;font-weight:700;color:var(--x-acc);background:rgba(var(--x-rgb),.12);padding:1px 5px;border-radius:5px}
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -1084,14 +1098,15 @@ const SIM = (() => {
     return ["✅", "держится на новых сделках"];
   }
   function backtest(D, v){
-    const cost = D.cost, split = D.split, stake = D.stake, rows = [];
+    const cost = D.cost, split = D.split, stake = D.stake, rows = [], trades = [];
     for (const t of D.tokens){
-      if (check(t, v)) continue;
+      const why = check(t, v);
+      if (why){ trades.push({t, ok: false, why}); continue; }
       const info = {}, hits = [], cs = D.candles[t.a] || [];
       let roi;
       if (v.once !== false) roi = simTp(t, v.tp || [], cs, v.follow !== false, hits, cost, v.to || null, info, D);
       else roi = t.roi != null ? netRoi(1 + t.roi, 1, cost, stake) : null;
-      if (roi === null || roi === undefined) continue;
+      if (roi === null || roi === undefined){ trades.push({t, ok: false, why: "нет результата (открыта / нет свечей)"}); continue; }
       const tp = v.tp || [];
       let exit = null;
       if (info.to_closed) exit = info.to_ts;
@@ -1100,8 +1115,10 @@ const SIM = (() => {
       else exit = t.fb + D.hold_h * 3600;
       rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: exit, hold: exit ? exit - t.fb : null,
                  tp_all: tp.length > 0 && hits.length === tp.length, to_hit: !!info.to_used});
+      trades.push({t, ok: true, roi, test: split != null && t.fb >= split, hold: exit ? exit - t.fb : null,
+                   tps: hits.map(h => h[0]), to: !!info.to_used});
     }
-    const out = {...v};
+    const out = {...v, trades};
     if (!rows.length) return Object.assign(out, {n: 0, wr: 0, full_total: 0, test: null, verdict: null, max_dd: 0, loss_streak: 0, equity: [], one_hit: null});
     const rois = rows.map(d => d.roi), test = rows.filter(d => d.test).map(d => d.roi), train = rows.filter(d => !d.test).map(d => d.roi);
     const wr = a => a.filter(r => r > 0).length / a.length, sum = a => a.reduce((s, x) => s + x, 0);
@@ -1148,7 +1165,7 @@ async function stLoad(force){
   ST.loading = true; ST.err = "";
   try {
     const init = (tg && tg.initData) || "";
-    const r = await fetch(P.sa + "/api/my?init=" + encodeURIComponent(init), {cache: "no-store"});
+    const r = await fetch(P.sa + "/api/my?init=" + encodeURIComponent(init) + "&k=" + encodeURIComponent(P.sk || ""), {cache: "no-store"});
     if (r.status === 403) throw new Error("auth");
     if (!r.ok) throw new Error("http " + r.status);
     ST.list = await r.json();
@@ -1156,6 +1173,48 @@ async function stLoad(force){
   ST.loading = false;
   if (screen === "strat") render(true);
 }
+// Поиск прямо в окне: сервер бота считает, окно раз в 2 с спрашивает ход и само открывает результат
+let xPollT = null;
+async function stRun(addr, chain){
+  try {
+    const r = await fetch(`${P.sa}/api/run?k=${encodeURIComponent(P.sk)}&addr=${encodeURIComponent(addr)}&chain=${chain}&period=${ST.per}`, {cache: "no-store"});
+    if (r.status === 409){ xToast("Уже идёт поиск — дождись его"); }
+    else if (!r.ok){ xToast(r.status === 403 ? "Ключ устарел — отправь боту /app" : "Сервер не принял: " + (await r.text()).slice(0, 60)); return; }
+    ST.job = await r.json(); ST.addr = ""; ST.started = true;
+    try { inTG && tg.HapticFeedback && tg.HapticFeedback.impactOccurred("light"); } catch (e) {}
+    render(true); stPoll();
+  } catch (e) { xToast("Сервер бота не отвечает"); }
+}
+function stPoll(){
+  clearTimeout(xPollT);
+  xPollT = setTimeout(async () => {
+    try {
+      const j = await (await fetch(`${P.sa}/api/job?k=${encodeURIComponent(P.sk)}`, {cache: "no-store"})).json();
+      ST.job = j;
+      if (j.state === "run"){ if (screen === "strat" && ST.v === "list") stJobPatch(); stPoll(); return; }
+      if (j.state === "done"){
+        if (!ST.started){ ST.job = null; return; }   // старый поиск из прошлого открытия окна — не прыгаем
+        ST.started = false;
+        ST.list = null; await stLoad(true);
+        const i = (ST.list || []).findIndex(d => d.a === j.addr);
+        if (i >= 0 && screen === "strat"){ ST.i = i; ST.v = "home"; ST.job = null; render(); window.scrollTo(0, 0);
+          try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {} }
+        return;
+      }
+      render(true);
+    } catch (e) { stPoll(); }
+  }, 2000);
+}
+function stJobHTML(){
+  const j = ST.job; if (!j || !j.state) return "";
+  if (j.state === "error") return `<div class="x-card x-vd x-b" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Не получилось</div><div class="x-vs">${esc(j.err || "")}</div></div>`;
+  if (j.state !== "run") return "";
+  const pc = Math.round(100 * (j.done || 0) / (j.total || 5)), sec = Math.round(Date.now() / 1000 - (j.t || 0));
+  return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-acc)">●</span>Считаю ${xShort(j.addr)} · ${String(j.period).replace("d", " дн")}</div>
+    <div class="x-vs">${esc(j.msg || "")} · ${sec} с</div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${Math.max(4, pc)}%;background:var(--acc);transition:width .4s"></i></div>
+    <div class="x-note" style="margin:8px 0 0">Окно можно не закрывать — результат откроется сам. Обычно 1–3 минуты.</div></div>`;
+}
+function stJobPatch(){ const el = document.getElementById("xjob"); if (!el) { render(true); return; } const tmp = document.createElement("div"); tmp.innerHTML = stJobHTML(); if (tmp.firstElementChild) el.replaceWith(tmp.firstElementChild); }
 async function stLoadSim(d){
   if (!d || !d.api || ST.sd[d.api]) return;
   ST.sdErr = "";
@@ -1187,15 +1246,16 @@ function xHead(title, pill, back){
 }
 function stList(){
   const per = ["7d", "30d", "60d", "90d"];
-  let h = topHTML("Стратегия", true);
-  h += `<div class="x-card" style="margin-bottom:6px"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
+  let h = topHTML("Стратегия", true) + stJobHTML();
+  const busy = ST.job && ST.job.state === "run";
+  h += `<div class="x-card" style="margin-bottom:6px${busy ? ";opacity:.5;pointer-events:none" : ""}"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
     <input class="x-in" id="xaddr" placeholder="адрес кошелька" value="${esc(ST.addr)}" autocomplete="off" spellcheck="false">
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
     <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">🧠 Найти стратегию</button>
-    <div class="x-note" style="margin:8px 2px 0">Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке.</div></div>`;
+    <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
   if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
-  if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — открой окно кнопкой «📱 Настройки» из бота.</div>`;
+  if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — отправь боту /app и открой окно из новой кнопки «📱 Настройки».</div>`;
   if (ST.err === "net") return h + `<div class="x-card x-m">Сервер бота не отвечает (бот выключен или Caddy не запущен). <button class="x-link" data-xre="1">Повторить</button></div>`;
   if (!ST.list) return h + `<div class="x-card x-m">Загружаю…</div>`;
   if (!ST.list.length) return h + `<div class="x-card x-m">Пока пусто — найди стратегию первого кошелька.</div>`;
@@ -1210,7 +1270,8 @@ function stList(){
 }
 function stHome(D){
   let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
-  h += xVerdict(D) + `<div class="x-sec">Лучшее в каждом режиме</div>` + xModeCard(D, "n") + xModeCard(D, "f");
+  h += xVerdict(D) + (P.sa && P.sk ? `<button class="x-btn x-ghost" data-xexcel="1" style="margin-top:10px;height:44px">📊 Excel в чат</button>` : "")
+    + `<div class="x-sec">Лучшее в каждом режиме</div>` + xModeCard(D, "n") + xModeCard(D, "f");
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
     <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(v.ex)} · ${v.n} сд.</div></div>
@@ -1228,10 +1289,53 @@ function xTiles(v){
     <div class="x-tile"><div class="x-k">Минусы подряд</div><div class="x-v">${v.ls != null ? v.ls : "—"}</div></div></div>`;
 }
 function xSettings(rows){
-  return `<div class="x-card" style="padding:0">${rows.map((r, j) => {
+  return `<div class="x-twz"><div class="x-card" style="padding:0">${rows.map((r, j) => {
     const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено)/.test(r[1]);
     return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v${off ? " x-off" : ""}">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>`;
-  }).join("")}</div><button class="x-btn x-solid" data-xcpall="1" style="margin-top:10px">Скопировать все настройки</button>`;
+  }).join("")}</div><button class="x-btn x-solid" data-xcpall="1" style="margin-top:10px">Скопировать все настройки</button></div>`;
+}
+function xRawParams(r){
+  r = r || [0, 0, 0, 0, 3, 0, 1, 1, [0, 0], []];
+  return {cap: r[0], cap_min: r[1], age: r[2], age_min: r[3], min_usd: r[4], max_usd: r[5], once: !!r[6], follow: !!r[7],
+          to: r[8] && r[8][0] ? r[8] : null, tp: r[9] || [], lp_mode: r[10] || "all", lp: r[11] || null};
+}
+let xSort = "date", xDir = -1, xFlt = "all", xShowBad = false, xAll = false;
+function xPeak(sd, t){   // пик цены после входа (по свечам окна), во сколько раз от его входа
+  const cs = (sd.candles || {})[t.a] || [], p0 = t.cp || t.p0; if (!p0 || !cs.length) return null;
+  const end = t.ls ? Math.max(t.ls, t.fb + 6000) : t.fb + 86400; let mx = 0;
+  for (const c of cs) if (c[0] >= t.fb && c[0] <= end && c[2] > mx) mx = c[2];
+  return mx ? mx / p0 : null;
+}
+function xTrades(D, o, color){
+  const sd = ST.sd[D.api] || {};
+  const all = o.trades.filter(x => x.ok).map(x => Object.assign(x, {pk: x.pk !== undefined ? x.pk : xPeak(sd, x.t)}));
+  const bad = o.trades.filter(x => !x.ok);
+  let ok = all.filter(x => xFlt === "all" || (xFlt === "win" && x.roi > 0) || (xFlt === "loss" && x.roi <= 0) || (xFlt === "new" && x.test));
+  const key = {date: x => x.t.fb, roi: x => x.roi, mc: x => x.t.mc || 0, pk: x => x.pk || 0, hold: x => x.hold || 0, usd: x => x.t.usd, age: x => x.t.age || 0};
+  ok.sort((a, b) => (key[xSort](a) - key[xSort](b)) * xDir);
+  const sum = a => a.reduce((s, x) => s + x.roi, 0) * 100;
+  const dt = ts => new Date(ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}).replace(",", "");
+  const mc = x => x == null ? "—" : x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 10000 ? 0 : 1) + "K" : "$" + Math.round(x);
+  const hd = (k, l) => `<th data-xsort="${k}" class="${xSort === k ? "on" : ""}">${l}${xSort === k ? (xDir < 0 ? " ↓" : " ↑") : ""}</th>`;
+  const fl = (k, l, n) => `<button class="x-chip${xFlt === k ? " on" : ""}" data-xflt="${k}" style="flex:0 0 auto;height:30px;padding:0 10px;font-size:12px">${l} ${n}</button>`;
+  let h = `<div class="x-sec">Сделки копии · итог <b class="${xCls(sum(all))}">${xUsd(sum(all))}</b></div>
+    <div class="x-chips" style="margin:0 0 8px;overflow-x:auto">${fl("all", "Все", all.length)}${fl("win", "Плюс", all.filter(x => x.roi > 0).length)}${fl("loss", "Минус", all.filter(x => x.roi <= 0).length)}${fl("new", "Новые", all.filter(x => x.test).length)}</div>
+    <div class="x-card x-tw"><table class="x-tb"><thead><tr><th class="x-st">Токен</th>${hd("date", "Вход")}${hd("age", "Возраст")}${hd("mc", "Капа")}${hd("usd", "Сумма")}${hd("pk", "Пик")}${hd("hold", "Холд")}${hd("roi", "Копия")}<th>Выход</th></tr></thead><tbody>`;
+  const shown = xAll ? ok : ok.slice(0, 30);
+  h += shown.map(x => `<tr class="${x.roi > 0 ? "w" : "l"}">
+      <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button><button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button>${x.test ? '<i class="x-new">нов.</i>' : ""}</div></td>
+      <td>${dt(x.t.fb)}</td><td>${x.t.age != null ? (xDur(x.t.age) || "<1 мин") : "—"}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td>
+      <td>${x.pk ? "x" + x.pk.toFixed(x.pk >= 10 ? 0 : 1) : "—"}</td><td>${x.hold != null ? (xDur(x.hold) || "<1 мин") : "—"}</td>
+      <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * 100)}</span></td>
+      <td class="x-m">${x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}</td></tr>`).join("");
+  h += `</tbody></table></div>`;
+  if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:10px 4px 0;font-size:12.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
+  if (bad.length){
+    h += `<button class="x-link" data-xbad="1" style="margin:10px 4px 0 12px;font-size:12.5px">${xShowBad ? "Скрыть" : "Показать"} не прошедшие (${bad.length})</button>`;
+    if (xShowBad) h += `<div class="x-card x-tw" style="margin-top:8px"><table class="x-tb"><thead><tr><th class="x-st">Токен</th><th>Вход</th><th>Капа</th><th>Сумма</th><th>Почему нет</th></tr></thead><tbody>${bad.map(x => `<tr class="o">
+      <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button></div></td><td>${dt(x.t.fb)}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td><td class="x-m">✗ ${esc(x.why)}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  return h + `<div class="x-note">Таблица листается вбок. Тап по названию — график в GMGN с его сделками, ⧉ — скопировать адрес токена. Тап по заголовку — сортировка.</div>`;
 }
 function stDetail(D){
   const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
@@ -1244,6 +1348,11 @@ function stDetail(D){
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
   h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s);
   if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
+  if (D.api){
+    const sd = ST.sd[D.api];
+    if (!sd){ stLoadSim(D); h += `<div class="x-sec">Сделки копии</div><div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки…"}</div>`; }
+    else h += xTrades(D, SIM.backtest(sd, xRawParams(v.raw)), M.c);
+  }
   return h;
 }
 function btParams(){
@@ -1279,6 +1388,7 @@ function stBt(D){
     h += `<div id="xres">${xTiles(view)}${o.verdict ? `<div class="x-note">${esc(o.verdict[0])} ${esc(o.verdict[1])}</div>` : ""}
       ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">⚠ весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
       <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xChart(o.equity, o.mark, M.c)}</div></div>`;
+    ST.btTrades = o;
   }
   const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id])}" placeholder="${ph}"></label>`;
   h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}</div>
@@ -1288,10 +1398,13 @@ function stBt(D){
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
   if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
+  if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c)}</div>`;
   return h;
 }
+let xJobChecked = false;
 function stratHTML(){
   if (!ST.list && !ST.loading && !ST.err) stLoad();
+  if (!xJobChecked && P.sa && P.sk){ xJobChecked = true; stPoll(); }
   const D = xD();
   let body;
   if (ST.v === "list" || !D) body = stList();
@@ -1334,8 +1447,10 @@ document.addEventListener("input", e => {
     const tmp = document.createElement("div"); tmp.innerHTML = stBt(D);
     const nr = tmp.querySelector("#xres"), or = document.getElementById("xres");
     if (nr && or) or.replaceWith(nr);
-    const ns = tmp.querySelectorAll(".x-card")[tmp.querySelectorAll(".x-card").length - 1], cards = document.querySelectorAll(".x .x-card");
-    if (ns && cards.length) cards[cards.length - 1].replaceWith(ns);
+    const nt = tmp.querySelector("#xbtt"), ot = document.getElementById("xbtt");
+    if (nt && ot) ot.replaceWith(nt);
+    const tw = tmp.querySelector(".x-twz"), ow = document.querySelector(".x .x-twz");
+    if (tw && ow) ow.replaceWith(tw);
   }, 120);
 });
 document.addEventListener("click", async e => {
@@ -1344,10 +1459,28 @@ document.addEventListener("click", async e => {
   if (t.closest("[data-xre]")){ ST.err = ""; ST.list = null; stLoad(true); render(true); return; }
   const per = t.closest("[data-xper]"); if (per){ ST.per = per.dataset.xper; render(true); return; }
   if (t.closest("[data-xrun]")){
-    const a = (document.getElementById("xaddr") || {}).value || ST.addr;
-    if (!/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a.trim())){ xToast("Вставь адрес кошелька"); return; }
-    const out = {v: 3, run: "strategy", addr: a.trim(), period: ST.per, chain: a.trim().startsWith("0x") ? (cur["m.chain"] !== "sol" && cur["m.chain"] !== "all" ? cur["m.chain"] : "bsc") : "sol"};
+    const a = ((document.getElementById("xaddr") || {}).value || ST.addr).trim();
+    if (!/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a)){ xToast("Вставь адрес кошелька"); return; }
+    const chain = a.startsWith("0x") ? (cur["m.chain"] !== "sol" && cur["m.chain"] !== "all" ? cur["m.chain"] : "bsc") : "sol";
+    if (P.sa && P.sk){ stRun(a, chain); return; }
+    const out = {v: 3, run: "strategy", addr: a, period: ST.per, chain};   // сервера нет — через чат, как раньше
     if (inTG && tg.sendData) tg.sendData(JSON.stringify(out)); else alert(JSON.stringify(out));
+    return;
+  }
+  const so = t.closest("[data-xsort]"); if (so){ const k = so.dataset.xsort; xDir = xSort === k ? -xDir : -1; xSort = k; render(true); return; }
+  const fl = t.closest("[data-xflt]"); if (fl){ xFlt = fl.dataset.xflt; render(true); return; }
+  const ca = t.closest("[data-xca]"); if (ca){ await xCopy(ca.dataset.xca); xToast("Адрес токена скопирован"); return; }
+  if (t.closest("[data-xbad]")){ xShowBad = !xShowBad; render(true); return; }
+  if (t.closest("[data-xall]")){ xAll = !xAll; render(true); return; }
+  const tk = t.closest("[data-xtok]");
+  if (tk){ const D = xD(); const url = `https://gmgn.ai/${D.c}/token/${tk.dataset.xtok}?maker=${D.a}`;
+    try { inTG && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); } catch (e) { window.open(url, "_blank"); } return; }
+  if (t.closest("[data-xexcel]")){
+    const D = xD(); xToast("Собираю Excel…");
+    try {
+      const r = await (await fetch(`${P.sa}/api/excel?k=${encodeURIComponent(P.sk)}&a=${encodeURIComponent(D.a)}&p=${D.p}`, {cache: "no-store"})).json();
+      xToast(r.r === "ok" ? "📊 Отправил Excel в чат" : r.r === "old" ? "Бот перезапускали — запусти поиск заново, тогда будет Excel" : "Не получилось отправить");
+    } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
   const it = t.closest("[data-xi]"); if (it){ ST.i = +it.dataset.xi; ST.v = "home"; render(); window.scrollTo(0, 0); return; }
