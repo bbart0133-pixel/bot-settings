@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Стратегия кошелька</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080a;--text:#eef1f3;--hint:#8f98a0;--dim:#69727a;--acc:#3ee6a0;--rgb:62,230,160;--flip:#ffb547;--fliprgb:255,181,71;
+  --warn:#f5c451;--bad:#ff6b6b;--good:#3ee6a0;--line:rgba(255,255,255,.075);--card:rgba(255,255,255,.028);--ink:#04130c}
+:root[data-theme="bsc"]{--acc:#f0b90b;--rgb:240,185,11;--flip:#a78bfa;--fliprgb:167,139,250;--ink:#1a1300}
+:root[data-theme="rh"]{--acc:#3ee07a;--rgb:62,224,122;--ink:#03140a}
+:root[data-theme="arc"]{--acc:#4d8dff;--rgb:77,141,255;--ink:#020c22}
+:root[data-theme="ely"]{--acc:#e06cf5;--rgb:224,108,245;--ink:#24052b}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{font:15px/1.4 Onest,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh;
+  background:var(--bg) radial-gradient(70% 300px at 50% -60px,rgba(var(--rgb),.10),transparent 70%) no-repeat}
+#app{padding:16px 16px 100px;max-width:520px;margin:0 auto}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--hint);font-size:20px}
+.h{font-weight:700;font-size:24px;letter-spacing:-.3px;flex:1;min-width:0}
+.pill{font-size:12.5px;color:var(--hint);border:1px solid var(--line);border-radius:999px;padding:6px 10px;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.verdict.w{border-color:rgba(245,196,81,.35);background:rgba(245,196,81,.06)}
+.verdict.g{border-color:rgba(var(--rgb),.35);background:rgba(var(--rgb),.06)}
+.verdict.b{border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.vt{font-weight:700;font-size:16px;display:flex;gap:8px;align-items:flex-start}
+.vs{color:var(--hint);font-size:13px;margin-top:6px}
+.sec{font-size:13px;font-weight:600;color:var(--hint);margin:18px 4px 8px}
+.mode{margin-bottom:10px;position:relative;display:block;width:100%;text-align:left}
+.mode.win{border-color:rgba(var(--rgb),.45)}
+.mh{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--hint);padding-right:104px;white-space:nowrap;overflow:hidden}
+.mh b{color:var(--text);font-size:14.5px}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.big{font-size:30px;font-weight:700;letter-spacing:-.5px;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:6px 14px;font-size:12.5px;color:var(--hint);flex-wrap:wrap}
+.row b{color:var(--text);font-weight:600}
+.ok{color:var(--good)!important}.bad{color:var(--bad)!important}
+.tag{display:inline-flex;gap:6px;align-items:center;margin-top:10px;font-size:12px;color:var(--warn);background:rgba(245,196,81,.08);border-radius:8px;padding:5px 8px}
+.spark{position:absolute;right:14px;top:30px;width:96px;height:40px}
+.chev{position:absolute;right:14px;bottom:14px;color:var(--dim)}
+.list{padding:2px 14px}
+.it{display:grid;grid-template-columns:8px 1fr auto auto;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px;width:100%;text-align:left}
+.it:last-child{border-bottom:0}
+.m{font-size:12px;color:var(--dim)}
+.num{font-variant-numeric:tabular-nums;font-weight:600}
+.note{font-size:12px;color:var(--dim);margin:10px 4px 0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:14px;font-weight:600;font-size:14.5px;width:100%}
+.ghost{border:1px solid var(--line);background:rgba(10,11,13,.85)}
+.solid{background:var(--acc);color:var(--ink)}
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;
+  background:linear-gradient(180deg,transparent,var(--bg) 35%);max-width:520px;margin:0 auto}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{flex:1 1 0;min-width:0;text-align:center;font-size:13px;padding:8px 2px;border-radius:11px;border:1px solid var(--line);color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab.on{border-color:var(--mc);color:var(--text);background:rgba(var(--mrgb),.10)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}
+.tile .k{font-size:11.5px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .v{font-size:18px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.s{display:grid;grid-template-columns:auto minmax(0,1fr) 32px;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px;width:100%;text-align:left}
+.s:last-child{border-bottom:0}
+.s .k{color:var(--hint);white-space:nowrap}
+.s .v{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.s .v.off{color:var(--dim);font-weight:500}
+.cp{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--hint)}
+.s.done .cp{color:var(--acc);border-color:rgba(var(--rgb),.5)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid var(--line);
+  padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.empty{color:var(--hint);text-align:center;padding:60px 20px}
+</style></head><body>
+<div id="app"></div><div class="toast" id="toast"></div>
+<script>
+const tg = window.Telegram && Telegram.WebApp;
+try { tg && tg.ready(); tg && tg.expand(); } catch (e) {}
+const THEME = {sol: "sol", bsc: "bsc", robinhood: "rh", arc: "arc", elysium: "ely"};
+const CH = {sol: "SOL", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium"};
+let D = null, view = {s: "home", m: "n", i: 0};
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const usd = v => v == null ? "—" : (v < 0 ? "−$" : "+$") + Math.abs(Math.round(v)).toLocaleString("ru-RU").replace(/,/g, " ");
+const usdAbs = v => "$" + Math.abs(Math.round(v || 0)).toLocaleString("ru-RU");
+const pct = v => Math.round((v || 0) * 100) + "%";
+const cls = v => v == null ? "" : v > 0 ? "ok" : v < 0 ? "bad" : "";
+const short = a => a ? a.slice(0, 4) + "…" + a.slice(-4) : "";
+const dur = s => s == null ? null : s < 60 ? Math.round(s) + " с" : s < 3600 ? Math.round(s / 60) + " мин" : Math.round(s / 3600) + " ч";
+const MODES = {n: {t: "Обычный", c: "var(--acc)", rgb: "var(--rgb)"}, f: {t: "Флипы", c: "var(--flip)", rgb: "var(--fliprgb)"}};
+function b64bytes(s){ s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+async function load(){
+  const q = new URLSearchParams(location.search);
+  if (q.get("z")){
+    if (!window.DecompressionStream) throw new Error("old");
+    const st = new Blob([b64bytes(q.get("z"))]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return JSON.parse(await new Response(st).text());
+  }
+  if (q.get("j")) return JSON.parse(new TextDecoder().decode(b64bytes(q.get("j"))));
+  return null;
+}
+function spark(eq, color, w, h){
+  if (!eq || eq.length < 2) return "";
+  const mn = Math.min(0, ...eq), mx = Math.max(0, ...eq), r = (mx - mn) || 1;
+  const pts = eq.map((v, i) => `${(i / (eq.length - 1) * w).toFixed(1)},${(h - 3 - (v - mn) / r * (h - 6)).toFixed(1)}`).join(" ");
+  return `<polyline fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>`;
+}
+function chart(v, color){
+  const eq = v.eq || []; const w = 330, h = 120;
+  if (eq.length < 2) return `<div class="m" style="padding:30px 0;text-align:center">мало сделок для графика</div>`;
+  const mn = Math.min(0, ...eq), mx = Math.max(0, ...eq), r = (mx - mn) || 1, y0 = h - 3 - (0 - mn) / r * (h - 6);
+  const mk = v.mk != null ? `<line x1="${v.mk * w}" y1="0" x2="${v.mk * w}" y2="${h}" stroke="rgba(255,255,255,.18)"/><text x="${v.mk * w + 4}" y="12" fill="#8f98a0" font-size="10">новые сделки →</text>` : "";
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="height:120px;margin-top:6px"><line x1="0" y1="${y0}" x2="${w}" y2="${y0}" stroke="rgba(255,255,255,.12)" stroke-dasharray="3 4"/>${mk}${spark(eq, color, w, h)}</svg>`;
+}
+function verdictHTML(){
+  const pk = D.pk; const base = D.b != null ? ` Копировать всё подряд без фильтров: <b class="${cls(D.b)}">${usd(D.b)}</b> за период.` : "";
+  if (pk.w) return `<div class="card verdict w"><div class="vt"><span style="color:var(--warn)">⚠</span>Надёжной стратегии нет</div><div class="vs">${esc(pk.y.replace(/^надёжной стратегии нет:\s*/, "").replace(/^./, c => c.toUpperCase()))}.${base}</div></div>`;
+  if (!pk.m) return `<div class="card verdict b"><div class="vt"><span style="color:var(--bad)">⛔</span>Копировать не стоит</div><div class="vs">${esc(pk.y.replace(/^./, c => c.toUpperCase()))}.${base}</div></div>`;
+  const t = pk.m === "normal" ? "обычное копирование" : "флипы";
+  return `<div class="card verdict g"><div class="vt"><span style="color:var(--acc)">●</span>Больше подходит: ${t}</div><div class="vs">${esc(pk.y.replace(/^./, c => c.toUpperCase()))}.${base}</div></div>`;
+}
+function modeCard(k){
+  const md = D.m[k], M = MODES[k];
+  if (!md || !md.v.length) return `<div class="card mode"><div class="mh"><span class="dot" style="background:${M.c}"></span><b>${M.t}</b></div><div class="m" style="margin-top:8px">мало закрытых сделок для подбора</div></div>`;
+  const v = md.v[md.r || 0]; const win = (D.pk.m === "normal" && k === "n") || (D.pk.m === "flip" && k === "f");
+  return `<button class="card mode${win && !D.pk.w ? " win" : ""}" data-open="${k}:${md.r || 0}">
+    <div class="mh"><span class="dot" style="background:${M.c}"></span><b>${M.t}</b> · ${esc(v.nm)}</div>
+    <svg class="spark" viewBox="0 0 96 40">${spark(v.eq, M.c, 96, 40)}</svg>
+    <div class="big ${cls(v.tot)}">${usd(v.tot)}</div>
+    <div class="row"><span>${v.n} сделок · WR <b>${pct(v.wr)}</b></span><span>просадка <b>−${usdAbs(v.dd)}</b></span>${v.h != null ? `<span>холд ~${dur(v.h)}</span>` : ""}</div>
+    <div class="row" style="margin-top:4px"><span>на новых сделках ${v.te != null ? `<b class="${cls(v.te)}">${usd(v.te)}</b>` : "<b>—</b>"}</span></div>
+    ${v.oh ? `<div class="tag">⚠ ${esc(v.oh)}</div>` : ""}<div class="chev">›</div></button>`;
+}
+function home(){
+  let h = `<div class="top"><div class="h">Стратегия</div><div class="pill">${short(D.a)} · ${esc(CH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}</div></div>`;
+  h += verdictHTML();
+  h += `<div class="sec">Лучшее в каждом режиме</div>` + modeCard("n") + modeCard("f");
+  const rows = [];
+  for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="it" data-open="${k}:${i}">
+    <span class="dot" style="background:${MODES[k].c}"></span><div>${esc(v.nm)}<div class="m">${esc(v.ex)} · ${v.n} сд.</div></div>
+    <span class="m ${cls(v.te)}">${v.te != null ? (v.vd && v.vd[0] === "✅" ? "✓ " : "") + usd(v.te) : "—"}</span><span class="num ${cls(v.tot)}">${usd(v.tot)}</span></button>`));
+  if (rows.length) h += `<div class="sec">Все варианты</div><div class="card list">${rows.join("")}</div>
+    <div class="note">Справа — итог за период ($100 на сделку), рядом — на новых сделках, которые подбор не видел.</div>`;
+  return h + `<div class="dock"><button class="btn ghost" data-close="1">Excel с токенами — в чате</button></div>`;
+}
+function detail(){
+  const k = view.m, md = D.m[k], M = MODES[k], v = md.v[view.i];
+  document.documentElement.style.setProperty("--mc", M.c); document.documentElement.style.setProperty("--mrgb", M.rgb);
+  let h = `<div class="top"><button class="back" data-home="1">‹</button><div class="h">${M.t}</div><div class="pill">${short(D.a)} · ${String(D.p).replace("d", " дн")}</div></div>`;
+  h += `<div class="tabs">${md.v.map((x, i) => `<button class="tab${i === view.i ? " on" : ""}" data-open="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
+  const vd = v.vd ? v.vd[0] : null;
+  h += `<div class="grid">
+    <div class="tile"><div class="k">Итог</div><div class="v ${cls(v.tot)}">${usd(v.tot)}</div></div>
+    <div class="tile"><div class="k">Новые сделки</div><div class="v ${cls(v.te)}">${v.te != null ? usd(v.te) : "—"}</div></div>
+    <div class="tile"><div class="k">Просадка</div><div class="v bad">−${usdAbs(v.dd)}</div></div>
+    <div class="tile"><div class="k">Сделок</div><div class="v">${v.n}</div></div>
+    <div class="tile"><div class="k">Винрейт</div><div class="v">${pct(v.wr)}</div></div>
+    <div class="tile"><div class="k">Минусы подряд</div><div class="v">${v.ls != null ? v.ls : "—"}</div></div></div>`;
+  if (v.vd) h += `<div class="note" style="margin:10px 4px 0">${esc(v.vd[0])} ${esc(v.vd[1])}</div>`;
+  h += `<div class="card" style="margin-top:10px;padding:12px 14px 8px"><div class="mh" style="padding-right:0"><b style="font-size:13px">Баланс копии</b> · $100 на сделку</div>${chart(v, M.c)}</div>`;
+  h += `<div class="sec">Вход и выход</div><div class="card" style="font-size:13.5px"><div><span class="m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="m">Выход:</span> ${esc(v.ex)}</div></div>`;
+  h += `<div class="sec">Настройки для TradeWiz</div><div class="card" style="padding:0">${v.s.map((r, j) => {
+    const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено)/.test(r[1]);
+    return `<button class="s" data-copy="${j}"><span class="k">${esc(r[0])}</span><span class="v${off ? " off" : ""}">${esc(nice(r[1]))}</span><span class="cp">⧉</span></button>`;
+  }).join("")}</div>`;
+  if (v.oh) h += `<div class="tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
+  return h + `<div class="dock"><button class="btn solid" data-copyall="1">Скопировать все настройки</button></div>`;
+}
+// короче для экрана: «вкл: 120 сек (2м 0с) → продажа 100%» → «120 сек → 100%»
+const nice = t => String(t).replace(/^вкл:\s*/, "").replace(/\s*\(\d+м \d+с\)/, "").replace(/продажа /g, "");
+function render(){
+  const app = document.getElementById("app");
+  if (!D){ app.innerHTML = `<div class="empty">Нет данных. Открой окно кнопкой «📱 Открыть в приложении» под результатом поиска стратегии.</div>`; return; }
+  app.innerHTML = view.s === "home" ? home() : detail();
+  try {
+    if (tg && tg.BackButton){ view.s === "home" ? tg.BackButton.hide() : tg.BackButton.show(); }
+  } catch (e) {}
+  window.scrollTo(0, 0);
+}
+let toastT;
+function toast(t){ const el = document.getElementById("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1400); }
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (_) {} ta.remove(); }
+  try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
+}
+document.addEventListener("click", async e => {
+  const o = e.target.closest("[data-open]");
+  if (o){ const [m, i] = o.dataset.open.split(":"); view = {s: "detail", m, i: +i}; try { tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); } catch (_) {} render(); return; }
+  if (e.target.closest("[data-home]")){ view = {s: "home"}; render(); return; }
+  if (e.target.closest("[data-close]")){ try { tg && tg.close(); } catch (_) {} return; }
+  const c = e.target.closest("[data-copy]");
+  if (c){ const v = D.m[view.m].v[view.i], r = v.s[+c.dataset.copy]; await copy(r[1].replace(/\s*\(~\$[^)]*\)/, "").replace(/\s*\(только Jito\)/, "")); c.classList.add("done"); toast("Скопировано: " + r[0]); return; }
+  if (e.target.closest("[data-copyall]")){ const v = D.m[view.m].v[view.i]; await copy(v.s.map(r => r[0] + ": " + r[1]).join("\n")); toast("Все настройки скопированы"); }
+});
+try { tg && tg.BackButton && tg.BackButton.onClick(() => { view = {s: "home"}; render(); }); } catch (e) {}
+(async () => {
+  try { D = await load(); }
+  catch (e) { document.getElementById("app").innerHTML = `<div class="empty">${e.message === "old" ? "Telegram/телефон слишком старый, чтобы открыть это окно — обнови приложение. Всё то же есть в Excel." : "Не получилось прочитать данные."}</div>`; return; }
+  if (D){
+    document.documentElement.dataset.theme = THEME[D.c] || "sol";
+    try { tg && tg.setHeaderColor && tg.setHeaderColor("#07080a"); tg && tg.setBackgroundColor && tg.setBackgroundColor("#07080a"); } catch (e) {}
+  }
+  render();
+})();
+</script>
+</body></html>
