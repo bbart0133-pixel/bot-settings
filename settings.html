@@ -269,6 +269,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 /* ===== Спокойный стиль: плоские карточки, один акцентный цвет, стекло только у панели и шторок ===== */
 body{background:transparent!important}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.10),transparent 70%)}
+/* Фон под сеть: бледный график (свечи / линия / соты), снизу ярче, к верху тает — текст не мешает */
+#bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%);mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%)}
+#bgfx svg{position:absolute;inset:0;width:100%;height:100%}
+/* карточки над графиком — матовые: график под ними размыт, текст читается */
+.card,.tile,.hero,.list,.x-card{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .card,.tile{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.075);box-shadow:none}
 .hero{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.08);box-shadow:none}
 .hero .glow,.hero .dots{display:none}
@@ -415,6 +421,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </style>
 </head>
 <body>
+<div id="bgfx" aria-hidden="true"></div>
 <div class="app" id="app"></div>
 <div class="dock"><div class="dockin">
   <div class="abar" id="abar"><button class="cta ghost" id="bfind" style="width:auto;padding:0 16px">Найти токены</button><button class="cta" id="bsave"></button></div>
@@ -803,8 +810,48 @@ function applyTheme(){
   const t = THEME_OF[screen === "onchain" ? ocChain : sc || cur["m.chain"]] || "def";
   if (document.documentElement.dataset.theme === t) return;
   document.documentElement.dataset.theme = t;
+  bgFx(t);
   const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
   try { if (inTG){ tg.setHeaderColor && tg.setHeaderColor(bg); tg.setBackgroundColor && tg.setBackgroundColor(bg); } } catch (e) {}
+}
+// Фон под сеть. Рисуется один раз на смену сети, случайность с зерном — у каждой сети картинка всегда одна и та же.
+function bgFx(t){
+  const el = document.getElementById("bgfx"); if (!el) return;
+  let seed = {sol: 7, bsc: 11, rh: 23, arc: 31, ely: 43}[t] || 0;
+  if (!seed){ el.innerHTML = ""; return; }
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const W = 400, H = 800, cs = getComputedStyle(document.documentElement);
+  const acc = cs.getPropertyValue("--acc").trim(), g1 = cs.getPropertyValue("--g1").trim(), g3 = cs.getPropertyValue("--g3").trim();
+  const grid = [...Array(9)].map((_, i) => `<line x1="0" x2="${W}" y1="${300 + i * 60}" y2="${300 + i * 60}" stroke="rgba(255,255,255,.05)" stroke-width="1"/>`).join("");
+  // случайное блуждание цены с ростом: от низа слева к верху справа
+  const walk = (n, drift, vol) => { let v = 0; const a = []; for (let i = 0; i < n; i++){ v += drift + (rnd() - .45) * vol; a.push(v); } return a; };
+  let body = "";
+  if (t === "sol" || t === "bsc"){
+    const n = 34, step = W / n, w = step * .5, pts = walk(n, 1.4, 9);
+    const lo = Math.min(...pts), hi = Math.max(...pts), y = v => 760 - (v - lo) / (hi - lo || 1) * 380;
+    let prev = pts[0] - 3;
+    pts.forEach((v, i) => {
+      const o = prev, c = v, up = c >= o, x = i * step + step * .25;
+      const top = Math.max(o, c) + rnd() * 4, bot = Math.min(o, c) - rnd() * 4;
+      const col = up ? acc : (t === "sol" ? g1 : "#7a6a3a");
+      body += `<line x1="${x + w / 2}" x2="${x + w / 2}" y1="${y(top)}" y2="${y(bot)}" stroke="${col}" stroke-width="1.2"/>`
+        + `<rect x="${x}" y="${y(Math.max(o, c))}" width="${w}" height="${Math.max(2, Math.abs(y(o) - y(c)))}" rx="1.5" fill="${col}" opacity="${up ? .9 : .6}"/>`;
+      prev = c;
+    });
+    if (t === "bsc"){   // соты в углу — мотив сети BNB, без логотипа
+      const hx = (cx, cy, r) => { const p = [...Array(6)].map((_, k) => { const a = Math.PI / 3 * k + Math.PI / 6; return (cx + r * Math.cos(a)).toFixed(1) + "," + (cy + r * Math.sin(a)).toFixed(1); }).join(" "); return `<polygon points="${p}" fill="none" stroke="${acc}" stroke-width="1" opacity=".35"/>`; };
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 4; c++) body = hx(250 + c * 40 + (r % 2) * 20, 330 + r * 35, 20) + body;
+    }
+  } else {
+    const n = 60, pts = walk(n, t === "rh" ? 1.1 : .6, t === "ely" ? 14 : 8);
+    const lo = Math.min(...pts), hi = Math.max(...pts), y = v => 760 - (v - lo) / (hi - lo || 1) * 360, x = i => i / (n - 1) * W;
+    const d = pts.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+    body += `<defs><linearGradient id="bgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${acc}" stop-opacity=".35"/><stop offset="1" stop-color="${acc}" stop-opacity="0"/></linearGradient></defs>`
+      + `<path d="${d} L${W} ${H} L0 ${H} Z" fill="url(#bgf)"/><path d="${d}" fill="none" stroke="${acc}" stroke-width="2"/>`;
+    if (t === "rh") pts.forEach((v, i) => { if (i % 12 === 6) body += `<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${g3}"/>`; });
+    if (t === "arc") for (let i = 0; i < 40; i++) body += `<circle cx="${(i % 8) * 50 + 25}" cy="${330 + Math.floor(i / 8) * 50}" r="1.4" fill="${g1}" opacity=".5"/>`;
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice">${grid}${body}</svg>`;
 }
 function render(keepScroll){
   document.body.classList.add("wide"); document.body.dataset.scr = screen;
