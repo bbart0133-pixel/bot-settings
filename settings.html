@@ -273,6 +273,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 #bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%);mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%)}
 #bgfx svg{position:absolute;inset:0;width:100%;height:100%}
+/* логотип внизу главной: буквы белые, снег голубой */
+.flogo{display:flex;justify-content:center;margin:18px 0 0;opacity:.85;text-shadow:0 0 6px var(--bg),0 0 2px var(--bg);pointer-events:none;user-select:none}
+.flogo .lgo{margin:0;white-space:pre;line-height:1.15;font:600 calc(min(100vw,560px) * .62 / 28 / .6) / 1.15 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#e9eaee}
+.flogo .lgt{color:#3ccf74}.flogo .lgs{color:#ffd54a}.flogo .lgb1{color:#ff5a5a}.flogo .lgb2{color:#4da3ff}.flogo .lgn{color:#9fb3ff}
 /* карточки над графиком — матовые: график под ними размыт, текст читается */
 .card,.tile,.hero,.list,.x-card{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .card,.tile{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.075);box-shadow:none}
@@ -361,6 +365,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-chip.on{border-color:var(--acc)!important;color:var(--text)!important;background:rgba(var(--x-rgb),.12)!important}
 .x-link{color:var(--acc)!important;text-decoration:underline}
 .x-f{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.x-f.qf{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}.x-f.qf input{height:38px;font-size:14px}
+/* окно расширения: без нижней панели вкладок — только стратегия, больше места под таблицу */
+body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!important}
 .x-fl{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--hint)}
 .x-fl input{height:44px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 15px var(--hd);padding:0 12px;width:100%;outline:none}
 .x-tg{display:flex!important;align-items:center;justify-content:space-between;padding:12px 14px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:14px;width:100%}
@@ -853,6 +860,23 @@ function bgFx(t){
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice">${grid}${body}</svg>`;
 }
+// Логотип LUPA 028 внизу главной: буквы белые, снег — голубые точки и звёздочки
+const LOGO_TXT = [" .  __    __  __ ____   ___", "   / /   / / / // __ \\ /   |", "  / /   / / / // /_/ // /| |", " / /___/ /_/ // ____// ___ |", "/_____/\\____//_/    /_/  |_|", "         ____  ___   ____  *", "        / __ \\|__ \\ ( __ )", "       / / / /__/ // __  | .", "      / /_/ // __// /_/ /", "      \\____//____/\\____/   *"];
+const LOGO_HTML = (() => {
+  let ball = 0;
+  const rows = LOGO_TXT.map((ln, r) => [...ln].map((ch, c) => {
+    const e = esc(ch); if (ch === " ") return " ";
+    if (r >= 5 && c <= 5){   // ёлка
+      if (ch === "*") return `<span class="lgs">*</span>`;
+      if (ch === "o") return `<span class="${ball++ % 2 ? "lgb2" : "lgb1"}">o</span>`;
+      if (ch === ".") return `<span class="lgs">.</span>`;
+      return `<span class="lgt">${e}</span>`;
+    }
+    if ((ch === "*" || ch === ".") ) return `<span class="lgn">${e}</span>`;
+    return e;
+  }).join(""));
+  return `<pre class="lgo">${rows.join("\n")}</pre>`;
+})();
 function render(keepScroll){
   document.body.classList.add("wide"); document.body.dataset.scr = screen;
   applyTheme();
@@ -1054,6 +1078,7 @@ function bootEmpty(msg){
 }
 function bootWith(x){
   P = norm(x);
+  if (typeof EXT !== "undefined" && EXT) document.body.classList.add("ext");
   if (!P || !P.s){ bootEmpty(); return; }
   document.querySelector(".dock").style.display = "";
   start = Object.assign({}, P.s, {"m.chain": (P.m || {}).chain || "sol", "m.period": (P.m || {}).period || "6h"});
@@ -1064,20 +1089,38 @@ function bootWith(x){
 }
 // Кнопка «Открыть» у чата (главное мини-приложение): данных в адресе нет — берём их у сервера бота по initData.
 // Адрес сервера — в параметре ?sa= ссылки, которую вписали в BotFather.
+// Расширение Chrome открывает апку с #ext=1&sa=…&k=…&addr=…&chain=… (в «#» — чтобы ключ не уходил на GitHub)
+const HASHQ = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+const EXT = HASHQ.get("ext") ? {addr: (HASHQ.get("addr") || "").trim(), chain: HASHQ.get("chain") || ""} : null;
 async function bootFromServer(){
-  const sa = new URLSearchParams(location.search).get("sa") || "";
-  const init = (tg && tg.initData) || "";
-  if (!/^https:\/\//.test(sa) || !init){ bootEmpty(); return; }
+  const sa = new URLSearchParams(location.search).get("sa") || HASHQ.get("sa") || "";
+  const init = (tg && tg.initData) || "", key = HASHQ.get("k") || "";
+  if (!/^https:\/\//.test(sa) || (!init && !key)){ bootEmpty(); return; }
   document.getElementById("app").innerHTML = '<div class="empty">Загружаю…</div>';
   try {
-    const r = await fetch(sa.replace(/\/$/, "") + "/api/boot?init=" + encodeURIComponent(init), {cache: "no-store"});
-    if (r.status === 403){ bootEmpty("Бот тебя не узнал. Открой окно кнопкой «📱 Open App» в чате с ботом."); return; }
+    const r = await fetch(sa.replace(/\/$/, "") + "/api/boot?" + (init ? "init=" + encodeURIComponent(init) : "k=" + encodeURIComponent(key)), {cache: "no-store"});
+    if (r.status === 403){ bootEmpty(init ? "Бот тебя не узнал. Открой окно кнопкой «📱 Open App» в чате с ботом."
+      : "Ключ не подошёл или устарел. Отправь боту /ext и вставь новый ключ в параметрах расширения."); return; }
     const j = await r.json();
+    if (EXT){ screen = "strat"; if (/^0x/.test(EXT.addr) && ["bsc", "robinhood", "arc", "elysium"].includes(EXT.chain)) EXT.setChain = EXT.chain; }
     bootWith(decode(j.d));
-  } catch (e) { bootEmpty("Сервер бота не отвечает. Открой окно кнопкой «📱 Open App» в чате с ботом."); }
+    if (EXT && EXT.setChain) cur["m.chain"] = EXT.setChain;
+  } catch (e) { bootEmpty("Сервер бота не отвечает" + (init ? ". Открой окно кнопкой «📱 Open App» в чате с ботом." : " — проверь «Сервер бота» в параметрах расширения.")); }
 }
 const _boot = payload();
 if (_boot) bootWith(_boot); else bootFromServer();
+// Расширение уже открыло окно и прислало другой кошелёк: меняется только «#…» — страница не перезагружается,
+// просто открываем его поиск (или подставляем адрес) — мгновенно, без новой загрузки.
+window.addEventListener("hashchange", () => {
+  if (!EXT || !P) return;
+  const h = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+  const addr = (h.get("addr") || "").trim(), ch = h.get("chain") || "";
+  screen = "strat"; ST.bt = null;
+  if (/^0x/.test(addr) && ["bsc", "robinhood", "arc", "elysium"].includes(ch)) cur["m.chain"] = ch;
+  const i = addr ? (ST.list || []).findIndex(d => d.a === addr) : -1;
+  if (i >= 0){ ST.i = i; ST.v = "home"; } else if (addr){ ST.addr = addr; qOpen(addr, ch, QK.per || "30d", "list"); return; } else ST.v = "list";
+  render(); window.scrollTo(0, 0);
+});
 // Живой статус: раз в 4 с спрашиваем сервер бота, что он делает, и обновляем «Сейчас идёт» без переоткрытия окна
 let liveT = null, liveFail = 0;
 async function liveState(){
@@ -1326,6 +1369,11 @@ async function stLoad(force){
     if (r.status === 403) throw new Error("auth");
     if (!r.ok) throw new Error("http " + r.status);
     ST.list = await r.json();
+    if (EXT && EXT.addr && !EXT.done){   // открыто из расширения по кошельку: есть готовый поиск — сразу он, нет — адрес в поле
+      EXT.done = true;
+      const i = ST.list.findIndex(d => d.a === EXT.addr);
+      if (i >= 0){ ST.i = i; ST.v = "home"; } else { ST.addr = EXT.addr; setTimeout(() => qOpen(EXT.addr, EXT.chain, "30d", "list"), 0); }
+    }
   } catch (e) { ST.err = e.message === "auth" ? "auth" : "net"; }
   ST.loading = false;
   if (screen === "strat") render(true);
@@ -1409,6 +1457,7 @@ function stList(){
     <input class="x-in" id="xaddr" placeholder="адрес кошелька" value="${esc(ST.addr)}" autocomplete="off" spellcheck="false">
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
     <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">🧠 Найти стратегию</button>
+    ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">⚡ Быстро: сделки кошелька</button>` : ""}
     <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
   if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
@@ -1427,7 +1476,7 @@ function stList(){
 }
 function stHome(D){
   let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
-  h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<button class="x-btn x-ghost" data-xexcel="1" style="margin-top:10px;height:44px">📊 Excel в чат</button>` : "")
+  h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">📊 Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">⚡ Сделки кошелька</button></div>` : "")
     + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
@@ -1563,12 +1612,155 @@ function stBt(D){
   return h + `</div></div>`;
 }
 let xJobChecked = false;
+// ===== ⚡ Быстрый разбор: сделки кошелька за пару секунд (без поиска стратегии) — фильтры, итоги «все: …», таблица =====
+let QK = {addr: "", chain: "", per: "30d", data: null, loading: false, err: "", f: {}, sort: "fb", dir: -1, all: false, back: "list"};
+const Q_MC = [["0–3K", 0, 3], ["3–10K", 3, 10], ["10–20K", 10, 20], ["20–50K", 20, 50], ["50–100K", 50, 100], ["100–200K", 100, 200], ["200–500K", 200, 500], ["500K+", 500, ""]];
+function qOpen(addr, chain, per, back){
+  QK = Object.assign(QK, {addr, chain: chain || (/^0x/.test(addr) ? (["bsc", "robinhood", "arc", "elysium"].includes(cur["m.chain"]) ? cur["m.chain"] : "bsc") : "sol"),
+    per: per || QK.per || "30d", data: null, err: "", all: false, back: back || "list"});
+  ST.v = "q"; render(); window.scrollTo(0, 0); qLoad();
+}
+async function qLoad(){
+  if (!P.sa || !P.sk){ QK.err = "Нужен сервер бота (STRAT_API_URL в .env)"; render(true); return; }
+  QK.loading = true; QK.err = ""; const want = QK.addr + QK.per;
+  try {
+    const r = await fetch(`${P.sa}/api/trades?k=${encodeURIComponent(P.sk)}&addr=${encodeURIComponent(QK.addr)}&chain=${QK.chain}&period=${QK.per}`, {cache: "no-store"});
+    if (want !== QK.addr + QK.per) return;   // пока качали, переключили кошелёк/период
+    if (r.status === 403) throw new Error("Ключ устарел — открой окно заново (/app или /ext)");
+    if (!r.ok) throw new Error(await r.text());
+    const j = await r.json();
+    QK.data = Object.assign(j, {rows: j.rows.map(a => { const o = {}; j.k.forEach((k, i) => o[k] = a[i]); return o; })});
+  } catch (e) { QK.err = String(e.message || e).slice(0, 160); }
+  QK.loading = false;
+  if (screen === "strat" && ST.v === "q") render(true);
+}
+const qNum = v => v === "" || v == null || isNaN(+v) ? null : +v;
+function qFilter(rows){
+  const f = QK.f, n = k => qNum(f[k]);
+  return rows.filter(r => {
+    if (n("mc1") != null && !(r.mc != null && r.mc >= n("mc1") * 1000)) return false;
+    if (n("mc2") != null && !(r.mc != null && r.mc <= n("mc2") * 1000)) return false;
+    if (n("roi1") != null && !(r.roi != null && r.roi * 100 >= n("roi1"))) return false;
+    if (n("roi2") != null && !(r.roi != null && r.roi * 100 <= n("roi2"))) return false;
+    if (n("pnl1") != null && !(r.pnl != null && r.pnl >= n("pnl1"))) return false;
+    if (n("h1") != null && !(r.hold_h != null && r.hold_h * 60 >= n("h1"))) return false;
+    if (n("h2") != null && !(r.hold_h != null && r.hold_h * 60 <= n("h2"))) return false;
+    if (n("s1") != null && !(r.spent != null && r.spent >= n("s1"))) return false;
+    if (n("s2") != null && !(r.spent != null && r.spent <= n("s2"))) return false;
+    if (f.res === "win" && !(r.pnl != null && r.pnl > 0)) return false;
+    if (f.res === "loss" && !(r.pnl != null && r.pnl <= 0)) return false;
+    if (f.st === "closed" && !r.closed) return false;
+    if (f.st === "open" && r.closed) return false;
+    if (f.lp && f.lp !== "all" && r.lp !== f.lp) return false;
+    if (f.q && !(String(r.sym).toLowerCase().includes(f.q.toLowerCase()) || String(r.a).toLowerCase() === f.q.toLowerCase())) return false;
+    return true;
+  });
+}
+function qStats(rows){
+  const med = a => { const v = a.slice().sort((x, y) => x - y), n = v.length; return !n ? null : n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2; };
+  const sold = rows.filter(r => r.pnl != null), rois = rows.filter(r => r.roi != null).map(r => r.roi), holds = rows.filter(r => r.hold_h != null).map(r => r.hold_h);
+  return {n: rows.length, wr: sold.length ? sold.filter(r => r.pnl > 0).length / sold.length : null,
+    mroi: med(rois), aroi: rois.length ? rois.reduce((s, x) => s + x, 0) / rois.length : null,
+    pnl: sold.reduce((s, r) => s + r.pnl, 0), mhold: med(holds)};
+}
+const qPct = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v * 100)) + "%";
+const qMc = x => x == null ? "—" : x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 10000 ? 0 : 1) + "K" : "$" + Math.round(x);
+const qHold = h => h == null ? "—" : h * 60 < 1 ? "<1 мин" : h < 1 ? Math.round(h * 60) + " мин" : h < 48 ? Math.floor(h) + " ч " + String(Math.round((h % 1) * 60)).padStart(2, "0") + " мин" : Math.round(h / 24) + " дн";
+function qResHTML(){
+  const all = QK.data.rows, rows = qFilter(all), a = qStats(all), s = qStats(rows);
+  const tile = (k, v, va, cls) => `<div class="x-tile"><div class="x-k">${k}</div><div class="x-v ${cls || ""}">${v}</div><div class="x-m" style="font-size:11.5px;margin-top:2px">все: ${va}</div></div>`;
+  return `<div id="qres"><div class="x-grid">
+    ${tile("Позиций", s.n, a.n)}${tile("Винрейт", s.wr == null ? "—" : Math.round(s.wr * 100) + "%", a.wr == null ? "—" : Math.round(a.wr * 100) + "%")}
+    ${tile("Медианный ROI", qPct(s.mroi), qPct(a.mroi), xCls(s.mroi))}${tile("Средний ROI", qPct(s.aroi), qPct(a.aroi), xCls(s.aroi))}
+    ${tile("PnL", xUsd(s.pnl), xUsd(a.pnl), xCls(s.pnl))}${tile("Медиана холда", qHold(s.mhold), qHold(a.mhold))}</div>
+    <div class="x-note" style="margin:8px 2px 0">Позиция — все его покупки и продажи одного токена. ROI и PnL — по уже проданной части. ${QK.data.tr ? "⚠️ История длинная — показаны последние сделки периода." : ""}</div></div>`;
+}
+function qTabHTML(){
+  const rows = qFilter(QK.data.rows);
+  const key = {fb: r => r.fb || 0, mc: r => r.mc || 0, xmc: r => r.xmc || 0, spent: r => r.spent || 0, roi: r => r.roi == null ? -1e9 : r.roi, pnl: r => r.pnl == null ? -1e9 : r.pnl, hold: r => r.hold_h == null ? -1 : r.hold_h};
+  rows.sort((x, y) => (key[QK.sort](x) - key[QK.sort](y)) * QK.dir);
+  const dt = ts => ts ? new Date(ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}).replace(",", "") : "—";
+  const hd = (k, l) => `<th data-qsort="${k}" class="${QK.sort === k ? "on" : ""}">${l}${QK.sort === k ? (QK.dir < 0 ? " ↓" : " ↑") : ""}</th>`;
+  const shown = QK.all ? rows : rows.slice(0, 60);
+  let h = `<div id="qtab"><div class="x-card x-tw"><table class="x-tb"><thead><tr><th class="x-st">Токен</th>${hd("fb", "Вход")}${hd("mc", "Капа вх.")}${hd("xmc", "Капа вых.")}${hd("spent", "Сумма")}${hd("roi", "ROI")}${hd("pnl", "PnL")}${hd("hold", "Холд")}<th>Статус</th></tr></thead><tbody>`;
+  h += shown.map(r => `<tr class="${r.pnl == null ? "" : r.pnl > 0 ? "w" : "l"}">
+    <td class="x-st"><div class="x-tk"><button data-qtok="${esc(r.a)}" class="x-tl">${esc(r.sym)} ↗</button><button data-xca="${esc(r.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button></div></td>
+    <td>${dt(r.fb)}</td><td>${qMc(r.mc)}</td><td>${qMc(r.xmc)}</td><td>$${Math.round(r.spent || 0)}</td>
+    <td class="${xCls(r.roi)}"><b>${qPct(r.roi)}</b></td><td class="${xCls(r.pnl)}">${r.pnl == null ? "—" : xUsd(r.pnl)}</td><td>${qHold(r.hold_h)}</td>
+    <td class="x-m">${r.closed ? "закрыт" : r.close ? "продал " + Math.round(r.close * 100) + "%" : "держит"}${r.lp ? " · " + esc(r.lp) : ""}</td></tr>`).join("");
+  h += `</tbody></table></div>`;
+  if (!rows.length) h += `<div class="x-note">Под фильтры ничего не попало.</div>`;
+  if (rows.length > 60) h += `<button class="x-link" data-qall="1" style="margin:10px 4px 0;font-size:12.5px">${QK.all ? "Свернуть" : "Показать все " + rows.length}</button>`;
+  return h + `</div>`;
+}
+function stQuick(){
+  const per = ["7d", "30d", "60d", "90d"], f = QK.f;
+  let h = xHead("Сделки кошелька", `${xShort(QK.addr)} · ${esc(xCH[QK.chain] || QK.chain)} · ${QK.per.replace("d", " дн")}`, QK.back);
+  const have = (ST.list || []).findIndex(d => d.a === QK.addr);
+  const busy = ST.job && ST.job.state === "run";
+  const inp = (k, label, ph) => `<label class="x-fl">${label}<input data-qf="${k}" value="${esc(f[k] == null ? "" : f[k])}" placeholder="${ph}" ${k === "q" ? 'spellcheck="false"' : 'inputmode="decimal"'}></label>`;
+  const chip = (k, v, l) => `<button class="x-chip${(f[k] || "all") === v ? " on" : ""}" data-qset="${k}:${v}" style="flex:0 0 auto;padding:0 12px;height:32px;font-size:12.5px">${l}</button>`;
+  const lps = QK.data ? [...new Set(QK.data.rows.map(r => r.lp).filter(Boolean))] : [];
+  const left = `<div class="x-chips" style="margin:0 0 10px">${per.map(p => `<button class="x-chip${QK.per === p ? " on" : ""}" data-qper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
+    <div class="x-chips" style="margin:0 0 4px;flex-wrap:wrap">${have >= 0 ? `<button class="x-btn x-ghost" data-xi="${have}" style="height:42px;flex:1">🧠 Открыть стратегию</button>` : ""}
+      <button class="x-btn x-solid" data-qrun="1" style="height:42px;flex:1${busy ? ";opacity:.5;pointer-events:none" : ""}">${have >= 0 ? "🔁 Пересчитать стратегию" : "🧠 Полный поиск стратегии"}</button></div>
+    ${stJobHTML()}
+    <div class="x-sec" style="display:flex;justify-content:space-between">Фильтры <button class="x-link" data-qreset="1" style="font-size:12.5px">сбросить</button></div>
+    <div class="x-card">
+      <div class="x-m" style="font-size:12px;margin-bottom:6px">Капа входа, тыс. $ · быстро:</div>
+      <div class="x-chips" style="margin:0 0 8px;flex-wrap:wrap">${Q_MC.map(([l, a, b]) => `<button class="x-chip${String(f.mc1 ?? "") === String(a) && String(f.mc2 ?? "") === String(b) ? " on" : ""}" data-qmc="${a}:${b}" style="flex:0 0 auto;padding:0 10px;height:30px;font-size:12px">${l}</button>`).join("")}</div>
+      <div class="x-f qf">${inp("mc1", "Капа от, K", "любая")}${inp("mc2", "Капа до, K", "любая")}${inp("roi1", "ROI от, %", "любой")}${inp("roi2", "ROI до, %", "любой")}
+        ${inp("h1", "Холд от, мин", "любой")}${inp("h2", "Холд до, мин", "любой")}${inp("s1", "Сумма от, $", "любая")}${inp("s2", "Сумма до, $", "любая")}
+        ${inp("pnl1", "PnL от, $", "не меньше")}${inp("q", "Тикер или адрес", "любой")}</div>
+      <div class="x-m" style="font-size:12px;margin:10px 0 0">Результат</div><div class="x-chips" style="flex-wrap:wrap">${chip("res", "all", "все")}${chip("res", "win", "в плюсе")}${chip("res", "loss", "в минусе")}</div>
+      <div class="x-m" style="font-size:12px;margin:10px 0 0">Статус</div><div class="x-chips" style="flex-wrap:wrap">${chip("st", "all", "все")}${chip("st", "closed", "закрыт")}${chip("st", "open", "держит")}</div>
+      ${lps.length > 1 ? `<div class="x-m" style="font-size:12px;margin:10px 0 0">Лаунчпад</div><div class="x-chips" style="flex-wrap:wrap">${chip("lp", "all", "все")}${lps.map(l => chip("lp", l, esc(l))).join("")}</div>` : ""}
+    </div>`;
+  let right;
+  if (QK.err) right = `<div class="x-card x-m">Не получилось: ${esc(QK.err)} <button class="x-link" data-qre="1">Повторить</button></div>`;
+  else if (!QK.data) right = `<div class="x-card x-m">Загружаю сделки кошелька… обычно 2–10 секунд, повторно — сразу.</div>`;
+  else right = qResHTML() + `<div class="x-sec">Позиции по токенам</div>` + qTabHTML();
+  return h + `<div class="x-2 x-btl"><div class="x-l x-btform">${left}</div><div class="x-r x-btres">${right}</div></div>`;
+}
+let qRecalcT;
+document.addEventListener("input", e => {
+  const k = e.target.dataset && e.target.dataset.qf; if (!k || !QK.data) return;
+  QK.f[k] = k === "q" ? e.target.value.trim() : e.target.value.replace(",", ".").replace(/[^\d.\-]/g, "");
+  clearTimeout(qRecalcT);
+  qRecalcT = setTimeout(() => {   // пересчёт без перерисовки формы — фокус остаётся в поле
+    const tmp = document.createElement("div"); tmp.innerHTML = qResHTML() + qTabHTML();
+    const a = document.getElementById("qres"), b = document.getElementById("qtab");
+    if (a) a.replaceWith(tmp.querySelector("#qres")); if (b) b.replaceWith(tmp.querySelector("#qtab"));
+    document.querySelectorAll("[data-qmc]").forEach(c => { const [x, y] = c.dataset.qmc.split(":"); c.classList.toggle("on", String(QK.f.mc1 ?? "") === x && String(QK.f.mc2 ?? "") === y); });
+  }, 100);
+});
+document.addEventListener("click", e => {
+  if (screen !== "strat") return;
+  const t = e.target;
+  const qp = t.closest("[data-qper]"); if (qp){ QK.per = qp.dataset.qper; QK.data = null; render(true); qLoad(); return; }
+  const qm = t.closest("[data-qmc]"); if (qm){ const [a, b] = qm.dataset.qmc.split(":"); const same = String(QK.f.mc1 ?? "") === a && String(QK.f.mc2 ?? "") === b;
+    QK.f.mc1 = same ? "" : a; QK.f.mc2 = same ? "" : b; render(true); return; }
+  const qs = t.closest("[data-qset]"); if (qs){ const [k, v] = qs.dataset.qset.split(/:(.*)/s); QK.f[k] = v; render(true); return; }
+  const so = t.closest("[data-qsort]"); if (so){ const k = so.dataset.qsort; QK.dir = QK.sort === k ? -QK.dir : -1; QK.sort = k; render(true); return; }
+  if (t.closest("[data-qreset]")){ QK.f = {}; render(true); return; }
+  if (t.closest("[data-qall]")){ QK.all = !QK.all; render(true); return; }
+  if (t.closest("[data-qre]")){ QK.err = ""; QK.data = null; render(true); qLoad(); return; }
+  if (t.closest("[data-qrun]")){ ST.per = QK.per; stRun(QK.addr, QK.chain); return; }
+  const tk = t.closest("[data-qtok]");
+  if (tk){ const url = `https://gmgn.ai/${QK.chain}/token/${tk.dataset.qtok}?maker=${QK.addr}`;
+    try { inTG && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); } catch (x) { window.open(url, "_blank"); } return; }
+  const qo = t.closest("[data-qopen]"); if (qo){ const a = qo.dataset.qopen === "addr" ? ((document.getElementById("xaddr") || {}).value || ST.addr).trim() : qo.dataset.qopen;
+    if (qo.dataset.qopen === "addr" && !/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a)){ xToast("Вставь адрес кошелька"); return; }
+    const D = xD(); qOpen(a, ST.v === "home" && D ? D.c : "", ST.v === "home" && D ? D.p : ST.per, ST.v === "home" ? "home" : "list"); return; }
+});
+
 function stratHTML(){
   if (!ST.list && !ST.loading && !ST.err) stLoad();
   if (!xJobChecked && P.sa && P.sk){ xJobChecked = true; stPoll(); }
   const D = xD();
   let body;
-  if (ST.v === "list" || !D) body = stList();
+  if (ST.v === "q") body = stQuick();
+  else if (ST.v === "list" || !D) body = stList();
   else if (ST.v === "home") body = stHome(D);
   else if (ST.v === "detail") body = stDetail(D);
   else { if (D.api && !ST.sd[D.api]) stLoadSim(D); body = stBt(D); }
@@ -1593,7 +1785,7 @@ function xToast(t, ms){
 }
 function stBack(){
   if (screen !== "strat") return false;
-  if (ST.v === "bt") ST.v = "detail"; else if (ST.v === "detail") ST.v = "home"; else if (ST.v === "home") ST.v = "list"; else return false;
+  if (ST.v === "q") ST.v = QK.back === "home" && xD() ? "home" : "list"; else if (ST.v === "bt") ST.v = "detail"; else if (ST.v === "detail") ST.v = "home"; else if (ST.v === "home") ST.v = "list"; else return false;
   render(); window.scrollTo(0, 0); return true;
 }
 let xRecalcT;
