@@ -379,16 +379,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 @media (min-width:900px){
   body.wide[data-scr="strat"] .app{max-width:1240px}
   body.wide .dockin{max-width:1240px}
-  .x-2{display:grid;grid-template-columns:minmax(380px,440px) minmax(0,1fr);gap:22px;align-items:start}
-  .x-r > .x-sec:first-child{margin-top:0}
-  .x-2 > .x-r{position:sticky;top:12px}
-  .x-btl{grid-template-rows:auto 1fr}
-  .x-btl .x-btres{grid-column:2;grid-row:1;position:static}
-  .x-btl .x-btform{grid-column:1;grid-row:1 / span 2}
-  .x-btl .x-bttab{grid-column:2;grid-row:2;position:static}
-  .x-tw{overflow-x:visible}
-  .x-tb{width:100%}
-  .x-tb .x-st{position:static}
+  .x-tw{overflow-x:auto}
+  .x-tb{width:max-content;min-width:100%}
   .x-list{max-height:none}
 }
 .dk,.dl,.dr,.dkg,.dgi{display:block}
@@ -408,7 +400,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   .dgi > .sec:first-child{margin-top:4px}
   body[data-scr="home"] .hero{min-height:0}
 }
-@media (min-width:1200px){ .x-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px} .x-modes .x-mode{margin:0} }
+@media (min-width:1180px){
+  .x-2{display:grid;grid-template-columns:minmax(380px,440px) minmax(0,1fr);gap:22px;align-items:start}
+  .x-r > .x-sec:first-child{margin-top:0}
+  .x-2 > .x-r{position:sticky;top:12px}
+  .x-btl{grid-template-rows:auto 1fr}
+  .x-btl .x-btres{grid-column:2;grid-row:1;position:static}
+  .x-btl .x-btform{grid-column:1;grid-row:1 / span 2}
+  .x-btl .x-bttab{grid-column:2;grid-row:2;position:static}
+}
+
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -687,20 +688,24 @@ function lpColors(names){
   names.forEach(n => { if (!out[n]) { out[n] = LP_SPARE.find(c => !used.has(c)) || "#55555c"; used.add(out[n]); } });
   return out;
 }
-function weekHTML(id, title, days, fmt, stacks){
+// lagH: DefiLlama дописывает объёмы бирж с опозданием — вчерашний день ещё несколько часов после полуночи UTC
+// неполный (бывает вдвое меньше). Такой день рисуем штриховкой и не берём в среднее.
+function weekHTML(id, title, days, fmt, stacks, lagH){
   if (!days || days.length < 2) return "";
-  const today = Math.floor(Date.now() / 86400000) * 86400;
+  const now = Date.now() / 1000, today = Math.floor(now / 86400) * 86400, lag = (lagH || 0) * 3600;
+  const fin = t => t + 86400 + lag <= now;
   const max = Math.max(...days.map(x => x[1]), 1);
-  const lastFull = days.map(x => x[0] < today).lastIndexOf(true);
-  const sel = ocTip[id] !== undefined ? ocTip[id] : (lastFull >= 0 ? lastFull : days.length - 1);   // по умолчанию — вчера (полный день)
+  const lastFull = days.map(x => fin(x[0])).lastIndexOf(true);
+  const sel = ocTip[id] !== undefined ? ocTip[id] : (lastFull >= 0 ? lastFull : days.length - 1);   // по умолчанию — последний полный день
   const [ts, v] = days[sel];
-  const partial = ts >= today;
-  const full = days.filter(x => x[0] < today), avg = full.length ? full.reduce((a, x) => a + x[1], 0) / full.length : 0;
+  const partial = !fin(ts);
+  const note = ts >= today ? " · сегодня, день ещё идёт" : partial ? " · данные ещё дополняются" : "";
+  const full = days.filter(x => fin(x[0])), avg = full.length ? full.reduce((a, x) => a + x[1], 0) / full.length : 0;
   if (stacks && stacks.length) return stackHTML(id, title, days, fmt, stacks, sel, today, avg);
   return `<div class="sec">${esc(title)}</div><div class="card wk">
-    <div class="wkh"><span class="wkv">${esc(fmt(v))}</span><span class="wkd">${esc(dayFull(ts))}${partial ? " · сегодня, день ещё идёт" : ""}</span></div>
+    <div class="wkh"><span class="wkv">${esc(fmt(v))}</span><span class="wkd">${esc(dayFull(ts))}${esc(note)}</span></div>
     <div class="wkb" role="img" aria-label="${esc(title)}: ${days.map(x => dayFull(x[0]) + " " + fmt(x[1])).join(", ")}">
-      ${days.map(([t, val], i) => `<button class="wkc${i === sel ? " on" : ""}${t >= today ? " part" : ""}" data-wk="${id}:${i}" aria-label="${esc(dayFull(t))}: ${esc(fmt(val))}">
+      ${days.map(([t, val], i) => `<button class="wkc${i === sel ? " on" : ""}${fin(t) ? "" : " part"}" data-wk="${id}:${i}" aria-label="${esc(dayFull(t))}: ${esc(fmt(val))}">
         <i style="height:${Math.max(3, Math.round(val / max * 100))}%"></i><span>${esc(dayLbl(t))}</span></button>`).join("")}
     </div>
     ${avg ? `<div class="wkf">в среднем за полный день ${esc(fmt(avg))}</div>` : ""}</div>`;
@@ -743,7 +748,7 @@ function onchainHTML(){
       : `<div class="tile"><span class="a">${esc((o.lp || [])[0] ? o.lp[0][0] : "Лаунчпад")}</span><span class="b">${esc((o.lp || [])[0] ? usdBig(o.lp[0][1]) : "—")}</span><span class="c">комиссии за 24ч</span></div>`}</div>`;
   if ((o.dx || []).length) R += `<div class="sec">Биржи, объём за 24 ч</div>` + barsHTML(o.dx, usdBig);
   if ((o.bt || []).length) R += `<div class="sec">Торговые боты, комиссии за 24 ч</div><div class="sdesc">сколько пользователи заплатили ботам</div>` + barsHTML(o.bt, usdBig);
-  h += weekHTML("vd", "Объём DEX по дням", o.vd, usdBig);
+  h += weekHTML("vd", "Объём DEX по дням", o.vd, usdBig, null, 12);
   let stacks = null;
   if (o.md && o.mdl && Object.keys(o.mdl).length){
     const names = Object.keys(o.mdl), col = lpColors(names);
@@ -996,17 +1001,36 @@ document.getElementById("bsave").onclick = () => openReview("save");
 document.getElementById("bfind").onclick = () => openRun();
 document.getElementById("sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeReview(); });
 
-P = norm(payload());
-if (!P || !P.s){
-  document.getElementById("app").innerHTML = '<div class="empty">Открой это окно кнопкой «📱 Настройки» в боте.<br><br>Если открыл ею, а видишь это — отправь боту /app и нажми новую кнопку.</div>';
+function bootEmpty(msg){
+  document.getElementById("app").innerHTML = '<div class="empty">' + (msg || 'Открой это окно кнопкой «📱 Open App» в боте.<br><br>Если открыл ею, а видишь это — отправь боту /app и нажми новую кнопку.') + '</div>';
   document.querySelector(".dock").style.display = "none";
-} else {
+}
+function bootWith(x){
+  P = norm(x);
+  if (!P || !P.s){ bootEmpty(); return; }
+  document.querySelector(".dock").style.display = "";
   start = Object.assign({}, P.s, {"m.chain": (P.m || {}).chain || "sol", "m.period": (P.m || {}).period || "6h"});
   sel = P.p || ""; base = Object.assign({}, start); cur = Object.assign({}, start);
   try { const q = localStorage.getItem("runQuiet"); if (q !== null) runQuiet = q === "1"; } catch (x) {}
   render();
   setTimeout(() => liveState(), 300);   // после загрузки всего скрипта
 }
+// Кнопка «Открыть» у чата (главное мини-приложение): данных в адресе нет — берём их у сервера бота по initData.
+// Адрес сервера — в параметре ?sa= ссылки, которую вписали в BotFather.
+async function bootFromServer(){
+  const sa = new URLSearchParams(location.search).get("sa") || "";
+  const init = (tg && tg.initData) || "";
+  if (!/^https:\/\//.test(sa) || !init){ bootEmpty(); return; }
+  document.getElementById("app").innerHTML = '<div class="empty">Загружаю…</div>';
+  try {
+    const r = await fetch(sa.replace(/\/$/, "") + "/api/boot?init=" + encodeURIComponent(init), {cache: "no-store"});
+    if (r.status === 403){ bootEmpty("Бот тебя не узнал. Открой окно кнопкой «📱 Open App» в чате с ботом."); return; }
+    const j = await r.json();
+    bootWith(decode(j.d));
+  } catch (e) { bootEmpty("Сервер бота не отвечает. Открой окно кнопкой «📱 Open App» в чате с ботом."); }
+}
+const _boot = payload();
+if (_boot) bootWith(_boot); else bootFromServer();
 // Живой статус: раз в 4 с спрашиваем сервер бота, что он делает, и обновляем «Сейчас идёт» без переоткрытия окна
 let liveT = null, liveFail = 0;
 async function liveState(){
@@ -1341,7 +1365,7 @@ function stList(){
     <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
   if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
-  if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — отправь боту /app и открой окно из новой кнопки «📱 Настройки».</div>`;
+  if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — отправь боту /app и открой окно из новой кнопки «📱 Open App».</div>`;
   if (ST.err === "net") return h + `<div class="x-card x-m">Сервер бота не отвечает (бот выключен или Caddy не запущен). <button class="x-link" data-xre="1">Повторить</button></div>`;
   if (!ST.list) return h + `<div class="x-card x-m">Загружаю…</div>`;
   if (!ST.list.length) return h + `<div class="x-card x-m">Пока пусто — найди стратегию первого кошелька.</div>`;
