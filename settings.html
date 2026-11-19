@@ -388,6 +388,9 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-tk{display:flex;align-items:center;gap:6px}
 .x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
 .x-ca{width:24px;height:24px;border-radius:7px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
+.xq-tip{position:absolute;z-index:3;background:#16141d;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:7px 9px;font-size:11.5px;line-height:1.45;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5);white-space:nowrap;color:var(--text)}
+.xq-tip b{font-size:12px}
+.xq-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--hint);margin-top:6px;flex-wrap:wrap}.xq-row b{color:var(--text)}
 .x-new{font-style:normal;font-size:10px;font-weight:700;color:var(--x-acc);background:rgba(var(--x-rgb),.12);padding:1px 5px;border-radius:5px}
 @media (min-width:900px){
   body.wide[data-scr="strat"] .app{max-width:1240px}
@@ -884,6 +887,8 @@ function render(keepScroll){
   const html = screen === "strat" ? stratHTML() : screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
   document.getElementById("app").innerHTML = html;
   fitHollow();
+  try { xEqDraw(); } catch (e) {}
+  if (screen === "strat") xMemSave();
   updateDock();
   if (keepScroll) window.scrollTo(0, y);
 }
@@ -1118,7 +1123,7 @@ window.addEventListener("hashchange", () => {
   screen = "strat"; ST.bt = null;
   if (/^0x/.test(addr) && ["bsc", "robinhood", "arc", "elysium"].includes(ch)) cur["m.chain"] = ch;
   const i = addr ? (ST.list || []).findIndex(d => d.a === addr) : -1;
-  if (i >= 0){ ST.i = i; ST.v = "home"; } else if (addr){ ST.addr = addr; qOpen(addr, ch, QK.per || "30d", "list"); return; } else ST.v = "list";
+  if (i >= 0) stOpenItem(i); else if (addr){ ST.addr = addr; qOpen(addr, ch, QK.per || "30d", "list"); return; } else ST.v = "list";
   render(); window.scrollTo(0, 0);
 });
 // Живой статус: раз в 4 с спрашиваем сервер бота, что он делает, и обновляем «Сейчас идёт» без переоткрытия окна
@@ -1358,6 +1363,70 @@ function xChart(eq, mk, color){
   const m = mk != null ? `<line x1="${mk * w}" y1="0" x2="${mk * w}" y2="${h}" stroke="rgba(255,255,255,.18)"/><text x="${mk * w + 4}" y="12" fill="#8f98a0" font-size="10">новые сделки →</text>` : "";
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="height:120px;margin-top:6px"><line x1="0" y1="${y0}" x2="${w}" y2="${y0}" stroke="rgba(255,255,255,.12)" stroke-dasharray="3 4"/>${m}${xSpark(eq, color, w, h)}</svg>`;
 }
+// ===== Баланс копии (вариант А): оси в $, даты, точка на сделку, просадка, «новые сделки», подсказка по тапу =====
+const XEQ = {}; let xeqN = 0;
+// Точки графика из результата бэктеста: сделки в порядке выхода (как считается просадка), баланс нарастающим итогом
+function xEqPts(o, stake){
+  const rows = o.trades.filter(x => x.ok).map(x => ({s: x.t.sym, a: x.t.a, fb: x.t.fb, ex: x.hold != null ? x.t.fb + x.hold : x.t.fb, r: x.roi, te: !!x.test}));
+  rows.sort((a, b) => a.ex - b.ex);
+  let c = 0;
+  return rows.map(x => { c += x.r * stake; return Object.assign(x, {c, p: x.r * stake}); });
+}
+function xEqBox(pts, mark, color){
+  if (!pts || pts.length < 2) return `<div class="x-m" style="padding:30px 0;text-align:center">мало сделок для графика</div>`;
+  const id = "e" + (++xeqN); XEQ[id] = {pts, mark, color};
+  if (xeqN > 40) delete XEQ["e" + (xeqN - 40)];
+  return `<div class="x-eq" data-eq="${id}"></div>`;
+}
+const xK = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return s + "$" + (a >= 1e4 ? Math.round(a / 1e3) + "K" : a >= 1e3 ? (a / 1e3).toFixed(1).replace(".0", "") + "K" : Math.round(a)); };
+const xDd = (ts, full) => { const d = new Date(ts * 1000); const s = String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0");
+  return full ? s + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") : s; };
+function xEqDraw(){
+  document.querySelectorAll(".x-eq[data-eq]").forEach(el => {
+    const E = XEQ[el.dataset.eq]; if (!E) return;
+    const W = Math.max(240, Math.floor(el.clientWidth)); if (el._w === W) return; el._w = W;
+    const pts = E.pts, n = pts.length, H = W < 420 ? 170 : 210, L = 44, R = 52, T = 14, B = 22;
+    const eq = [0, ...pts.map(p => p.c)];
+    const mn = Math.min(0, ...eq), mx = Math.max(0, ...eq), pad = (mx - mn) * .08 || 10, lo = mn - (mn < 0 ? pad : 0), hi = mx + pad;
+    const x = i => L + i / n * (W - L - R), y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+    let pk = 0; const peak = eq.map(v => pk = Math.max(pk, v));
+    const ddMax = Math.max(...eq.map((v, i) => peak[i] - v));
+    const grid = [0, hi > 1 ? mx : null, lo < -1 ? mn : null].filter(v => v != null && (v === 0 || Math.abs(y(v) - y(0)) > 14));
+    let s = `<svg width="${W}" height="${H}" style="display:block">`;
+    const mi = E.mark != null ? Math.round(E.mark * n) : null;
+    if (mi != null && mi > 0 && mi < n) s += `<rect x="${x(mi)}" y="${T}" width="${W - R - x(mi)}" height="${H - T - B}" fill="rgba(255,255,255,.035)"/><text x="${x(mi) + 5}" y="${T + 11}" fill="#8f98a0" font-size="10">${W - R - x(mi) < 84 ? "новые" : "новые сделки"}</text>`;
+    s += grid.map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,${v === 0 ? .16 : .06})"${v === 0 ? ' stroke-dasharray="3 4"' : ""}/><text x="${L - 6}" y="${y(v) + 3.5}" fill="#6f6a80" font-size="10" text-anchor="end">${v === 0 ? "$0" : xK(v)}</text>`).join("");
+    if (ddMax > 0) s += `<path d="M${eq.map((v, i) => x(i) + "," + y(peak[i])).join(" L")} L${eq.map((v, i) => x(i) + "," + y(v)).reverse().join(" L")} Z" fill="rgba(255,107,107,.15)"/>`;
+    s += `<polyline fill="none" stroke="${E.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${eq.map((v, i) => x(i) + "," + y(v)).join(" ")}"/>`;
+    const rd = n > 80 ? 2.2 : n > 40 ? 3 : 3.5;
+    s += pts.map((p, k) => `<circle cx="${x(k + 1)}" cy="${y(p.c)}" r="${rd}" fill="${p.p > 0 ? "#14f195" : "#ff6b6b"}" stroke="#0b0a10" stroke-width="1.5"/>`).join("");
+    s += `<text x="${W - R + 6}" y="${y(eq[n]) + 4}" fill="${eq[n] >= 0 ? E.color : "#ff6b6b"}" font-size="11.5" font-weight="700">${xK(eq[n])}</text>`;
+    const di = [1, Math.round(n / 2), n].filter((v, i, a) => a.indexOf(v) === i);
+    s += di.map(i => `<text x="${x(i)}" y="${H - 6}" fill="#6f6a80" font-size="10" text-anchor="${i === 1 ? "start" : i === n ? "end" : "middle"}">${xDd(pts[i - 1].ex)}</text>`).join("");
+    s += `<line class="xq-v" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="rgba(255,255,255,.35)" visibility="hidden"/><circle class="xq-c" r="6" fill="none" stroke="#fff" stroke-width="1.5" visibility="hidden"/>`;
+    s += `<rect class="xq-hit" x="${L - 6}" y="0" width="${W - L - R + 12}" height="${H}" fill="transparent" style="cursor:crosshair;touch-action:pan-y"/></svg>`;
+    const best = pts.reduce((a, p) => p.p > a.p ? p : a, pts[0]), worst = pts.reduce((a, p) => p.p < a.p ? p : a, pts[0]);
+    el.innerHTML = `<div style="position:relative">${s}<div class="xq-tip" hidden></div></div>
+      <div class="xq-row"><span>просадка <b class="x-bad">−${xAbs(ddMax)}</b></span><span>лучшая <b class="${xCls(best.p)}">${xUsd(best.p)}</b></span><span>худшая <b class="${xCls(worst.p)}">${xUsd(worst.p)}</b></span></div>`;
+    const hit = el.querySelector(".xq-hit"), tip = el.querySelector(".xq-tip"), vl = el.querySelector(".xq-v"), cc = el.querySelector(".xq-c");
+    const show = ev => {
+      const r = hit.getBoundingClientRect(), px = ev.clientX - r.left + (L - 6);
+      const k = Math.max(1, Math.min(n, Math.round((px - L) / (W - L - R) * n)));
+      const p = pts[k - 1], cx = x(k), cy = y(p.c);
+      vl.setAttribute("x1", cx); vl.setAttribute("x2", cx); vl.setAttribute("visibility", "visible");
+      cc.setAttribute("cx", cx); cc.setAttribute("cy", cy); cc.setAttribute("visibility", "visible");
+      tip.innerHTML = `<b>#${k} · ${esc(p.s)}</b> <span class="x-m">${xDd(p.ex, true)}</span>${p.te ? ' <i class="x-new">нов.</i>' : ""}<br>сделка <b class="${xCls(p.p)}">${p.r > 0 ? "+" : ""}${Math.round(p.r * 100)}% · ${xUsd(p.p)}</b><br>баланс <b class="${xCls(p.c)}">${xUsd(p.c)}</b>`;
+      tip.hidden = false;
+      const tw = tip.offsetWidth, left = cx + 12 + tw > W ? cx - 12 - tw : cx + 12;
+      tip.style.left = Math.max(0, left) + "px"; tip.style.top = Math.max(0, Math.min(H - tip.offsetHeight - 4, cy - tip.offsetHeight / 2)) + "px";
+    };
+    const hide = () => { tip.hidden = true; vl.setAttribute("visibility", "hidden"); cc.setAttribute("visibility", "hidden"); };
+    hit.addEventListener("pointermove", show); hit.addEventListener("pointerdown", show);
+    hit.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hide(); });
+  });
+}
+window.addEventListener("resize", () => { document.querySelectorAll(".x-eq").forEach(el => el._w = 0); xEqDraw(); });
+
 const xD = () => ST.list && ST.i >= 0 ? ST.list[ST.i] : null;
 async function stLoad(force){
   if (!P.sa){ ST.err = "nosrv"; return; }
@@ -1372,7 +1441,7 @@ async function stLoad(force){
     if (EXT && EXT.addr && !EXT.done){   // открыто из расширения по кошельку: есть готовый поиск — сразу он, нет — адрес в поле
       EXT.done = true;
       const i = ST.list.findIndex(d => d.a === EXT.addr);
-      if (i >= 0){ ST.i = i; ST.v = "home"; } else { ST.addr = EXT.addr; setTimeout(() => qOpen(EXT.addr, EXT.chain, "30d", "list"), 0); }
+      if (i >= 0) stOpenItem(i); else { ST.addr = EXT.addr; setTimeout(() => qOpen(EXT.addr, EXT.chain, "30d", "list"), 0); }
     }
   } catch (e) { ST.err = e.message === "auth" ? "auth" : "net"; }
   ST.loading = false;
@@ -1477,6 +1546,7 @@ function stList(){
 function stHome(D){
   let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
   h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">📊 Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">⚡ Сделки кошелька</button></div>` : "")
+    + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">🧪 Свой бэктест</button>`
     + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
@@ -1550,7 +1620,11 @@ function stDetail(D){
   h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
   h += xTiles(v);
   if (v.vd) h += `<div class="x-note">${esc(v.vd[0])} ${esc(v.vd[1])}</div>`;
-  h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · $100 на сделку</div>${xChart(v.eq, v.mk, M.c)}</div>`;
+  if (D.api && !ST.sd[D.api] && !ST.sdErr) stLoadSim(D);
+  let eqHtml = xChart(v.eq, v.mk, M.c);
+  const sdD = D.api && ST.sd[D.api];
+  if (sdD && v.raw){ try { const o = SIM.backtest(sdD, xRawParams(v.raw)); eqHtml = xEqBox(xEqPts(o, sdD.stake || 100), o.mark, M.c); } catch (e) {} }
+  h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · $${(sdD && sdD.stake) || 100} на сделку</div>${eqHtml}</div>`;
   h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
   h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s);
@@ -1579,6 +1653,19 @@ function btRows(D, v, base){
     ["Таймаут", v.to ? `${v.to[0]} сек → продажа ${v.to[1]}%` : "выкл"], ["Follow Sell", v.follow ? "вкл" : "ВЫКЛ"], ["Лаунчпады", "все"]];
   return rows.concat((base.s || []).filter(r => /Fee|Tip|Газ/.test(r[0])));
 }
+// Запоминаем, где ты был и что настроил в «Своём бэктесте» — по кошельку и периоду. После обновления страницы
+// (или повторного открытия из расширения) открывается тот же экран с теми же цифрами, а не готовая стратегия.
+const xMemKey = D => "lupa_st_" + D.a + "_" + D.p;
+function xMemSave(){
+  const D = xD(); if (!D || !["home", "detail", "bt"].includes(ST.v)) return;
+  try { localStorage.setItem(xMemKey(D), JSON.stringify({v: ST.v, m: ST.m, k: ST.k, bt: ST.bt, t: Date.now()})); } catch (e) {}
+}
+function xMemLoad(D){ try { const j = JSON.parse(localStorage.getItem(xMemKey(D)) || "null"); return j && Date.now() - (j.t || 0) < 30 * 86400e3 ? j : null; } catch (e) { return null; } }
+function stOpenItem(i){   // открыть поиск из списка: туда, где остановился в прошлый раз
+  ST.i = i; ST.bt = null; const D = xD(), sv = D && xMemLoad(D);
+  if (sv && D.m[sv.m] && D.m[sv.m].v[sv.k]){ ST.m = sv.m; ST.k = sv.k; ST.v = sv.v; ST.bt = sv.v === "bt" ? sv.bt : null; }
+  else ST.v = "home";
+}
 function stBt(D){
   const k = ST.m, M = X_MODES[k], base = D.m[k].v[ST.k];
   if (!ST.bt){
@@ -1586,7 +1673,7 @@ function stBt(D){
     ST.bt = {cap: r[0] || "", cm: r[1] || "", ag: r[2] || "", am: r[3] || "", mn: r[4] || "", mx: r[5] || "", o: r[6], f: r[7],
              to: r[8][0] || "", tp_: r[8][1] || 100, t1: (r[9][0] || [])[0] || "", s1: (r[9][0] || [])[1] || "", t2: (r[9][1] || [])[0] || "", s2: (r[9][1] || [])[1] || ""};
   }
-  let h = xHead("Свой бэктест", M.t, "detail") + `<div class="x-2 x-btl"><div class="x-r x-btres">`;
+  let h = xHead("Свой бэктест", M.t, "detail") + `<div class="x-note" style="margin:-4px 2px 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Настройки сохраняются сами — после обновления страницы будут те же.</span><button class="x-link" data-xbtreset="1">вернуть как в варианте «${esc(base.nm)}»</button></div><div class="x-2 x-btl"><div class="x-r x-btres">`;
   const sd = ST.sd[D.api];
   if (!D.api) h += `<div class="x-card x-m">Этот поиск сделан до подключения сервера — запусти поиск заново, тогда бэктест заработает здесь.</div>`;
   else if (!sd) h += `<div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки кошелька…"}</div>`;
@@ -1595,7 +1682,7 @@ function stBt(D){
     const view = {tot: o.full_total, te: o.test ? o.test.total : null, dd: o.max_dd, n: o.n, wr: o.wr, ls: o.loss_streak};
     h += `<div id="xres">${xTiles(view)}${o.verdict ? `<div class="x-note">${esc(o.verdict[0])} ${esc(o.verdict[1])}</div>` : ""}
       ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">⚠ весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
-      <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xChart(o.equity, o.mark, M.c)}</div></div>`;
+      <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xEqBox(xEqPts(o, sd.stake || 100), o.mark, M.c)}</div></div>`;
     ST.btTrades = o;
   }
   h += `</div><div class="x-l x-btform">`;
@@ -1794,12 +1881,14 @@ document.addEventListener("input", e => {
   if (e.target.id === "xaddr"){ ST.addr = e.target.value.trim(); return; }
   if (!f || !ST.bt) return;
   ST.bt[f] = e.target.value.replace(",", ".").replace(/[^\d.]/g, "");
+  xMemSave();
   clearTimeout(xRecalcT);
   xRecalcT = setTimeout(() => {   // пересчёт без перерисовки формы — фокус и клавиатура остаются
     const D = xD(); if (!D || !ST.sd[D.api]) return;
     const tmp = document.createElement("div"); tmp.innerHTML = stBt(D);
     const nr = tmp.querySelector("#xres"), or = document.getElementById("xres");
     if (nr && or) or.replaceWith(nr);
+    try { xEqDraw(); } catch (e) {}
     const nt = tmp.querySelector("#xbtt"), ot = document.getElementById("xbtt");
     if (nt && ot) ot.replaceWith(nt);
     const tw = tmp.querySelector(".x-twz"), ow = document.querySelector(".x .x-twz");
@@ -1836,10 +1925,16 @@ document.addEventListener("click", async e => {
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
-  const it = t.closest("[data-xi]"); if (it){ ST.i = +it.dataset.xi; ST.v = "home"; render(); window.scrollTo(0, 0); return; }
+  const it = t.closest("[data-xi]"); if (it){ stOpenItem(+it.dataset.xi); render(); window.scrollTo(0, 0); return; }
   const o = t.closest("[data-xo]"); if (o){ const [m, k] = o.dataset.xo.split(":"); ST.m = m; ST.k = +k; ST.v = "detail"; ST.bt = null; render(); window.scrollTo(0, 0); return; }
   const b = t.closest("[data-xb]"); if (b){ ST.v = b.dataset.xb; render(); window.scrollTo(0, 0); return; }
-  if (t.closest("[data-xbt]")){ ST.bt = null; ST.v = "bt"; render(); window.scrollTo(0, 0); return; }
+  if (t.closest("[data-xbt]")){ const D0 = xD(), sv = D0 && xMemLoad(D0);   // свой сетап этого варианта — как оставил
+    ST.bt = sv && sv.bt && sv.m === ST.m && sv.k === ST.k ? sv.bt : null; ST.v = "bt"; render(); window.scrollTo(0, 0); return; }
+  if (t.closest("[data-xbthome]")){ const D0 = xD(), sv = D0 && xMemLoad(D0);
+    if (sv && sv.bt && D0.m[sv.m] && D0.m[sv.m].v[sv.k]){ ST.m = sv.m; ST.k = sv.k; ST.bt = sv.bt; }
+    else { const pk = D0.pk || {}; ST.m = pk.m === "flip" && D0.m.f ? "f" : "n"; ST.k = (D0.m[ST.m] && D0.m[ST.m].r) || 0; ST.bt = null; }
+    ST.v = "bt"; render(); window.scrollTo(0, 0); return; }
+  if (t.closest("[data-xbtreset]")){ ST.bt = null; render(true); return; }
   const sw = t.closest("[data-xsw]"); if (sw && ST.bt){ ST.bt[sw.dataset.xsw] = ST.bt[sw.dataset.xsw] ? 0 : 1; render(true); return; }
   const cp = t.closest("[data-xcp]"); if (cp){ const r = stCurRows()[+cp.dataset.xcp]; if (r){ await xCopy(r[1].replace(/\s*\(~\$[^)]*\)/, "").replace(/\s*\(только Jito\)/, "")); cp.classList.add("done"); xToast("Скопировано: " + r[0]); } return; }
   if (t.closest("[data-xcpall]")){ await xCopy(stCurRows().map(r => r[0] + ": " + r[1]).join("\n")); xToast("Все настройки скопированы"); }
