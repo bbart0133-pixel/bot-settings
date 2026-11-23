@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Настройки бота</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -741,6 +741,18 @@ function stackHTML(id, title, days, fmt, stacks, sel, today, avg){
     </div>
     ${avg ? `<div class="wkf">в среднем за полный день ${esc(fmt(avg))}</div>` : ""}</div>`;
 }
+// Подозрительный объём: одна биржа даёт больше половины всего объёма сети и в разы больше следующей, или рост
+// за сутки больше +200%. Так обычно выглядит сбой данных DefiLlama или накрутка (wash trading через хуки Uniswap V4).
+function ocAnomaly(o){
+  const dx = o.dx || [], tot = num(o.v24);
+  if (!tot || !dx.length) return "";
+  const [nm, v] = dx[0], second = dx[1] ? num(dx[1][1]) : 0, share = num(v) / tot;
+  const big = share > 0.5 && (!second || num(v) > 4 * second);
+  if (!big && !(num(o.ch) > 200)) return "";
+  const why = big ? `${Math.round(share * 100)}% объёма — ${esc(nm)} (в ${second ? Math.round(num(v) / second) : "много"} раз больше следующей биржи). Без неё ≈ ${esc(usdBig(tot - num(v)))}.`
+    : `рост за сутки +${Math.round(num(o.ch))}% — необычно много.`;
+  return `<div class="sub2" style="color:var(--warn);line-height:1.4">⚠ Похоже на сбой данных DefiLlama или накрутку: ${why}</div>`;
+}
 function onchainHTML(){
   const ch = (P.ch || []).filter(([v]) => v !== "all");
   ensureOc();
@@ -757,7 +769,7 @@ function onchainHTML(){
   let R = "";
   h += `<div class="dk"><div class="dl"><div class="hero"><div class="glow"></div>${tick ? `<div class="mark" aria-hidden="true">${esc(tick)}</div>` : ""}<div class="dots"></div>
     <div><div class="lbl">Объём DEX за 24 ч</div><div class="big">${esc(usdBig(o.v24))}</div></div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${c !== undefined && c !== null ? `<span class="chg${c < 0 ? " dn" : ""}">${c > 0 ? "+" : ""}${(+c).toFixed(1)}% за сутки</span>` : ""}${o.v7 ? `<span class="sub2">за 7 дней ${esc(usdBig(o.v7))}</span>` : ""}</div></div>`;
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${c !== undefined && c !== null ? `<span class="chg${c < 0 ? " dn" : ""}">${c > 0 ? "+" : ""}${(+c).toFixed(1)}% за сутки</span>` : ""}${o.v7 ? `<span class="sub2">за 7 дней ${esc(usdBig(o.v7))}</span>` : ""}</div>${ocAnomaly(o)}</div>`;
   h += `<div class="tiles two2">
     <div class="tile"><span class="a">Миграций за 24ч</span><span class="b">${o.mg !== undefined ? fmtN(o.mg) : "—"}</span><span class="c">${o.mb ? "до миграции ~" + fmtN(o.mb) + " мин" : "по данным GMGN"}</span></div>
     ${(o.ml || []).length
@@ -1167,6 +1179,9 @@ const SIM = (() => {
     }
     return (o && ts - tm <= 3600) ? o : null;
   }
+  // длительность свечи: до следующей, но не больше 15 мин; high засчитываем, только если свеча закончилась до события
+  const cdur = (cs, i) => i + 1 < cs.length ? Math.max(1, Math.min(900, cs[i + 1][0] - cs[i][0]))
+    : i > 0 ? Math.max(1, Math.min(900, cs[i][0] - cs[i - 1][0])) : 60;
   function followSim(t, p0, tp, candles, hits, timeout, info){
     const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort((a, b) => (a[0] - b[0]) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) || (a[2] - b[2]) || (a[3] - b[3]));
     if (!ev.length) return null;
@@ -1179,7 +1194,7 @@ const SIM = (() => {
     const cs = (candles || []).filter(c => c[0] >= t.fb); let ci = 0;
     const sorted = (candles || []).slice().sort(cmpC);
     const runC = until => {
-      while (ci < cs.length && cs[ci][0] < until){
+      while (ci < cs.length && cs[ci][0] + cdur(cs, ci) <= until){
         const [tm, , h] = cs[ci];
         while (levels.length && left > 1e-12 && h >= p0 * (1 + levels[0][0] / 100)){
           const [pct, frac] = levels.shift(); const sell = left * frac / 100;
@@ -1217,8 +1232,9 @@ const SIM = (() => {
       if (!win.length || !((tp && tp.length) || timeout)) return null;
       let left = 1, proceeds = 0; const levels = (tp || []).map(x => x.slice());
       let toTs = timeout ? t.fb + timeout[0] : null; const sorted = candles.slice().sort(cmpC);
-      for (const [tm, , h] of win){
-        if (toTs !== null && tm > toTs){
+      for (let k = 0; k < win.length; k++){
+        const [tm, , h] = win[k];
+        if (toTs !== null && tm + cdur(win, k) > toTs){
           const px = priceAt(sorted, toTs); if (!px) return null;
           const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell; toTs = null;
           if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = t.fb + timeout[0]; }
@@ -1246,8 +1262,9 @@ const SIM = (() => {
     if (!candles.length) return null;
     const end = t.ls ? t.ls : D.now;
     let left = 1, proceeds = 0; const levels = tp.map(x => x.slice());
-    for (const [tm, , h] of candles){
-      if (tm < t.fb || tm > end || !levels.length) continue;
+    for (let k = 0; k < candles.length; k++){
+      const [tm, , h] = candles[k];
+      if (tm < t.fb || tm + cdur(candles, k) > end || !levels.length) continue;
       while (levels.length && h >= p0 * (1 + levels[0][0] / 100)){
         const [pct, frac] = levels.shift(); const sell = left * frac / 100;
         proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
@@ -1266,7 +1283,9 @@ const SIM = (() => {
     return netRoi(g + 1, nTp + (info.to_used ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
   }
   function check(t, v){
-    if (t.cf) return "копия не исполнилась бы (slippage)";
+    // своё «Макс. проскальзывание» в бэктесте: по замеренной цене копий (crs — во сколько раз дороже его входа)
+    if (v.sl != null && t.crs){ if (t.crs - 1 > v.sl / 100) return "копия не исполнилась бы (slippage)"; }
+    else if (t.cf) return "копия не исполнилась бы (slippage)";
     if (v.lp_mode === "only" && t.lp !== v.lp) return "лаунчпад";
     if (v.lp_mode === "not" && t.lp === v.lp) return "лаунчпад";
     const mc = t.mc;
@@ -1641,7 +1660,8 @@ function btParams(){
   const B = ST.bt, n = x => +String(x || "").replace(",", ".") || 0;
   const tp = [[n(B.t1), n(B.s1)], [n(B.t2), n(B.s2)]].filter(([a]) => a > 0).map(([a, b]) => [a, b > 0 ? Math.min(100, b) : 100]);
   return {cap: n(B.cap), cap_min: n(B.cm), age: n(B.ag), age_min: n(B.am), min_usd: n(B.mn), max_usd: n(B.mx),
-          once: !!B.o, follow: !!B.f, to: n(B.to) ? [n(B.to), Math.min(100, n(B.tp_) || 100)] : null, tp, lp_mode: "all", lp: null};
+          once: !!B.o, follow: !!B.f, to: n(B.to) ? [n(B.to), Math.min(100, n(B.tp_) || 100)] : null, tp, lp_mode: "all", lp: null,
+          sl: String(B.sl ?? "").trim() === "" ? null : n(B.sl)};
 }
 function btRows(D, v, base){
   const sd = ST.sd[D.api] || {}, nat = sd.native, sym = {bsc: "BNB", sol: "SOL", robinhood: "ETH", elysium: "HYPE"}[D.c] || "";
@@ -1687,10 +1707,12 @@ function stBt(D){
   }
   h += `</div><div class="x-l x-btform">`;
   const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id])}" placeholder="${ph}"></label>`;
-  h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}</div>
+  h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}${inp("sl", "Макс. проскальзывание, %", sd && sd.cost && sd.cost.slip_max ? Math.round(sd.cost.slip_max * 100) + " (как в поиске)" : "как в поиске")}</div>
+    <div class="x-note" style="margin:6px 2px 0">Проскальзывание — насколько дороже его входа копия ещё купила бы. Выше — сделка «не исполнилась бы». Цена копии замерена по блокчейну${sd && sd.tokens && !sd.tokens.some(t => t.crs) ? " (в этом поиске замеров нет — поле не влияет)" : ""}.</div>
     <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
-      <button class="x-tg" data-xsw="f"><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
-    <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
+      <button class="x-tg" data-xsw="f"${B.o ? "" : ' style="opacity:.4"'}><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
+    ${B.o ? "" : `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">⚠ <b>Buy Once выключен</b> — копия повторяет все его покупки и выходит вместе с ним, поэтому <b>Follow Sell, тейки и таймаут сейчас не влияют</b> на итог. Включи Buy Once, чтобы проверить выход по тейкам и таймауту.</div></div>`}
+    <div class="x-sec"${B.o ? "" : ' style="opacity:.4"'}>Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
   if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
