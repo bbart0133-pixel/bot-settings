@@ -395,6 +395,15 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-tb tr.l .x-st{box-shadow:inset 3px 0 0 rgba(255,107,107,.6),1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.o td{opacity:.65}
 .x-tk{display:flex;align-items:center;gap:6px}
+.x-chk{width:17px;height:17px;flex:0 0 auto;margin:0;accent-color:var(--acc);cursor:pointer}
+.x-tb tr.xx td{opacity:.38}
+.x-tb tr.xx td.x-st{opacity:1}
+.x-tb tr.xx .x-tl{text-decoration:line-through;opacity:.5}
+.x-exb{margin:0 0 10px;font-size:13.5px}
+.x-exh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.x-exh .x-link{font-size:12.5px}
+.x-exr{margin-top:4px}
+.x-exc{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.06)}
 .x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
 .x-ca{width:24px;height:24px;border-radius:7px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
 .xq-tip{position:absolute;z-index:3;background:#16141d;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:7px 9px;font-size:11.5px;line-height:1.45;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5);white-space:nowrap;color:var(--text)}
@@ -1430,7 +1439,10 @@ const SIM = (() => {
   function whyNone(t, v, cs){
     const tp = v.tp || [], follow = v.follow !== false;
     if (!follow && !tp.length && !v.to) return "у копии нет выхода: ни Follow Sell, ни тейков, ни таймаута";
-    if ((tp.length || v.to) && !cs.length) return "нет свечей цены — тейки/таймаут не проверить";
+    if ((tp.length || v.to) && !cs.length) return t.cz === "budget" ? "нет свечей — не хватило лимита запросов к GMGN (запусти поиск ещё раз — докачает)"
+      : t.cz === "fail" ? "GMGN не ответил по свечам — запусти поиск ещё раз"
+      : t.cz === "gmgn" ? "у GMGN нет графика этого токена — тейки/таймаут не проверить"
+      : "нет свечей цены — тейки/таймаут не проверить";
     if (follow){
       const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
       let held = +(t.amt || 0), left = 1; const fi = ev.findIndex(e => e[1] === "buy");
@@ -1811,27 +1823,65 @@ function xPeak(sd, t){   // пик цены после входа (по свеч
   for (const c of cs) if (c[0] >= t.fb && c[0] <= end && c[2] > mx) mx = c[2];
   return mx ? mx / p0 : null;
 }
-function xTrades(D, o, color){
+// ===== «Что если убрать этот токен»: галочки в таблице сделок → итог без них и одна настройка TradeWiz, которая их уберёт =====
+const xNiceSteps = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 10];
+function xNiceBelow(x){ if (!(x > 0)) return 0; const e = Math.pow(10, Math.floor(Math.log10(x))); for (let i = xNiceSteps.length - 1; i >= 0; i--){ const v = xNiceSteps[i] * e; if (v < x) return v; } return 0.8 * e; }
+function xNiceAbove(x){ if (!(x >= 0)) return 0; if (x === 0) return 1; const e = Math.pow(10, Math.floor(Math.log10(x))); for (const st of xNiceSteps){ const v = st * e; if (v > x) return v; } return 12 * e; }
+function xExSet(D){ const key = [D.api, ST.v, ST.m, ST.k].join("|"); if (!ST.ex || ST.ex.key !== key) ST.ex = {key, set: new Set()}; return ST.ex.set; }
+function xParamsToB(p){
+  const tp = p.tp || [];
+  return {cap: p.cap || "", cm: p.cap_min || "", ag: p.age || "", am: p.age_min || "", mn: p.min_usd ? Math.round(p.min_usd * 100) / 100 : "", mx: p.max_usd ? Math.round(p.max_usd * 100) / 100 : "",
+          o: p.once ? 1 : 0, f: p.follow ? 1 : 0, to: p.to ? p.to[0] : "", tp_: p.to ? p.to[1] : 100,
+          t1: tp[0] ? tp[0][0] : "", s1: tp[0] ? tp[0][1] : "", t2: tp[1] ? tp[1][0] : "", s2: tp[1] ? tp[1][1] : "", sl: p.sl == null ? "" : p.sl};
+}
+function xExCands(sd, P, E, keep){
+  // одна настройка, которая отсекает ВСЕ отмеченные токены; считаем бэктестом, сколько ещё сделок уйдёт
+  const mcs = E.map(x => x.t.mc), ages = E.map(x => x.t.age), usds = E.map(x => x.t.usd), out = [];
+  const money = v => "$" + Math.round(v).toLocaleString("ru-RU"), mins = v => v + " мин";
+  const add = (lbl, val, patch) => out.push({lbl, val, p: Object.assign({}, P, patch)});
+  if (mcs.every(v => v != null)){
+    const lo = Math.min(...mcs), hi = Math.max(...mcs);
+    const c1 = xNiceBelow(lo); if (c1 > (P.cap_min || 0) && (!P.cap || c1 < P.cap)) add("Max MC", money(c1), {cap: c1});
+    const c2 = xNiceAbove(hi); if ((!P.cap || c2 < P.cap) && c2 > (P.cap_min || 0)) add("Min MC", money(c2), {cap_min: c2});
+  }
+  if (ages.every(v => v != null)){
+    const lo = Math.min(...ages), hi = Math.max(...ages);
+    const a1 = Math.floor((lo - 1) / 60); if (a1 >= 1 && (!P.age || a1 < P.age) && a1 > (P.age_min || 0)) add("Max Token Age", mins(a1), {age: a1});
+    const a2 = Math.floor(hi / 60) + 1; if (a2 > (P.age_min || 0) && (!P.age || a2 < P.age)) add("Min Token Age", mins(a2), {age_min: a2});
+  }
+  const u1 = xNiceAbove(Math.max(...usds)); if (u1 > (P.min_usd || 0) && (!P.max_usd || u1 < P.max_usd)) add("Min Trigger Buy (его вход от)", money(u1), {min_usd: u1});
+  const u2 = xNiceBelow(Math.min(...usds)); if (u2 > (P.min_usd || 0) && (!P.max_usd || u2 < P.max_usd)) add("Max Trigger Buy (его вход до)", money(u2), {max_usd: u2});
+  const st = sd.stake || 100, ea = new Set(E.map(x => x.t.a));
+  for (const c of out){
+    try { const o = SIM.backtest(sd, c.p), ok = o.trades.filter(x => x.ok), ka = new Set(ok.map(x => x.t.a));
+      c.tot = o.full_total; c.n = ok.length; c.left = ok.filter(x => ea.has(x.t.a)).length;
+      c.lost = keep.filter(x => !ka.has(x.t.a)); } catch (e) { c.bad = true; }
+  }
+  return out.filter(c => !c.bad && c.left === 0 && c.n > 0).sort((a, b) => b.tot - a.tot);
+}
+function xTrades(D, o, color, P){
   const sd = ST.sd[D.api] || {};
+  const EX = xExSet(D), stake = sd.stake || 100;
   const all = o.trades.filter(x => x.ok).map(x => Object.assign(x, {pk: x.pk !== undefined ? x.pk : xPeak(sd, x.t)}));
   const bad = o.trades.filter(x => !x.ok);
   let ok = all.filter(x => xFlt === "all" || (xFlt === "win" && x.roi > 0) || (xFlt === "loss" && x.roi <= 0) || (xFlt === "new" && x.test));
   const key = {date: x => x.t.fb, roi: x => x.roi, mc: x => x.t.mc || 0, pk: x => x.pk || 0, hold: x => x.hold || 0, usd: x => x.t.usd, age: x => x.t.age || 0};
   ok.sort((a, b) => (key[xSort](a) - key[xSort](b)) * xDir);
-  const sum = a => a.reduce((s, x) => s + x.roi, 0) * 100;
+  const sum = a => a.reduce((s, x) => s + x.roi, 0) * stake;
   const dt = ts => new Date(ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}).replace(",", "");
   const mc = x => x == null ? "—" : x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 10000 ? 0 : 1) + "K" : "$" + Math.round(x);
   const hd = (k, l) => `<th data-xsort="${k}" class="${xSort === k ? "on" : ""}">${l}${xSort === k ? (xDir < 0 ? " ↓" : " ↑") : ""}</th>`;
   const fl = (k, l, n) => `<button class="x-chip${xFlt === k ? " on" : ""}" data-xflt="${k}" style="flex:0 0 auto;height:30px;padding:0 10px;font-size:12px">${l} ${n}</button>`;
   let h = `<div class="x-sec">Сделки копии · итог <b class="${xCls(sum(all))}">${xUsd(sum(all))}</b></div>
     <div class="x-chips" style="margin:0 0 8px;overflow-x:auto">${fl("all", "Все", all.length)}${fl("win", "Плюс", all.filter(x => x.roi > 0).length)}${fl("loss", "Минус", all.filter(x => x.roi <= 0).length)}${fl("new", "Новые", all.filter(x => x.test).length)}</div>
+    ${xExBox(D, sd, P, all, EX, sum)}
     <div class="x-card x-tw"><table class="x-tb"><thead><tr><th class="x-st">Токен</th>${hd("date", "Вход")}${hd("age", "Возраст")}${hd("mc", "Капа")}${hd("usd", "Сумма")}${hd("pk", "Пик")}${hd("hold", "Холд")}${hd("roi", "Копия")}<th>Выход</th></tr></thead><tbody>`;
   const shown = xAll ? ok : ok.slice(0, 30);
-  h += shown.map(x => `<tr class="${x.roi > 0 ? "w" : "l"}">
-      <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button><button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button>${x.test ? '<i class="x-new">нов.</i>' : ""}</div></td>
+  h += shown.map(x => `<tr class="${x.roi > 0 ? "w" : "l"}${EX.has(x.t.a) ? " xx" : ""}">
+      <td class="x-st"><div class="x-tk">${P ? `<input type="checkbox" class="x-chk" data-xex="${esc(x.t.a)}" ${EX.has(x.t.a) ? "" : "checked"} aria-label="оставить токен">` : ""}<button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button><button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button>${x.test ? '<i class="x-new">нов.</i>' : ""}</div></td>
       <td>${dt(x.t.fb)}</td><td>${x.t.age != null ? (xDur(x.t.age) || "<1 мин") : "—"}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td>
       <td>${x.pk ? "x" + x.pk.toFixed(x.pk >= 10 ? 0 : 1) : "—"}</td><td>${x.hold != null ? (xDur(x.hold) || "<1 мин") : "—"}</td>
-      <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * 100)}</span></td>
+      <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * stake)}</span></td>
       <td class="x-m">${x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}${x.mtm ? " · ещё держит — по последней цене" : ""}${x.lots > 1 ? " · " + x.lots + " покупки" : ""}</td></tr>`).join("");
   h += `</tbody></table></div>`;
   if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:10px 4px 0;font-size:12.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
@@ -1840,7 +1890,22 @@ function xTrades(D, o, color){
     if (xShowBad) h += `<div class="x-card x-tw" style="margin-top:8px"><table class="x-tb"><thead><tr><th class="x-st">Токен</th><th>Вход</th><th>Капа</th><th>Сумма</th><th>Почему нет</th></tr></thead><tbody>${bad.map(x => `<tr class="o">
       <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button></div></td><td>${dt(x.t.fb)}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td><td class="x-m">✗ ${esc(x.why)}</td></tr>`).join("")}</tbody></table></div>`;
   }
-  return h + `<div class="x-note">Таблица листается вбок. Тап по названию — график в GMGN с его сделками, ⧉ — скопировать адрес токена. Тап по заголовку — сортировка.</div>`;
+  return h + `<div class="x-note">Таблица листается вбок. Тап по названию — график в GMGN с его сделками, ⧉ — скопировать адрес токена. Тап по заголовку — сортировка.${P ? " Сними галочку у токена — увидишь итог без него и какая настройка его уберёт." : ""}</div>`;
+}
+function xExBox(D, sd, P, all, EX, sum){
+  if (!P || !EX.size) return "";
+  const E = all.filter(x => EX.has(x.t.a)), keep = all.filter(x => !EX.has(x.t.a));
+  if (!E.length) return "";
+  const wr = keep.length ? Math.round(100 * keep.filter(x => x.roi > 0).length / keep.length) : 0;
+  const names = [...new Set(E.map(x => x.t.sym))].slice(0, 4).join(", ") + (E.length > 4 ? "…" : "");
+  let h = `<div class="x-card x-exb"><div class="x-exh"><b>Без ${esc(names)}</b><button class="x-link" data-xexclr="1">вернуть все</button></div>
+    <div class="x-exr">итог <b class="${xCls(sum(keep))}">${xUsd(sum(keep))}</b> вместо ${xUsd(sum(all))} · ${keep.length} сд. · WR ${wr}%</div>
+    <div class="x-m" style="margin:8px 0 4px">Это если убрать их руками. Чтобы TradeWiz их сам не брал — одна настройка:</div>`;
+  ST.exC = xExCands(sd, P, E, keep);
+  if (!ST.exC.length) h += `<div class="x-m">Одной настройкой их не отсечь: капа, возраст и сумма входа у них такие же, как у хороших сделок.</div>`;
+  h += ST.exC.slice(0, 4).map((c, i) => `<div class="x-exc"><div><b>${esc(c.lbl)}</b> ${esc(c.val)}<div class="x-m">итог <b class="${xCls(c.tot)}">${xUsd(c.tot)}</b> · ${c.n} сд.${c.lost.length ? ` · уберёт ещё ${c.lost.length}: ${esc(c.lost.slice(0, 3).map(x => x.t.sym).join(", "))}${c.lost.length > 3 ? "…" : ""}` : " · больше ничего не убирает"}</div></div>
+    <button class="x-btn x-ghost" data-xexap="${i}" style="height:36px;width:auto;padding:0 12px;font-size:12.5px;flex:0 0 auto">в бэктест →</button></div>`).join("");
+  return h + `</div>`;
 }
 function stDetail(D){
   const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
@@ -1862,7 +1927,7 @@ function stDetail(D){
   if (D.api){
     const sd = ST.sd[D.api];
     if (!sd){ stLoadSim(D); h += `<div class="x-sec">Сделки копии</div><div class="x-card x-m">${ST.sdErr ? esc(ST.sdErr) : "Загружаю сделки…"}</div>`; }
-    else h += xTrades(D, SIM.backtest(sd, xRawParams(v.raw)), M.c);
+    else h += xTrades(D, SIM.backtest(sd, xRawParams(v.raw)), M.c, xRawParams(v.raw));
   }
   return h + `</div></div>`;
 }
@@ -1928,7 +1993,7 @@ function stBt(D){
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
   if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
   h += `</div><div class="x-r x-bttab">`;
-  if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c)}</div>`;
+  if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c, btParams())}</div>`;
   return h + `</div></div>`;
 }
 let xJobChecked = false;
@@ -2159,6 +2224,9 @@ document.addEventListener("click", async e => {
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
+  const xe = t.closest("[data-xex]"); if (xe){ const D0 = xD(); if (D0){ const S = xExSet(D0), a = xe.dataset.xex; S.has(a) ? S.delete(a) : S.add(a); render(true); } return; }
+  if (t.closest("[data-xexclr]")){ if (ST.ex) ST.ex.set.clear(); render(true); return; }
+  const xa = t.closest("[data-xexap]"); if (xa && ST.exC){ const c = ST.exC[+xa.dataset.xexap]; if (c){ ST.bt = xParamsToB(c.p); ST.v = "bt"; if (ST.ex) ST.ex.set.clear(); render(); window.scrollTo(0, 0); xToast(c.lbl + " → " + c.val); } return; }
   if (t.closest("[data-xgm]")) return;   // тап по адресу — это ссылка на GMGN, а не открытие поиска
   const it = t.closest("[data-xi]"); if (it){ stOpenItem(+it.dataset.xi); render(); window.scrollTo(0, 0); return; }
   const o = t.closest("[data-xo]"); if (o){ const [m, k] = o.dataset.xo.split(":"); ST.m = m; ST.k = +k; ST.v = "detail"; ST.bt = null; render(); window.scrollTo(0, 0); return; }
