@@ -1807,7 +1807,7 @@ function xTiles(v){
 }
 function xSettings(rows){
   return `<div class="x-twz"><div class="x-card" style="padding:0">${rows.map((r, j) => {
-    const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено)/.test(r[1]);
+    const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено|не указана)/.test(r[1]);
     return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v${off ? " x-off" : ""}">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>`;
   }).join("")}</div><button class="x-btn x-solid" data-xcpall="1" style="margin-top:10px">Скопировать все настройки</button></div>`;
 }
@@ -1921,7 +1921,7 @@ function stDetail(D){
   h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · ${stakeLbl(sdD)} на сделку</div>${eqHtml}</div>`;
   h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
-  h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s) + xBlizzBox(D, "detail");
+  h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(xWithBuy(D, v.s)) + xBlizzBox(D, "detail");
   if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
   h += `</div><div class="x-r">`;
   if (D.api){
@@ -1991,7 +1991,7 @@ function stBt(D){
     <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
-  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base)) + xBlizzBox(D, "bt");
+  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(xWithBuy(D, btRows(D, btParams(), base))) + xBlizzBox(D, "bt");
   h += `</div><div class="x-r x-bttab">`;
   if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c, btParams())}</div>`;
   return h + `</div></div>`;
@@ -2152,10 +2152,18 @@ function stratHTML(){
   try { if (inTG){ ST.v === "list" ? tg.BackButton.hide() : tg.BackButton.show(); } } catch (e) {}
   return `<div class="x">${body}</div>`;
 }
+// Buy Amount — сумма покупки копии из «Покупка и газ» (Ещё); первой строкой, как в меню копи-бота
+function xBuyRow(D){
+  const k = D.c === "bsc" ? ["strat_buy_bnb", "BNB"] : D.c === "sol" ? ["strat_buy_sol", "SOL"] : null;
+  if (!k) return null;
+  const v = num(cur[k[0]]), nat = ((ST.sd[D.api] || {}).native) || 0;
+  return ["Buy Amount", v ? `${fmtN(v)} ${k[1]}` + (nat ? ` (~$${Math.round(v * nat)})` : "") : "не указана — Ещё → «Покупка и газ»"];
+}
+const xWithBuy = (D, rows) => { const b = xBuyRow(D); return b ? [b].concat(rows) : rows; };
 function stCurRows(){
   const D = xD(); if (!D) return [];
   const base = D.m[ST.m].v[ST.k];
-  return ST.v === "bt" ? btRows(D, btParams(), base) : base.s;
+  return xWithBuy(D, ST.v === "bt" ? btRows(D, btParams(), base) : base.s);
 }
 async function xCopy(text){
   try { await navigator.clipboard.writeText(text); }
