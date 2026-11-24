@@ -1168,6 +1168,7 @@ const SIM = (() => {
   const netRoi = (g, nSells, cost, stake) => !cost ? g - 1
     : g * (1 - cost.f) ** 2 * (1 - cost.so) / (1 + cost.si) - 1 - cost.gas * (1 + Math.max(1, nSells)) / stake;
   const cmpC = (a, b) => (a[0] - b[0]) || (a[1] - b[1]) || (a[2] - b[2]);
+  const evCmp = (a, b) => (a[0] - b[0]) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) || (a[2] - b[2]) || (a[3] - b[3]);
   function priceAt(cs, ts){
     let prev = null;
     for (let k = 0; k < cs.length; k++){ if (cs[k][0] <= ts) prev = k; else break; }
@@ -1182,8 +1183,127 @@ const SIM = (() => {
   // длительность свечи: до следующей, но не больше 15 мин; high засчитываем, только если свеча закончилась до события
   const cdur = (cs, i) => i + 1 < cs.length ? Math.max(1, Math.min(900, cs[i + 1][0] - cs[i][0]))
     : i > 0 ? Math.max(1, Math.min(900, cs[i][0] - cs[i - 1][0])) : 60;
+  // Buy Once ВЫКЛ: копия покупает на каждую его покупку (прошедшую фильтры) — отдельный лот (= _lot_mask/_multi_sim бота)
+  function lotMask(t, v){
+    const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
+    const first = ev.findIndex(e => e[1] === "buy"); if (first < 0) return [];
+    const mc0 = t.mc, p0 = t.p0, supply = (mc0 && p0) ? mc0 / p0 : null, age0 = t.age;
+    const out = [];
+    ev.forEach((e, k) => {
+      const [ts, kind, amt, usd] = e;
+      if (k <= first || kind !== "buy") return;
+      const price = (amt && usd && amt > 0 && usd > 0) ? usd / amt : null;
+      let ok = price !== null;
+      if (ok && v.min_usd && usd < v.min_usd) ok = false;
+      if (ok && v.max_usd && usd > v.max_usd) ok = false;
+      if (ok && (v.cap || v.cap_min)){ const mc = supply ? price * supply : null;
+        if (mc === null || (v.cap && mc > v.cap) || (v.cap_min && mc < v.cap_min)) ok = false; }
+      if (ok && (v.age || v.age_min)){ const ag = age0 != null ? age0 + (ts - t.fb) : null;
+        if (ag === null || (v.age && ag > v.age * 60) || (v.age_min && ag < v.age_min * 60)) ok = false; }
+      out.push(ok);
+    });
+    return out;
+  }
+  function multiSim(t, tp, candles, follow, timeout, mask, cost, D){
+    if (!follow && !(tp && tp.length) && !timeout) return null;
+    const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
+    const first = ev.findIndex(e => e[1] === "buy");
+    let held = +(t.amt || 0); const p0 = t.p0;
+    if (first < 0 || held <= 0 || !p0) return null;
+    if (((tp && tp.length) || timeout) && !(candles && candles.length)) return null;
+    const ratio = t.cp ? t.cp / p0 : 1;
+    if (cost && t.cr) cost = {...cost, si: 0};
+    const holdS = D.hold_h * 3600;
+    const mk = (ts, pe) => ({ts, pe, left: 1, pr: 0, lv: (tp || []).map(x => x.slice()), ntp: 0, to: false, toc: false, cl: null});
+    const lots = [mk(t.fb, p0 * ratio)];
+    let tl = []; let j = 0;
+    ev.forEach((e, k) => {
+      if (k === first) return;
+      const [ts, kind, amt, usd] = e;
+      if (kind === "buy"){ const inc = j < mask.length ? mask[j] : false; j++; tl.push([ts, 0, "buy", [amt, usd, inc]]); }
+      else tl.push([ts, 0, "sell", [amt, usd]]);
+    });
+    if (timeout) tl.push([t.fb + timeout[0], 1, "to", 0]);
+    const srt = (candles || []).slice().sort(cmpC);
+    const cs = (candles || []).filter(c => c[0] >= t.fb);
+    let ci = 0, lastPrice = null; const hits = [];
+    const run = until => {
+      while (ci < cs.length && cs[ci][0] + cdur(cs, ci) <= until){
+        const [tm, , h] = cs[ci];
+        for (const L of lots){
+          if (L.left <= 1e-12 || tm < L.ts || (!follow && tm > L.ts + holdS)) continue;
+          while (L.lv.length && L.left > 1e-12 && h >= L.pe * (1 + L.lv[0][0] / 100)){
+            const [pct, frac] = L.lv.shift(); const sell = L.left * frac / 100;
+            L.pr += sell * (1 + pct / 100); L.left -= sell; L.ntp++; hits.push([pct, tm]);
+            if (L.left <= 1e-9) L.cl = tm;
+          }
+        }
+        ci++;
+      }
+    };
+    const tlCmp = (a, b) => (a[0] - b[0]) || (a[1] - b[1]);
+    tl.sort(tlCmp);
+    let k = 0;
+    while (k < tl.length){
+      const [ts, , kind, d] = tl[k]; k++;
+      run(ts);
+      if (kind === "to"){
+        const L = lots[d]; if (L.left <= 1e-9) continue;
+        const px = priceAt(srt, ts); if (!px) return null;
+        const sell = L.left * timeout[1] / 100; L.pr += sell * px / L.pe; L.left -= sell; L.to = true;
+        if (L.left <= 1e-9){ L.cl = ts; L.toc = true; }
+        continue;
+      }
+      if (kind === "buy"){
+        const [amt, usd, inc] = d; held += amt;
+        if (inc && amt > 0 && usd > 0){
+          lots.push(mk(ts, usd / amt * ratio));
+          if (timeout){ tl.push([ts + timeout[0], 1, "to", lots.length - 1]); tl = tl.slice(0, k).concat(tl.slice(k).sort(tlCmp)); }
+        }
+        continue;
+      }
+      const [amt, usd] = d;
+      if (amt <= 0 || held <= 0) continue;
+      const price = usd > 0 ? usd / amt : null; if (!price) continue;
+      const frac = Math.min(1, amt / held); held = Math.max(0, held - amt); lastPrice = price;
+      if (!follow) continue;
+      for (const L of lots) if (L.left > 1e-12){ const sold = L.left * frac; L.pr += sold * price / L.pe; L.left -= sold; if (L.left <= 1e-9) L.cl = ts; }
+    }
+    if (!follow) run(Infinity);
+    let roi = 0, gross = 0, exitTs = null, mtm = false;
+    for (const L of lots){
+      if (L.left > 1e-9){
+        if (follow){
+          if (L.left <= 0.05 && lastPrice){ L.pr += L.left * lastPrice / L.pe; L.left = 0; L.cl = L.cl || (ev.length ? ev[ev.length - 1][0] : L.ts); }
+          else if (srt.length && srt[srt.length - 1][1]){ L.pr += L.left * srt[srt.length - 1][1] / L.pe; mtm = true; }
+          else return null;
+        } else {
+          const win = cs.filter(c => L.ts <= c[0] && c[0] <= L.ts + holdS); if (!win.length) return null;
+          L.pr += L.left * win[win.length - 1][1] / L.pe; L.cl = L.ts + holdS;
+        }
+      }
+      const closed = ((tp && tp.length) && L.ntp === tp.length && tp[tp.length - 1][1] === 100) || L.toc;
+      const g = L.pr - 1; gross += g;
+      roi += netRoi(g + 1, L.ntp + (L.to ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
+      if (L.cl !== null) exitTs = exitTs === null ? L.cl : Math.max(exitTs, L.cl);
+    }
+    return {roi, gross, exit_ts: exitTs, hits, lots: lots.length, mtm, to_used: lots.some(L => L.to),
+            tp_all: !!(tp && tp.length) && lots.every(L => L.ntp === tp.length)};
+  }
+  // когда копия с Follow Sell продала всё (кошелёк продал всё, что держал) — = _follow_exit_ts бота
+  function followExitTs(t){
+    const ev = (t.ev || []).filter(e => e[0] >= (t.fb || 0)).slice().sort(evCmp);
+    let held = +(t.amt || 0); const fi = ev.findIndex(e => e[1] === "buy");
+    if (fi < 0 || held <= 0) return null;
+    let left = 1;
+    for (const [ts, kind, amt] of ev.slice(0, fi).concat(ev.slice(fi + 1))){
+      if (kind === "buy") held += amt;
+      else if (amt > 0 && held > 0){ left -= left * Math.min(1, amt / held); held = Math.max(0, held - amt); if (left <= 0.05) return ts; }
+    }
+    return null;
+  }
   function followSim(t, p0, tp, candles, hits, timeout, info){
-    const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort((a, b) => (a[0] - b[0]) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) || (a[2] - b[2]) || (a[3] - b[3]));
+    const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
     if (!ev.length) return null;
     let held = +(t.amt || 0);
     const fi = ev.findIndex(e => e[1] === "buy");
@@ -1220,7 +1340,11 @@ const SIM = (() => {
       proceeds += sold * price / p0; left -= sold; held = Math.max(0, held - amt); last = price;
     }
     if (left > 1e-9){
-      if (left <= 0.05 && last){ proceeds += left * last / p0; left = 0; } else return null;
+      if (left <= 0.05 && last){ proceeds += left * last / p0; left = 0; }
+      else if (candles && candles.length){   // кошелёк держит — остаток по последней известной цене (= бот)
+        const mark = sorted[sorted.length - 1][1]; if (!mark) return null;
+        proceeds += left * mark / p0; if (info) info.mtm = true;
+      } else return null;
     }
     return proceeds - 1;
   }
@@ -1282,6 +1406,23 @@ const SIM = (() => {
     const closed = (tp && tp.length && nTp === tp.length && tp[tp.length - 1][1] === 100) || info.to_closed;
     return netRoi(g + 1, nTp + (info.to_used ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
   }
+  // почему у сделки нет результата — понятными словами (раньше одна строка «открыта / нет свечей» на всё)
+  function whyNone(t, v, cs){
+    const tp = v.tp || [], follow = v.follow !== false;
+    if (!follow && !tp.length && !v.to) return "у копии нет выхода: ни Follow Sell, ни тейков, ни таймаута";
+    if ((tp.length || v.to) && !cs.length) return "нет свечей цены — тейки/таймаут не проверить";
+    if (follow){
+      const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
+      let held = +(t.amt || 0), left = 1; const fi = ev.findIndex(e => e[1] === "buy");
+      if (fi >= 0 && held > 0){
+        for (const [, kind, amt] of ev.slice(0, fi).concat(ev.slice(fi + 1))){
+          if (kind === "buy") held += amt; else if (amt > 0 && held > 0){ left -= left * Math.min(1, amt / held); held = Math.max(0, held - amt); }
+        }
+        if (left > 0.05) return left > 0.999 ? "кошелёк ещё держит — ничего не продал" : `кошелёк ещё держит — продал ${Math.round((1 - left) * 100)}%`;
+      }
+    }
+    return "нет цены в нужный момент (свечи неполные)";
+  }
   function check(t, v){
     // своё «Макс. проскальзывание» в бэктесте: по замеренной цене копий (crs — во сколько раз дороже его входа)
     if (v.sl != null && t.crs){ if (t.crs - 1 > v.sl / 100) return "копия не исполнилась бы (slippage)"; }
@@ -1327,20 +1468,26 @@ const SIM = (() => {
       const why = check(t, v);
       if (why){ trades.push({t, ok: false, why}); continue; }
       const info = {}, hits = [], cs = D.candles[t.a] || [];
-      let roi;
+      let roi, mres = null;
       if (v.once !== false) roi = simTp(t, v.tp || [], cs, v.follow !== false, hits, cost, v.to || null, info, D);
-      else roi = t.roi != null ? netRoi(1 + t.roi, 1, cost, stake) : null;
-      if (roi === null || roi === undefined){ trades.push({t, ok: false, why: "нет результата (открыта / нет свечей)"}); continue; }
+      else { mres = multiSim(t, v.tp || [], cs, v.follow !== false, v.to || null, lotMask(t, v), cost, D); roi = mres ? mres.roi : null; }
+      if (roi === null || roi === undefined){ trades.push({t, ok: false, why: whyNone(t, v, cs)}); continue; }
+      if (mres){
+        const ex = mres.exit_ts;
+        rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: ex, hold: ex ? ex - t.fb : null, tp_all: mres.tp_all, to_hit: mres.to_used});
+        trades.push({t, ok: true, roi, test: split != null && t.fb >= split, hold: ex ? ex - t.fb : null, tps: mres.hits.map(h => h[0]), to: mres.to_used, lots: mres.lots, mtm: mres.mtm});
+        continue;
+      }
       const tp = v.tp || [];
       let exit = null;
       if (info.to_closed) exit = info.to_ts;
       else if (tp.length && hits.length === tp.length && tp[tp.length - 1][1] === 100) exit = hits[hits.length - 1][1];
-      else if (v.follow !== false) exit = t.ls || null;
+      else if (v.follow !== false) exit = followExitTs(t) || t.ls || null;
       else exit = t.fb + D.hold_h * 3600;
       rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: exit, hold: exit ? exit - t.fb : null,
                  tp_all: tp.length > 0 && hits.length === tp.length, to_hit: !!info.to_used});
       trades.push({t, ok: true, roi, test: split != null && t.fb >= split, hold: exit ? exit - t.fb : null,
-                   tps: hits.map(h => h[0]), to: !!info.to_used});
+                   tps: hits.map(h => h[0]), to: !!info.to_used, mtm: !!info.mtm});
     }
     const out = {...v, trades};
     if (!rows.length) return Object.assign(out, {n: 0, wr: 0, full_total: 0, test: null, verdict: null, max_dd: 0, loss_streak: 0, equity: [], one_hit: null});
@@ -1622,7 +1769,7 @@ function xTrades(D, o, color){
       <td>${dt(x.t.fb)}</td><td>${x.t.age != null ? (xDur(x.t.age) || "<1 мин") : "—"}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td>
       <td>${x.pk ? "x" + x.pk.toFixed(x.pk >= 10 ? 0 : 1) : "—"}</td><td>${x.hold != null ? (xDur(x.hold) || "<1 мин") : "—"}</td>
       <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * 100)}</span></td>
-      <td class="x-m">${x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}</td></tr>`).join("");
+      <td class="x-m">${x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}${x.mtm ? " · ещё держит — по последней цене" : ""}${x.lots > 1 ? " · " + x.lots + " покупки" : ""}</td></tr>`).join("");
   h += `</tbody></table></div>`;
   if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:10px 4px 0;font-size:12.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
   if (bad.length){
@@ -1706,13 +1853,14 @@ function stBt(D){
     ST.btTrades = o;
   }
   h += `</div><div class="x-l x-btform">`;
-  const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id])}" placeholder="${ph}"></label>`;
+  const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id] == null ? "" : B[id])}" placeholder="${ph}"></label>`;
   h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}${inp("sl", "Макс. проскальзывание, %", sd && sd.cost && sd.cost.slip_max ? Math.round(sd.cost.slip_max * 100) + " (как в поиске)" : "как в поиске")}</div>
     <div class="x-note" style="margin:6px 2px 0">Проскальзывание — насколько дороже его входа копия ещё купила бы. Выше — сделка «не исполнилась бы». Цена копии замерена по блокчейну${sd && sd.tokens && !sd.tokens.some(t => t.crs) ? " (в этом поиске замеров нет — поле не влияет)" : ""}.</div>
     <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
-      <button class="x-tg" data-xsw="f"${B.o ? "" : ' style="opacity:.4"'}><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
-    ${B.o ? "" : `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">⚠ <b>Buy Once выключен</b> — копия повторяет все его покупки и выходит вместе с ним, поэтому <b>Follow Sell, тейки и таймаут сейчас не влияют</b> на итог. Включи Buy Once, чтобы проверить выход по тейкам и таймауту.</div></div>`}
-    <div class="x-sec"${B.o ? "" : ' style="opacity:.4"'}>Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
+      <button class="x-tg" data-xsw="f"><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
+    ${B.o ? "" : `<div class="x-note" style="margin:6px 2px 0">Buy Once выкл: копия покупает на каждую его покупку (если та проходит фильтры: сумма, капа и возраст в момент покупки) по $100 — у каждой свои тейки и таймаут, Follow Sell продаёт у всех ту же долю.</div>`}
+    ${!B.f && !(+B.t1 > 0 || +B.t2 > 0) && !(+B.to > 0) ? `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">⚠ <b>У копии нет выхода:</b> Follow Sell выключен, а тейков и таймаута нет — копия так и держит, итог не посчитать (поэтому 0 сделок). Поставь тейк (TP1) или таймаут, или включи Follow Sell.</div></div>` : ""}
+    <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
   if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
