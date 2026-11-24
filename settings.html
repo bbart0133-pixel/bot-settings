@@ -1921,7 +1921,7 @@ function stDetail(D){
   h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · ${stakeLbl(sdD)} на сделку</div>${eqHtml}</div>`;
   h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
-  h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s);
+  h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(v.s) + xBlizzBox(D, "detail");
   if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
   h += `</div><div class="x-r">`;
   if (D.api){
@@ -1991,7 +1991,7 @@ function stBt(D){
     <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
-  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base));
+  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(btRows(D, btParams(), base)) + xBlizzBox(D, "bt");
   h += `</div><div class="x-r x-bttab">`;
   if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c, btParams())}</div>`;
   return h + `</div></div>`;
@@ -2163,6 +2163,38 @@ async function xCopy(text){
   try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
 }
 let xToastT;
+// ===== 📤 В Blizz: копи-ордер с этими настройками (на паузе) — через сервер бота, ключ Blizz лежит только там =====
+function xBlizzKey(D, where){ return [D.api, D.a, where, ST.m, ST.k].join("|"); }
+function xBlizzBox(D, where){
+  if (!(P.sa && P.sk) || D.c !== "sol") return "";
+  const st = ST.blz && ST.blz.key === xBlizzKey(D, where) ? ST.blz : null;
+  let msg = "";
+  if (st){
+    const warn = (st.warn || []).map(w => `<div class="x-m" style="margin-top:4px">⚠ ${esc(w)}</div>`).join("");
+    msg = st.s === "send" ? `<div class="x-m">Отправляю в Blizz…</div>`
+      : st.s === "created" ? `<div><b class="x-ok">✓ Ордер создан в Blizz — на паузе.</b> Открой Blizz, проверь и включи.</div>`
+      : st.s === "updated" ? `<div><b class="x-ok">✓ Настройки ордера в Blizz обновлены.</b> Пауза/вкл — как было.</div>`
+      : st.s === "existing" ? `<div>На этот кошелёк у тебя уже есть копи-ордер в Blizz — его не трогал.</div><button class="x-btn x-ghost" data-xblz="${where}" data-xblzupd="1" style="height:40px;margin-top:8px">Заменить его настройки этими</button>`
+      : `<div class="x-bad">✗ ${esc(st.err || "не получилось")}</div>`;
+    msg = `<div class="x-card" style="margin-top:8px;font-size:13px">${msg}${warn}</div>`;
+  }
+  return `<button class="x-btn x-ghost" data-xblz="${where}" style="margin-top:10px"${st && st.s === "send" ? " disabled" : ""}>📤 В Blizz — создать копи-ордер (на паузе)</button>${msg}`;
+}
+async function xBlizzSend(where, upd){
+  const D = xD(); if (!D) return;
+  let p;
+  if (where === "bt") p = btParams();
+  else { const v = D.m[ST.m].v[ST.k]; p = xRawParams(v.raw); }
+  ST.blz = {key: xBlizzKey(D, where), s: "send"}; render(true);
+  try {
+    const r = await fetch(`${P.sa}/api/blizz?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({addr: D.a, chain: D.c, p, update: !!upd})});
+    const j = r.ok ? await r.json() : {ok: 0, err: r.status === 403 ? "ключ окна устарел — отправь боту /app" : "сервер ответил " + r.status};
+    ST.blz = Object.assign({key: xBlizzKey(D, where)}, j.ok ? {s: j.created ? "created" : j.updated ? "updated" : "existing", warn: j.warn} : {s: "err", err: j.err, warn: j.warn});
+    if (j.ok) try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
+  } catch (e) { ST.blz = {key: xBlizzKey(D, where), s: "err", err: "сервер бота не отвечает"}; }
+  render(true);
+}
 function xToast(t, ms){
   let el = document.getElementById("xtoast");
   if (!el){ el = document.createElement("div"); el.id = "xtoast"; el.className = "x-toast"; document.body.appendChild(el); }
@@ -2224,6 +2256,7 @@ document.addEventListener("click", async e => {
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
+  const bz = t.closest("[data-xblz]"); if (bz){ xBlizzSend(bz.dataset.xblz, !!bz.dataset.xblzupd); return; }
   const xe = t.closest("[data-xex]"); if (xe){ const D0 = xD(); if (D0){ const S = xExSet(D0), a = xe.dataset.xex; S.has(a) ? S.delete(a) : S.add(a); render(true); } return; }
   if (t.closest("[data-xexclr]")){ if (ST.ex) ST.ex.set.clear(); render(true); return; }
   const xa = t.closest("[data-xexap]"); if (xa && ST.exC){ const c = ST.exC[+xa.dataset.xexap]; if (c){ ST.bt = xParamsToB(c.p); ST.v = "bt"; if (ST.ex) ST.ex.set.clear(); render(); window.scrollTo(0, 0); xToast(c.lbl + " → " + c.val); } return; }
