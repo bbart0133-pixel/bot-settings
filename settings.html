@@ -359,6 +359,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-cp{width:32px;height:32px;border-radius:9px;border:1px solid var(--x-line);display:flex;align-items:center;justify-content:center;color:var(--hint)}
 .x-s.done .x-cp{color:var(--x-acc);border-color:rgba(var(--x-rgb),.5)}
 .x-in{width:100%;height:46px;margin-top:10px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 14px var(--hd);padding:0 12px;outline:none}
+.x-in.x-ta{height:auto;min-height:46px;max-height:180px;padding:12px;resize:vertical;line-height:1.4;font:600 13px var(--hd);word-break:break-all}
 .x-in:focus,.x-fl input:focus{border-color:rgba(var(--x-rgb),.6)}
 .x-chips{display:flex;gap:6px;margin-top:8px}
 .x-chip{flex:1;height:36px;border-radius:11px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:13px}
@@ -1626,6 +1627,17 @@ async function stLoad(force){
 }
 // Поиск прямо в окне: сервер бота считает, окно раз в 2 с спрашивает ход и само открывает результат
 let xPollT = null;
+// Кошельки из текста: адреса и ссылки (gmgn.ai/sol/address/…, solscan, ?maker= у ссылки на токен), без дублей, до 15
+function xParseW(text){
+  let t = String(text || ""); const out = [], seen = new Set();
+  const add = a => { const k = a.startsWith("0x") ? a.toLowerCase() : a; if (!seen.has(k)){ seen.add(k); out.push(a); } };
+  t = t.replace(/gmgn\.ai\/[a-z]+\/(?:address|wallet)\/([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})/gi, (m, a) => { add(a); return " "; });
+  t = t.replace(/gmgn\.ai\/[a-z]+\/token\/\S+/gi, m => { const mk = m.match(/[?&]maker=([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})/); if (mk) add(mk[1]); return " "; });
+  t = t.replace(/[?&](?:ref|chain|tab)=[^\s&]*/g, " ");
+  (t.match(/0x[0-9a-fA-F]{40}(?![0-9a-fA-F])|(?<![1-9A-HJ-NP-Za-km-z])[1-9A-HJ-NP-Za-km-z]{32,44}(?![1-9A-HJ-NP-Za-km-z])/g) || []).forEach(add);
+  return out.slice(0, 15);
+}
+const xRunLbl = n => n > 1 ? `🧠 Найти стратегии · ${n} кошельков` : "🧠 Найти стратегию";
 async function stRun(addr, chain){
   try {
     const r = await fetch(`${P.sa}/api/run?k=${encodeURIComponent(P.sk)}&addr=${encodeURIComponent(addr)}&chain=${chain}&period=${ST.per}`, {cache: "no-store"});
@@ -1647,6 +1659,9 @@ function stPoll(){
         if (!ST.started){ ST.job = null; return; }   // старый поиск из прошлого открытия окна — не прыгаем
         ST.started = false;
         ST.list = null; await stLoad(true);
+        if (j.n > 1){ ST.job = null; if (screen === "strat"){ ST.v = "list"; render(true); }
+          xToast(`Готово: ${j.ok || 0} из ${j.n} в «Мои поиски»` + ((j.ok || 0) >= 2 ? " · сравнение — в чате" : ""));
+          try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {} return; }
         const i = (ST.list || []).findIndex(d => d.a === j.addr);
         if (i >= 0 && screen === "strat"){ ST.i = i; ST.v = "home"; ST.job = null; render(); window.scrollTo(0, 0);
           try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {} }
@@ -1661,9 +1676,9 @@ function stJobHTML(){
   if (j.state === "error") return `<div class="x-card x-vd x-b" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Не получилось</div><div class="x-vs">${esc(j.err || "")}</div></div>`;
   if (j.state !== "run") return "";
   const pc = Math.round(100 * (j.done || 0) / (j.total || 5)), sec = Math.round(Date.now() / 1000 - (j.t || 0));
-  return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-acc)">●</span>Считаю ${xShort(j.addr)} · ${String(j.period).replace("d", " дн")}</div>
+  return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-acc)">●</span>${j.n > 1 ? `Пачка ${(j.i || 0) + 1}/${j.n} · ` : ""}Считаю ${xShort(j.addr || "")} · ${String(j.period).replace("d", " дн")}</div>
     <div class="x-vs">${esc(j.msg || "")} · ${sec} с</div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${Math.max(4, pc)}%;background:var(--acc);transition:width .4s"></i></div>
-    <div class="x-note" style="margin:8px 0 0">Окно можно не закрывать — результат откроется сам. Обычно 1–3 минуты.</div></div>`;
+    <div class="x-note" style="margin:8px 0 0">${j.n > 1 ? "Кошельки по очереди, 1–3 минуты на каждый. Каждый появится в «Мои поиски», сравнение пачки (кого копировать) придёт в чат." : "Окно можно не закрывать — результат откроется сам. Обычно 1–3 минуты."}</div></div>`;
 }
 function stJobPatch(){ const el = document.getElementById("xjob"); if (!el) { render(true); return; } const tmp = document.createElement("div"); tmp.innerHTML = stJobHTML(); if (tmp.firstElementChild) el.replaceWith(tmp.firstElementChild); }
 async function stLoadSim(d){
@@ -1700,9 +1715,9 @@ function stList(){
   let h = topHTML("Стратегия", true) + stJobHTML();
   const busy = ST.job && ST.job.state === "run";
   h += `<div class="x-card" style="margin-bottom:6px${busy ? ";opacity:.5;pointer-events:none" : ""}"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
-    <input class="x-in" id="xaddr" placeholder="адрес кошелька" value="${esc(ST.addr)}" autocomplete="off" spellcheck="false">
+    <textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="адрес или ссылка GMGN · можно пачку до 15, каждый с новой строки" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea>
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
-    <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">🧠 Найти стратегию</button>
+    <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">${xRunLbl(xParseW(ST.addr).length)}</button>
     ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">⚡ Быстро: сделки кошелька</button>` : ""}
     <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
@@ -2017,7 +2032,7 @@ document.addEventListener("click", e => {
   const tk = t.closest("[data-qtok]");
   if (tk){ const url = `https://gmgn.ai/${QK.chain}/token/${tk.dataset.qtok}?maker=${QK.addr}`;
     try { inTG && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); } catch (x) { window.open(url, "_blank"); } return; }
-  const qo = t.closest("[data-qopen]"); if (qo){ const a = qo.dataset.qopen === "addr" ? ((document.getElementById("xaddr") || {}).value || ST.addr).trim() : qo.dataset.qopen;
+  const qo = t.closest("[data-qopen]"); if (qo){ const a = qo.dataset.qopen === "addr" ? (xParseW((document.getElementById("xaddr") || {}).value || ST.addr)[0] || "") : qo.dataset.qopen;
     if (qo.dataset.qopen === "addr" && !/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a)){ xToast("Вставь адрес кошелька"); return; }
     const D = xD(); qOpen(a, ST.v === "home" && D ? D.c : "", ST.v === "home" && D ? D.p : ST.per, ST.v === "home" ? "home" : "list"); return; }
 });
@@ -2059,7 +2074,7 @@ function stBack(){
 let xRecalcT;
 document.addEventListener("input", e => {
   const f = e.target.dataset && e.target.dataset.xf;
-  if (e.target.id === "xaddr"){ ST.addr = e.target.value.trim(); return; }
+  if (e.target.id === "xaddr"){ ST.addr = e.target.value; e.target.style.height = "auto"; e.target.style.height = Math.min(180, e.target.scrollHeight + 2) + "px"; const b = document.querySelector("[data-xrun]"); if (b) b.textContent = xRunLbl(xParseW(ST.addr).length); return; }
   if (!f || !ST.bt) return;
   ST.bt[f] = e.target.value.replace(",", ".").replace(/[^\d.]/g, "");
   xMemSave();
@@ -2082,9 +2097,10 @@ document.addEventListener("click", async e => {
   if (t.closest("[data-xre]")){ ST.err = ""; ST.list = null; stLoad(true); render(true); return; }
   const per = t.closest("[data-xper]"); if (per){ ST.per = per.dataset.xper; render(true); return; }
   if (t.closest("[data-xrun]")){
-    const a = ((document.getElementById("xaddr") || {}).value || ST.addr).trim();
-    if (!/^([1-9A-HJ-NP-Za-km-z]{32,44}|0x[0-9a-fA-F]{40})$/.test(a)){ xToast("Вставь адрес кошелька"); return; }
-    const chain = a.startsWith("0x") ? (cur["m.chain"] !== "sol" && cur["m.chain"] !== "all" ? cur["m.chain"] : "bsc") : "sol";
+    const raw = ((document.getElementById("xaddr") || {}).value || ST.addr).trim(), ws = xParseW(raw);
+    if (!ws.length){ xToast("Вставь адрес или ссылку GMGN"); return; }
+    const a = ws.length > 1 || raw !== ws[0] ? raw : ws[0];   // сервер сам разберёт ссылки и пачку
+    const chain = ws[0].startsWith("0x") ? (cur["m.chain"] !== "sol" && cur["m.chain"] !== "all" ? cur["m.chain"] : "bsc") : "sol";
     if (P.sa && P.sk){ stRun(a, chain); return; }
     const out = {v: 3, run: "strategy", addr: a, period: ST.per, chain};   // сервера нет — через чат, как раньше
     if (inTG && tg.sendData) tg.sendData(JSON.stringify(out)); else alert(JSON.stringify(out));
