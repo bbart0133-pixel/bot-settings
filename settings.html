@@ -1808,6 +1808,8 @@ function xTiles(v){
 function xSettings(rows){
   return `<div class="x-twz"><div class="x-card" style="padding:0">${rows.map((r, j) => {
     const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено|не указана)/.test(r[1]);
+    if (r[0] === "Buy Amount" && /^не указана/.test(r[1])) return `<button class="x-s" data-xbuyed="1"><span class="x-k">${esc(r[0])}</span><span class="x-v x-off">${esc(r[1].replace(/ —.*/, ""))}</span><span class="x-cp" style="width:auto;padding:0 8px">✎</span></button>${xBuyEd()}`;
+    if (r[0] === "Buy Amount") return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])} <span class="x-link" data-xbuyed="1" style="font-size:12px;margin-left:6px">изменить</span></span><span class="x-v">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>${xBuyEd()}`;
     return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v${off ? " x-off" : ""}">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>`;
   }).join("")}</div><button class="x-btn x-solid" data-xcpall="1" style="margin-top:10px">Скопировать все настройки</button></div>`;
 }
@@ -2159,6 +2161,32 @@ function xBuyRow(D){
   const v = num(cur[k[0]]), nat = ((ST.sd[D.api] || {}).native) || 0;
   return ["Buy Amount", v ? `${fmtN(v)} ${k[1]}` + (nat ? ` (~$${Math.round(v * nat)})` : "") : "не указана — Ещё → «Покупка и газ»"];
 }
+// правка суммы покупки прямо здесь: сохраняется в настройки бота (как «Сохранить» в «Ещё»), остальные несохранённые правки не трогает
+let xBuyOpen = false;
+function xBuyEd(){
+  if (!xBuyOpen) return "";
+  const D = xD(); if (!D) return "";
+  const k = D.c === "bsc" ? ["strat_buy_bnb", "BNB"] : ["strat_buy_sol", "SOL"];
+  return `<div class="x-card" style="margin:8px 10px;padding:12px" id="xbuyf"><div class="x-m" style="margin-bottom:8px">Сколько ${k[1]} копия тратит на каждую покупку</div>
+    <div style="display:flex;gap:8px"><input class="x-in" id="xbuyin" inputmode="decimal" style="margin:0;flex:1" placeholder="например 0.1" value="${num(cur[k[0]]) || ""}">
+    <button class="x-btn x-solid" data-xbuysave="1" style="width:auto;padding:0 16px;height:46px">Сохранить</button></div>
+    <div class="x-m" style="margin-top:6px;font-size:12px">Итоги этого поиска посчитаны со старой суммой — пересчитаются при следующем поиске.</div></div>`;
+}
+async function xBuySave(){
+  const D = xD(); if (!D) return;
+  const k = D.c === "bsc" ? "strat_buy_bnb" : "strat_buy_sol";
+  const v = +String((document.getElementById("xbuyin") || {}).value || "").replace(",", ".");
+  if (!(v > 0)){ xToast("Впиши сумму, например 0.1"); return; }
+  if (!(P.sa && P.sk)){ xToast("Нужен сервер бота — поставь в Ещё → «Покупка и газ»", 3000); return; }
+  try {
+    const res = await fetch(`${P.sa}/api/apply?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "text/plain"},
+      body: JSON.stringify({v: 3, preset: sel, set: {[k]: v}, ops: []}), cache: "no-store"});
+    const r = res.ok ? await res.json() : null;
+    if (!r || !r.ok){ xToast(res.status === 403 ? "Ключ устарел — отправь боту /app" : "Не сохранилось — попробуй ещё раз", 3000); return; }
+    cur[k] = v; base[k] = v; start[k] = v; if (P.s) P.s[k] = v;
+    xBuyOpen = false; render(true); xToast("✅ Buy Amount сохранён");
+  } catch (e) { xToast("Сервер бота не отвечает", 3000); }
+}
 const xWithBuy = (D, rows) => { const b = xBuyRow(D); return b ? [b].concat(rows) : rows; };
 function stCurRows(){
   const D = xD(); if (!D) return [];
@@ -2264,6 +2292,9 @@ document.addEventListener("click", async e => {
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
+  if (t.closest("[data-xbuyed]")){ e.preventDefault(); e.stopPropagation(); xBuyOpen = !xBuyOpen; render(true); setTimeout(() => { const i = document.getElementById("xbuyin"); if (i) i.focus(); }, 50); return; }
+  if (t.closest("[data-xbuysave]")){ xBuySave(); return; }
+  if (t.closest("#xbuyf")) return;
   const bz = t.closest("[data-xblz]"); if (bz){ xBlizzSend(bz.dataset.xblz, !!bz.dataset.xblzupd); return; }
   const xe = t.closest("[data-xex]"); if (xe){ const D0 = xD(); if (D0){ const S = xExSet(D0), a = xe.dataset.xex; S.has(a) ? S.delete(a) : S.add(a); render(true); } return; }
   if (t.closest("[data-xexclr]")){ if (ST.ex) ST.ex.set.clear(); render(true); return; }
