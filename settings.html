@@ -315,6 +315,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .x-back{width:38px;height:38px;border-radius:12px;border:1px solid var(--x-line)!important;display:flex;align-items:center;justify-content:center;color:var(--hint);font-size:20px!important}
 .x-h{font-weight:700;font-size:24px;letter-spacing:-.3px;flex:1;min-width:0;font-family:var(--hd)}
+.x-gp{border:1.5px solid var(--gc)!important;box-shadow:0 0 0 1px color-mix(in srgb, var(--gc) 18%, transparent) inset;margin-bottom:10px}
+.x-gph{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:10px 2px 8px;border-bottom:1px solid color-mix(in srgb, var(--gc) 35%, transparent)}
+.x-gph b{color:var(--gc);font-size:13.5px}
+.x-gph span{color:var(--hint);font-size:12px}
+.x-gpf{padding:9px 2px 11px;font-size:12.5px;color:var(--hint);border-top:1px solid color-mix(in srgb, var(--gc) 25%, transparent)}
+.x-gpf b{color:var(--gc)}
+.x-gma{color:var(--acc);text-decoration:none;font-weight:600}
+.x-gma:hover{text-decoration:underline}
 .x-pill{font-size:12.5px;color:var(--hint);border:1px solid var(--x-line);border-radius:999px;padding:6px 10px;white-space:nowrap}
 .x-card{display:block;width:100%;background:var(--x-card);border:1px solid var(--x-line)!important;border-radius:18px;padding:14px}
 .x-vd.x-w{border-color:rgba(245,196,81,.35)!important;background:rgba(245,196,81,.06)}
@@ -1707,6 +1715,14 @@ function xModeCard(D, k){
     <div class="x-row" style="margin-top:4px"><span>на новых сделках ${v.te != null ? `<b class="${xCls(v.te)}">${xUsd(v.te)}</b>` : "<b>—</b>"}</span></div>
     ${v.oh ? `<div class="x-tag">⚠ ${esc(v.oh)}</div>` : ""}<div class="x-chev">›</div></button>`;
 }
+// адрес кошелька — ссылка на его страницу GMGN (в шапке — <a>, внутри строки-кнопки — <span>: <a> в <button> нельзя)
+const xGmA = (a, c) => `<a class="x-gma" href="https://gmgn.ai/${esc(c || "sol")}/address/${esc(a)}" data-xgm="1" title="открыть на GMGN">${xShort(a)} ↗</a>`;
+const xGmS = (a, c) => `<span class="x-gma" role="link" href="https://gmgn.ai/${esc(c || "sol")}/address/${esc(a)}" data-xgm="1" title="открыть на GMGN">${xShort(a)} ↗</span>`;
+document.addEventListener("click", e => {
+  const l = e.target.closest && e.target.closest("[data-xgm]"); if (!l) return;
+  e.preventDefault(); const url = l.getAttribute("href");
+  try { inTG && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); } catch (x) { window.open(url, "_blank"); }
+});
 function xHead(title, pill, back){
   return `<div class="x-top">${back ? `<button class="x-back" data-xb="${back}">‹</button>` : ""}<div class="x-h">${esc(title)}</div>${pill ? `<div class="x-pill">${pill}</div>` : ""}</div>`;
 }
@@ -1726,17 +1742,38 @@ function stList(){
   if (ST.err === "net") return h + `<div class="x-card x-m">Сервер бота не отвечает (бот выключен или Caddy не запущен). <button class="x-link" data-xre="1">Повторить</button></div>`;
   if (!ST.list) return h + `<div class="x-card x-m">Загружаю…</div>`;
   if (!ST.list.length) return h + `<div class="x-card x-m">Пока пусто — найди стратегию первого кошелька.</div>`;
-  return h + `<div class="x-card x-list">${ST.list.map((d, i) => {
+  const item = (d, i) => {
     const pk = d.pk, rk = pk.m === "flip" ? "f" : "n", rep = d.m[rk] && d.m[rk].v[d.m[rk].r || 0];
     const em = pk.w ? "⚠️" : !pk.m ? "⛔" : pk.m === "flip" ? "⚡" : "🎯";
     const when = new Date(d.t * 1000).toLocaleDateString("ru-RU", {day: "2-digit", month: "2-digit"});
-    return `<button class="x-it" data-xi="${i}"><span style="font-size:16px">${em}</span><div>${xShort(d.a)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
-      <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}</div></div>
+    const g = d.gp, medal = g ? (["🥇", "🥈", "🥉"][g.pl - 1] || g.pl + ".") : "";
+    const gl = g ? [g.ns ? `первым в ${g.fi} из ${g.ns}` + (g.lg != null ? (g.lg <= 0 ? " · обычно первый" : ` · отстаёт ${xDur(g.lg)}`) : "") : "",
+                    g.bd != null ? `плохих ${Math.round(g.bd * 100)}%` : ""].filter(Boolean).join(" · ") : "";
+    return `<button class="x-it" data-xi="${i}"><span style="font-size:${g && g.pl > 3 ? 13 : 16}px;${g && g.pl > 3 ? "color:var(--hint);font-weight:700;text-align:center" : ""}">${g ? medal : em}</span><div>${xGmS(d.a, d.c)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
+      <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}${gl ? " · " + esc(gl) : ""}</div></div>
       <span></span><span class="x-num ${xCls(rep && rep.tot)}">${rep ? xUsd(rep.tot) : "—"}</span></button>`;
-  }).join("")}</div>`;
+  };
+  // Пачки — одной рамкой своего цвета, по местам из сравнения; одиночные поиски — обычным списком
+  const GPC = ["#a78bfa", "#38bdf8", "#f5a524", "#f472b6", "#34d399", "#fb7185", "#facc15"];
+  const gcol = id => GPC[[...String(id)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) >>> 0, 7) % GPC.length];
+  const done = new Set(); let out = "", run = [];
+  const flush = () => { if (run.length){ out += `<div class="x-card x-list">${run.join("")}</div>`; run = []; } };
+  ST.list.forEach((d, i) => {
+    if (!d.gp){ run.push(item(d, i)); return; }
+    if (done.has(d.gp.id)) return;
+    done.add(d.gp.id); flush();
+    const mem = ST.list.map((x, j) => [x, j]).filter(([x]) => x.gp && x.gp.id === d.gp.id).sort((a, b) => a[0].gp.pl - b[0].gp.pl);
+    const g = d.gp, c = gcol(g.id), top = mem[0][0];
+    const when = new Date((g.t || d.t) * 1000).toLocaleDateString("ru-RU", {day: "2-digit", month: "2-digit"});
+    out += `<div class="x-card x-list x-gp" style="--gc:${c}"><div class="x-gph"><b>👥 Пачка · ${mem.length} кош.</b><span>${when}${g.sh != null ? ` · общих токенов ${g.sh} из ${g.tk}` : ""}${g.op ? " · похоже на одного оператора" : ""}</span></div>
+      ${mem.map(([x, j]) => item(x, j)).join("")}
+      <div class="x-gpf">→ Копируй <b>${xShort(top.a)}</b>: раньше заходит и/или меньше плохих сделок</div></div>`;
+  });
+  flush();
+  return h + out;
 }
 function stHome(D){
-  let h = xHead("Стратегия", `${xShort(D.a)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
+  let h = xHead("Стратегия", `${xGmA(D.a, D.c)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
   h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">📊 Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">⚡ Сделки кошелька</button></div>` : "")
     + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">🧪 Свой бэктест</button>`
     + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
@@ -1807,7 +1844,7 @@ function xTrades(D, o, color){
 }
 function stDetail(D){
   const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
-  let h = xHead(M.t, `${xShort(D.a)} · ${String(D.p).replace("d", " дн")}`, "home");
+  let h = xHead(M.t, `${xGmA(D.a, D.c)} · ${String(D.p).replace("d", " дн")}`, "home");
   h += `<div class="x-2"><div class="x-l">`;
   h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
   h += xTiles(v);
@@ -1978,7 +2015,7 @@ function qTabHTML(){
 }
 function stQuick(){
   const per = ["7d", "30d", "60d", "90d"], f = QK.f;
-  let h = xHead("Сделки кошелька", `${xShort(QK.addr)} · ${esc(xCH[QK.chain] || QK.chain)} · ${QK.per.replace("d", " дн")}`, QK.back);
+  let h = xHead("Сделки кошелька", `${xGmA(QK.addr, QK.chain)} · ${esc(xCH[QK.chain] || QK.chain)} · ${QK.per.replace("d", " дн")}`, QK.back);
   const have = (ST.list || []).findIndex(d => d.a === QK.addr);
   const busy = ST.job && ST.job.state === "run";
   const inp = (k, label, ph) => `<label class="x-fl">${label}<input data-qf="${k}" value="${esc(f[k] == null ? "" : f[k])}" placeholder="${ph}" ${k === "q" ? 'spellcheck="false"' : 'inputmode="decimal"'}></label>`;
@@ -2122,6 +2159,7 @@ document.addEventListener("click", async e => {
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
+  if (t.closest("[data-xgm]")) return;   // тап по адресу — это ссылка на GMGN, а не открытие поиска
   const it = t.closest("[data-xi]"); if (it){ stOpenItem(+it.dataset.xi); render(); window.scrollTo(0, 0); return; }
   const o = t.closest("[data-xo]"); if (o){ const [m, k] = o.dataset.xo.split(":"); ST.m = m; ST.k = +k; ST.v = "detail"; ST.bt = null; render(); window.scrollTo(0, 0); return; }
   const b = t.closest("[data-xb]"); if (b){ ST.v = b.dataset.xb; render(); window.scrollTo(0, 0); return; }
