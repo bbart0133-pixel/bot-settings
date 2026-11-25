@@ -10,7 +10,7 @@
 <style>
 :root{
   --bg:#050607; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
-  --text:#eef2f2; --hint:#8a9696; --dim:#6b7878; --mute:#4b5858;
+  --text:#eef2f2; --hint:#afb8b8; --dim:#97a0a0; --mute:#737d7d;
   --acc:#2dd4bf; --acc-l:#5eead4; --acc-xl:#ccfbf1; --acc-ink:#032622;
   --bad:#f87171; --bad-l:#fca5a5; --warn:#fbbf24;
   --hd:Onest,system-ui,sans-serif;
@@ -23,7 +23,7 @@
 :root[data-theme="sol"]{
   --bg:#07050d; --card:#0e0b17; --card2:#09070f; --line:#241d3a; --line2:#17122a; --chip:#1b1430;
   --acc:#14f195; --acc-l:#5ff7b6; --acc-xl:#d4fde9; --acc-ink:#03210f; --rgb:20,241,149;
-  --pill:#c4a5ff; --hline:#2f2356; --hbg:#09060f; --hint:#9690a8; --dim:#78718c; --mute:#4f4866;
+  --pill:#c4a5ff; --hline:#2f2356; --hbg:#09060f; --hint:#b8b4c4; --dim:#a09cae; --mute:#767088;
   --glow:rgba(153,69,255,.6); --glow2:rgba(20,241,149,.32);
   --mk:linear-gradient(135deg,#b07cff 10%,#7a5cff 45%,#14f195 90%);
   --g1:#b07cff; --g2:#7a5cff; --g3:#14f195;
@@ -31,7 +31,7 @@
 :root[data-theme="bsc"]{
   --bg:#070604; --card:#12100a; --card2:#0b0906; --line:#2c2513; --line2:#1d180d; --chip:#251e0b;
   --acc:#f0b90b; --acc-l:#f8d14a; --acc-xl:#fdf0c4; --acc-ink:#1f1600; --rgb:240,185,11;
-  --pill:#f8d14a; --hline:#3d3112; --hbg:#0a0805; --hint:#9a927e; --dim:#7d7563; --mute:#544d3d;
+  --pill:#f8d14a; --hline:#3d3112; --hbg:#0a0805; --hint:#bab5a7; --dim:#a49e92; --mute:#7a7468;
   --glow:rgba(240,185,11,.42); --glow2:rgba(240,185,11,.12);
   --mk:linear-gradient(135deg,#ffe27a,#f0b90b 60%,#c98f00);
   --g1:#ffe27a; --g2:#f0b90b; --g3:#d99a00;
@@ -39,7 +39,7 @@
 :root[data-theme="rh"]{
   --bg:#030a06; --card:#08140d; --card2:#050e09; --line:#163323; --line2:#0f2418; --chip:#0e2717;
   --acc:#3ee07a; --acc-l:#7aeea6; --acc-xl:#d9fbe6; --acc-ink:#032712; --rgb:62,224,122;
-  --pill:#e7c97e; --hline:#1f4a32; --hbg:#04100a; --hint:#8aa597; --dim:#6b8778; --mute:#47604f;
+  --pill:#e7c97e; --hline:#1f4a32; --hbg:#04100a; --hint:#afc2b8; --dim:#97aba0; --mute:#6f8376;
   --glow:rgba(30,150,80,.55); --glow2:rgba(214,180,106,.28);
   --mk:linear-gradient(135deg,#7aeea6,#3ee07a 50%,#e7c97e);
   --g1:#b8f7cf; --g2:#3ee07a; --g3:#e7c97e;
@@ -47,7 +47,7 @@
 :root[data-theme="arc"]{
   --bg:#04060c; --card:#0a0f1b; --card2:#070b14; --line:#1a2540; --line2:#121a2e; --chip:#111c36;
   --acc:#4d8dff; --acc-l:#86b2ff; --acc-xl:#dbe8ff; --acc-ink:#020c22; --rgb:77,141,255;
-  --pill:#9cc0ff; --hline:#1f3363; --hbg:#060a14; --hint:#8c97ad; --dim:#6d7890; --mute:#495368;
+  --pill:#9cc0ff; --hline:#1f3363; --hbg:#060a14; --hint:#b1b8c7; --dim:#99a0b1; --mute:#717989;
   --glow:rgba(77,141,255,.5); --glow2:rgba(120,220,255,.2);
   --mk:linear-gradient(135deg,#9cc0ff,#4d8dff 55%,#78dcff);
   --g1:#c3d8ff; --g2:#4d8dff; --g3:#78dcff;
@@ -55,7 +55,7 @@
 :root[data-theme="ely"]{
   --bg:#09050b; --card:#140b17; --card2:#0d070f; --line:#33193a; --line2:#221126; --chip:#2a1231;
   --acc:#e06cf5; --acc-l:#ee9ff9; --acc-xl:#fbe3fe; --acc-ink:#24052b; --rgb:224,108,245;
-  --pill:#f0b0fa; --hline:#4a2156; --hbg:#0c060e; --hint:#a291a8; --dim:#83708a; --mute:#5a4a60;
+  --pill:#f0b0fa; --hline:#4a2156; --hbg:#0c060e; --hint:#c0b4c4; --dim:#a89bad; --mute:#7e7283;
   --glow:rgba(224,108,245,.5); --glow2:rgba(255,160,120,.2);
   --mk:linear-gradient(135deg,#f5b8ff,#e06cf5 55%,#ff9f7a);
   --g1:#f5b8ff; --g2:#e06cf5; --g3:#ff9f7a;
@@ -275,17 +275,13 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
     repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 3px)}
 /* Фон под сеть: бледный график (свечи / линия / соты), снизу ярче, к верху тает — текст не мешает */
-#bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;
+#bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.38;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%);mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%)}
 #bgfx svg{position:absolute;inset:0;width:100%;height:100%}
-/* логотип внизу главной: буквы белые, снег голубой */
-.flogo{display:flex;justify-content:center;margin:18px 0 0;opacity:.85;text-shadow:0 0 6px var(--bg),0 0 2px var(--bg);pointer-events:none;user-select:none}
-.flogo .lgo{margin:0;white-space:pre;line-height:1.15;font:600 calc(min(100vw,560px) * .62 / 28 / .6) / 1.15 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#e9eaee}
-.flogo .lgt{color:#3ccf74}.flogo .lgs{color:#ffd54a}.flogo .lgb1{color:#ff5a5a}.flogo .lgb2{color:#4da3ff}.flogo .lgn{color:#9fb3ff}
 /* карточки над графиком — матовые: график под ними размыт, текст читается */
 .card,.tile,.hero,.list,.x-card{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.card,.tile{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.075);box-shadow:none}
-.hero{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+.card,.tile{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.hero{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);box-shadow:none}
 .hero .glow,.hero .dots{display:none}
 .hero .mark{opacity:.13}
 .glass{background:rgba(16,16,20,.72);-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35)}
@@ -293,7 +289,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .nav button{border-radius:18px}
 .nav button.on{background:rgba(255,255,255,.08);color:var(--text);box-shadow:none}
 .nav button.on svg{color:var(--acc)}
-.chip{background:transparent;border-color:rgba(255,255,255,.1);box-shadow:none;color:var(--hint)}
+.chip{background:transparent;border-color:rgba(255,255,255,.15);box-shadow:none;color:var(--hint)}
 .chip.on{background:rgba(var(--rgb),.12);border-color:var(--acc);color:var(--text);box-shadow:none}
 .cta{box-shadow:none}
 .bar .tr i{background:var(--acc)}
@@ -314,7 +310,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .sheet{background:rgba(0,0,0,.5);-webkit-backdrop-filter:none;backdrop-filter:none}
 
 /* ===== 🧠 Стратегия ===== */
-.x{--x-acc:var(--acc);--x-rgb:var(--rgb);--x-flip:#ffb547;--x-fliprgb:255,181,71;--x-warn:#f5c451;--x-bad:#ff6b6b;--x-line:rgba(255,255,255,.075);--x-card:rgba(255,255,255,.028)}
+.x{--x-acc:var(--acc);--x-rgb:var(--rgb);--x-flip:#ffb547;--x-fliprgb:255,181,71;--x-warn:#f5c451;--x-bad:#ff6b6b;--x-line:rgba(255,255,255,.12);--x-card:rgba(255,255,255,.045)}
 :root[data-theme="bsc"] .x{--x-flip:#a78bfa;--x-fliprgb:167,139,250}
 .x button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
 .x-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -349,7 +345,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .x-spark{position:absolute;right:14px;top:30px;width:96px;height:40px}
 .x-chev{position:absolute;right:14px;bottom:14px;color:var(--dim)}
 .x-list{padding:2px 14px}
-.x-it{display:grid!important;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:11px 2px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:13.5px;width:100%}
+.x-it{display:grid!important;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:11px 2px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;font-size:13.5px;width:100%}
 .x-it:last-child{border-bottom:0!important}
 .x-it.x-iw{grid-template-columns:30px 1fr auto auto}
 /* значок кошелька: узор 5×5 из адреса, цвет — тип стратегии */
@@ -367,7 +363,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .x-tile{background:var(--x-card);border:1px solid var(--x-line);border-radius:14px;padding:10px}
 .x-tile .x-k{font-size:11.5px;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .x-tile .x-v{font-size:18px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
-.x-s{display:grid!important;grid-template-columns:auto minmax(0,1fr) 32px;align-items:center;gap:8px;padding:10px 14px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:13.5px;width:100%}
+.x-s{display:grid!important;grid-template-columns:auto minmax(0,1fr) 32px;align-items:center;gap:8px;padding:10px 14px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;font-size:13.5px;width:100%}
 .x-s:last-child{border-bottom:0!important}
 .x-s .x-k{color:var(--hint);white-space:nowrap}
 .x-s .x-v{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
@@ -387,16 +383,16 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!important}
 .x-fl{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--hint)}
 .x-fl input{height:44px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 15px var(--hd);padding:0 12px;width:100%;outline:none}
-.x-tg{display:flex!important;align-items:center;justify-content:space-between;padding:12px 14px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:14px;width:100%}
+.x-tg{display:flex!important;align-items:center;justify-content:space-between;padding:12px 14px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;font-size:14px;width:100%}
 .x-tg:last-child{border-bottom:0!important}
 .x-sw{width:44px;height:26px;border-radius:13px;background:rgba(255,255,255,.12);position:relative;flex:0 0 44px}
 .x-sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
 .x-sw.on{background:var(--acc)}.x-sw.on::after{left:21px}
 .x-tw{padding:0!important;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .x-tb{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
-.x-tb th{position:sticky;top:0;font-size:11px;font-weight:600;color:var(--dim);text-align:right;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;background:#0c0b12}
+.x-tb th{position:sticky;top:0;font-size:11px;font-weight:600;color:var(--hint);text-align:right;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;background:#0c0b12}
 .x-tb th.on{color:var(--text)}
-.x-tb td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.05)}
+.x-tb td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
 .x-tb tr:last-child td{border-bottom:0}
 .x-tb .x-st{position:sticky;left:0;text-align:left;background:#0c0b12;z-index:1;box-shadow:1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.w .x-st{box-shadow:inset 3px 0 0 rgba(var(--x-rgb),.7),1px 0 0 rgba(255,255,255,.06)}
@@ -463,6 +459,32 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 /* спиннер «бот работает» */
 .spin{display:inline-block;width:10px;font-family:var(--mono);color:var(--acc);line-height:1}
 @media (prefers-reduced-motion:reduce){.seg i{transition:none}}
+/* PnL по дням */
+.x-calc{margin-top:10px;padding:12px 14px!important}
+.x-calh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:6px 0 10px;min-height:26px}
+.x-calb{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:-.4px}
+.x-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.x-cal .wd{font-size:10.5px;color:var(--dim);text-align:center;padding-bottom:2px}
+.x-cal button{all:unset;cursor:pointer;box-sizing:border-box;aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 5px;font-size:10.5px;min-width:0}
+.x-cal button .d{color:rgba(255,255,255,.65)}
+.x-cal button .p{font-family:var(--mono);font-size:10px;letter-spacing:-.3px;text-align:right;white-space:nowrap;overflow:hidden}
+.x-cal button.no{background:rgba(255,255,255,.035)}.x-cal button.no .d{color:var(--mute)}
+.x-cal button.td{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.x-cal button.on{outline:1.5px solid #fff;outline-offset:1px}
+.x-cal button:focus-visible{outline:2px solid var(--acc)}
+.x-call{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;font-size:12.5px;color:var(--hint)}
+.x-call div{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+@media (min-width:560px){.x-cal button .p{font-size:11px}}
+@media (min-width:1180px){.x-cal{max-width:520px}}
+.as-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(16px);opacity:0;transition:.2s;z-index:99;
+  display:flex;align-items:center;gap:12px;max-width:min(92vw,460px);background:#1b1e22;border:1px solid rgba(255,255,255,.14);padding:9px 10px 9px 14px;border-radius:14px;font-size:13px;color:#eef1f3;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.as-toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.as-toast span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.as-toast.bad{border-color:rgba(248,113,113,.6);color:#fecaca}.as-toast.bad span{white-space:normal}
+.as-toast button{flex:0 0 auto;height:32px;padding:0 12px;border-radius:10px;border:1px solid rgba(var(--rgb),.5);background:rgba(var(--rgb),.12);color:var(--acc-l);font:600 13px Onest,system-ui,sans-serif;cursor:pointer}
+body.ext .as-toast{bottom:20px}
+body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
+.as-toast.bad{min-width:min(92vw,340px)}
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -856,7 +878,8 @@ function presetsHTML(){
   const names = Object.keys(P.ps || {});
   let h = topHTML("Пресеты", true) + `<div class="dk"><div class="dl"><div class="sec">Сохранить текущие как новый</div><div class="card"><div class="pc">
     <input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета">
-    <div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div></div></div></div><div class="dr">
+    ${AUTO() ? `<button class="btn pri" data-saveas="1" style="margin-top:8px;width:100%;height:42px">Сохранить как новый</button><div class="sm">Сохранятся текущие настройки, выбранный пресет не изменится.</div>`
+      : `<div class="sm">Сохранится вместе с остальными изменениями.</div>`}<div class="ferr" id="saerr" style="display:none"></div></div></div></div><div class="dr">
     <div class="sec">Мои пресеты<i>${names.length}</i></div><div class="card">`;
   if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — сохрани текущие настройки как новый.</div></div>`;
   names.forEach(n => {
@@ -927,23 +950,6 @@ function bgFx(t){
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice">${grid}${body}</svg>`;
 }
-// Логотип LUPA 028 внизу главной: буквы белые, снег — голубые точки и звёздочки
-const LOGO_TXT = [" .  __    __  __ ____   ___", "   / /   / / / // __ \\ /   |", "  / /   / / / // /_/ // /| |", " / /___/ /_/ // ____// ___ |", "/_____/\\____//_/    /_/  |_|", "         ____  ___   ____  *", "        / __ \\|__ \\ ( __ )", "       / / / /__/ // __  | .", "      / /_/ // __// /_/ /", "      \\____//____/\\____/   *"];
-const LOGO_HTML = (() => {
-  let ball = 0;
-  const rows = LOGO_TXT.map((ln, r) => [...ln].map((ch, c) => {
-    const e = esc(ch); if (ch === " ") return " ";
-    if (r >= 5 && c <= 5){   // ёлка
-      if (ch === "*") return `<span class="lgs">*</span>`;
-      if (ch === "o") return `<span class="${ball++ % 2 ? "lgb2" : "lgb1"}">o</span>`;
-      if (ch === ".") return `<span class="lgs">.</span>`;
-      return `<span class="lgt">${e}</span>`;
-    }
-    if ((ch === "*" || ch === ".") ) return `<span class="lgn">${e}</span>`;
-    return e;
-  }).join(""));
-  return `<pre class="lgo">${rows.join("\n")}</pre>`;
-})();
 function render(keepScroll){
   document.body.classList.add("wide"); document.body.dataset.scr = screen;
   applyTheme();
@@ -978,9 +984,9 @@ function refreshRow(k){
 function updateDock(){
   const n = changeList().length;
   document.getElementById("nav").innerHTML = navHTML();
-  const ab = document.getElementById("abar"); ab.classList.toggle("on", n > 0);
+  const ab = document.getElementById("abar"); ab.classList.toggle("on", n > 0 && (!AUTO() || !!AS.fail));
   document.getElementById("bsave").textContent = `Сохранить (${n})`;
-  document.getElementById("app").style.paddingBottom = n ? "230px" : "170px";
+  document.getElementById("app").style.paddingBottom = ab.classList.contains("on") ? "230px" : "170px";
 }
 function openRun(){
   const n = changeList().length;
@@ -1058,6 +1064,7 @@ async function sendLive(out){
   } catch (e) { r = null; }
   sending = false;
   if (!r || !r.ok){ sendChat(out); return; }   // сервер не ответил — по-старому, через чат
+  AS.fail = "";
   const np = norm(r.d && decode(r.d));
   if (np && np.s){
     P = np; ops = []; renames = {}; saveAsName = "";
@@ -1088,7 +1095,8 @@ document.addEventListener("click", e => {
   const wk = e.target.closest("[data-wk]"); if (wk){ const [id, i] = wk.dataset.wk.split(":"); ocTip[id] = +i; render(true); return; }
   const oc = e.target.closest("[data-oc]"); if (oc){ ocChain = oc.dataset.oc; ocMsg = ""; ocTip = {}; render(true); return; }
   const pk = e.target.closest("[data-pick]"); if (pk){ openPicker(); return; }
-  const pv = e.target.closest("[data-pv]"); if (pv){ pickPreset(pv.dataset.pv); closeReview(); return; }
+  if (e.target.closest("[data-saveas]")){ if (!saveAsName){ asToast("Впиши имя нового пресета", null, 2200, true); return; } AS.saveAs = true; asFlush(); return; }
+  const pv = e.target.closest("[data-pv]"); if (pv){ closeReview(); asPreset(pv.dataset.pv); return; }
   const g = e.target.closest("[data-go]"); if (g){ go(g.dataset.go, g.dataset.to); return; }
   const sb = e.target.closest("[data-sub]"); if (sb){ fsub = sb.dataset.sub; render(); return; }
   const ac = e.target.closest("[data-act]"); if (ac){ openRun(); return; }
@@ -1100,21 +1108,21 @@ document.addEventListener("click", e => {
     const k = s.dataset.s, o = optsOf(findRow(k)).find(o => String(o[0]) === s.dataset.v);
     cur[k] = o ? o[0] : s.dataset.v;
     s.parentNode.querySelectorAll(`[data-s="${k}"]`).forEach(b => b.classList.toggle("on", b === s));
-    tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); refreshRow(k); return;
+    tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); refreshRow(k); asQueue(400); return;
   }
-  const q = e.target.closest("[data-q]"); if (q){ cur[q.dataset.q] = Number(q.dataset.v); refreshRow(q.dataset.q); return; }
+  const q = e.target.closest("[data-q]"); if (q){ cur[q.dataset.q] = Number(q.dataset.v); refreshRow(q.dataset.q); asQueue(400); return; }
   const a = e.target.closest("[data-a]");
   if (a){
     const n = a.closest("[data-p]").dataset.p, act = a.dataset.a;
-    if (act === "use") pickPreset(n);
-    else if (act === "del"){ if (a.dataset.sure){ ops.push(["delete", n]); delete renames[n]; if (sel === n) pickPreset(""); else render(true); } else { a.dataset.sure = "1"; a.textContent = "Точно удалить?"; } }
+    if (act === "use") asPreset(n);
+    else if (act === "del"){ if (a.dataset.sure){ ops.push(["delete", n]); delete renames[n]; if (sel === n) pickPreset(""); else render(true); asQueue(0); } else { a.dataset.sure = "1"; a.textContent = "Точно удалить?"; } }
     else if (act === "undel"){ ops = ops.filter(o => !(o[0] === "delete" && o[1] === n)); render(true); }
     else if (act === "ren"){ const box = a.closest("[data-acts]"); box.innerHTML = `<div class="irow"><input class="ti" maxlength="40" value="${esc(renames[n] || n)}" aria-label="Новое имя"><button class="btn pri" data-a="renok">OK</button></div>`; box.querySelector("input").focus(); }
     else if (act === "renok"){
       const v = a.parentNode.querySelector("input").value.trim();
       const taken = Object.keys(P.ps).filter(x => x !== n).map(x => renames[x] || x);
       if (v && v !== n && !taken.includes(v)) renames[n] = v; else delete renames[n];
-      render(true);
+      render(true); asQueue(0);
     }
   }
 });
@@ -1125,7 +1133,7 @@ document.addEventListener("input", e => {
     err.style.display = taken ? "" : "none"; err.textContent = taken ? "Такой пресет уже есть — выбери другое имя" : "";
     saveAsName = taken ? "" : v; updateDock(); return;
   }
-  if (i.dataset && i.dataset.sl){ cur[i.dataset.sl] = Number(i.value); refreshRow(i.dataset.sl); return; }
+  if (i.dataset && i.dataset.sl){ cur[i.dataset.sl] = Number(i.value); refreshRow(i.dataset.sl); asQueue(700); return; }
   const k = i.dataset && i.dataset.k; if (!k) return;
   if (i.type === "checkbox"){
     cur[k] = i.checked ? 1 : 0;
@@ -1137,7 +1145,92 @@ document.addEventListener("input", e => {
     cur[k] = s === "" || isNaN(Number(s)) ? 0 : Number(s);
   }
   refreshRow(k);
+  asQueue(i.type === "checkbox" ? 300 : 1000);   // число — когда перестал печатать
 });
+// вышел из поля — сохраняем сразу, не дожидаясь паузы
+document.addEventListener("change", e => { const i = e.target; if (i.dataset && (i.dataset.k || i.dataset.sl) && i.type !== "checkbox") asQueue(150); });
+// ===== Автосохранение: поменял — через ~1 с ушло боту в /api/apply, окно не закрывается =====
+// • шлём только изменённые поля (set), чтобы два окна (телефон и ПК) не затирали друг другу настройки
+// • запросы строго по очереди: следующий — после ответа на предыдущий
+// • «от» больше «до» — такое поле не шлём, пока не исправят (строка уже подсвечена)
+// • не прошло (403 / сервер молчит) — заметный тост, строки остаются отмеченными, возвращается кнопка «Сохранить»
+// • без сервера бота (P.sa/P.sk нет) — всё как раньше: кнопка «Сохранить» и отправка через чат
+const AS = {t: null, busy: false, again: false, fail: "", saveAs: false};
+function AUTO(){ return !!(P && P.sa && P.sk); }
+function asQueue(ms){ if (!AUTO()){ updateDock(); return; } clearTimeout(AS.t); AS.t = setTimeout(() => asFlush(), ms == null ? 1000 : ms); }
+function asBadRange(k){ const r = findRow(k); if (!r || r.t !== "range") return false; const a = num(cur[r.k]), b = num(cur[r.k2]); return !!(a && b && a > b); }
+// выбор пресета: сразу переключает активный пресет у бота (и для ночного парса) — поэтому тост с «Отменить»
+function asPreset(name){
+  const prev = sel; pickPreset(name);
+  if (!AUTO() || name === prev) return;
+  asFlush({presetUndo: prev});
+}
+function asToast(msg, undo, ms, bad){
+  let el = document.getElementById("astoast");
+  if (!el){ el = document.createElement("div"); el.id = "astoast"; el.className = "as-toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.classList.toggle("bad", !!bad);
+  el.innerHTML = `<span>${esc(msg)}</span>${undo ? `<button type="button">Отменить</button>` : ""}`;
+  if (undo) el.querySelector("button").onclick = () => { el.classList.remove("on"); undo(); };
+  el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), ms || 3500);
+}
+async function asFlush(opt){
+  opt = opt || {}; clearTimeout(AS.t);
+  if (!AUTO()) return;
+  if (AS.busy){ AS.again = true; return; }
+  const keys = changedKeys().filter(k => !asBadRange(k)), pre = presetChanged();
+  const sendOps = ops.slice(), sendRen = Object.assign({}, renames), saveAs = AS.saveAs && saveAsName ? saveAsName : "";
+  AS.saveAs = false;
+  if (!keys.length && !pre && !sendOps.length && !Object.keys(sendRen).length && !saveAs){ updateDock(); return; }
+  const set = {}, prev = {}; keys.forEach(k => { set[k] = cur[k]; prev[k] = base[k]; });   // старые значения — до отправки
+  const out = {v: 3, preset: sel, set, ops: []};
+  Object.keys(sendRen).forEach(o => out.ops.push(["rename", o, sendRen[o]]));
+  sendOps.forEach(o => out.ops.push(o.slice()));
+  out.m = {chain: cur["m.chain"], period: cur["m.period"]};
+  if (saveAs) out.save_as = saveAs;
+  AS.busy = true;
+  let r = null, st = 0;
+  try {
+    const res = await fetch(`${P.sa}/api/apply?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify(out), cache: "no-store"});
+    st = res.status; r = res.ok ? await res.json() : null;
+  } catch (e) { r = null; }
+  AS.busy = false;
+  if (!r || !r.ok){
+    AS.fail = st === 403 ? "Не сохранено — ключ устарел, отправь боту /app" : "Не сохранено — сервер бота не ответил";
+    asToast(AS.fail, null, 6000, true);
+    try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("error"); } catch (e) {}
+    AS.again = false; updateDock(); return;
+  }
+  AS.fail = "";
+  // что ушло — теперь сохранено; что поменяли, пока шёл запрос, остаётся «изменённым» и уйдёт следующим
+  keys.forEach(k => { base[k] = set[k]; });
+  ops = ops.filter(o => !sendOps.includes(o));
+  Object.keys(sendRen).forEach(o => { if (renames[o] === sendRen[o]) delete renames[o]; });
+  if (saveAs && saveAsName === saveAs){ saveAsName = ""; const n = document.getElementById("saname"); if (n) n.value = ""; }
+  const np = norm(r.d && decode(r.d));
+  if (np && np.s){
+    P.ps = np.ps || P.ps; P.s = np.s;
+    start = Object.assign({}, np.s, {"m.chain": start["m.chain"], "m.period": start["m.period"]});
+    if (np.p !== undefined){ P.p = np.p; if (saveAs || Object.keys(sendRen).includes(sel)) sel = np.p || ""; }
+  } else P.p = sel;
+  if (pre && !np) P.p = sel;
+  // тост: что сохранилось + «Отменить»
+  const pname = sel ? `«${sel}»` : "настройки без пресета";
+  let msg, undo = null;
+  if (opt.undone) msg = "Отменено";
+  else if (saveAs) msg = `Новый пресет «${saveAs}» сохранён`;
+  else if (pre){ msg = sel ? `В боте теперь пресет «${sel}»` : "В боте теперь без пресета"; if (opt.presetUndo !== undefined){ const pv = opt.presetUndo; undo = () => { pickPreset(pv); asFlush({undone: true}); }; } }
+  else if (keys.length){
+    msg = keys.length === 1 ? `Сохранено: ${labelOf(keys[0])} ${valText(keys[0], set[keys[0]])}` : `Сохранено в ${pname} · ${keys.length} изм.`;
+    undo = () => { keys.forEach(k => { cur[k] = prev[k]; }); render(true); asFlush({undone: true}); };
+  } else msg = "Сохранено";
+  asToast(msg, undo, undo ? 4500 : 2200);
+  try { inTG && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); } catch (e) {}
+  // перерисовка без потери фокуса: если человек печатает в поле — трогаем только отметки строк
+  const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest("#app") && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if (pre || saveAs || sendOps.length || Object.keys(sendRen).length || !typing) render(true);
+  else { keys.forEach(k => refreshRow(k)); updateDock(); }
+  if (AS.again){ AS.again = false; asFlush(); }
+}
 document.getElementById("bsave").onclick = () => openReview("save");
 document.getElementById("bfind").onclick = () => openRun();
 document.getElementById("sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeReview(); });
@@ -1605,6 +1698,31 @@ function xEqBox(pts, mark, color){
 const xK = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return s + "$" + (a >= 1e4 ? Math.round(a / 1e3) + "K" : a >= 1e3 ? (a / 1e3).toFixed(1).replace(".0", "") + "K" : Math.round(a)); };
 const xDd = (ts, full) => { const d = new Date(ts * 1000); const s = String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0");
   return full ? s + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") : s; };
+// ===== PnL копии по дням: календарь. Сделки — по дню выхода (когда деньги зафиксированы), день — по местному времени.
+// Сумма всех клеток = итог «Баланса копии». Тап по дню — сделки этого дня, повторный тап — сброс.
+function xCalHTML(pts, per){
+  if (!pts || !pts.length) return "";
+  const D0 = xD(), key = [D0 && D0.api, ST.v, ST.m, ST.k].join("|");
+  if (!ST.cal || ST.cal.key !== key) ST.cal = {key, i: null};
+  const n = Math.max(7, parseInt(per, 10) || 30), t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  const days = [...Array(n)].map((_, i) => { const d = new Date(t0); d.setDate(d.getDate() - (n - 1 - i)); return {dt: d, tr: [], p: 0}; });
+  pts.forEach(x => { const d = new Date(x.ex * 1000); d.setHours(0, 0, 0, 0); const i = Math.max(0, Math.min(n - 1, Math.round((d - days[0].dt) / 864e5))); days[i].tr.push(x); days[i].p += x.p; });
+  const mx = Math.max(...days.map(d => Math.abs(d.p)), 1), act = days.filter(d => d.tr.length), tot = days.reduce((a, d) => a + d.p, 0);
+  const fd = d => String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0");
+  const WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+  const sh = v => { const a = Math.abs(v), sg = v < 0 ? "−" : "+"; if (a < .5) return "0"; return sg + (a >= 1000 ? (a / 1000).toFixed(1).replace(".0", "") + "K" : Math.round(a)); };
+  const sel = ST.cal.i != null && days[ST.cal.i] ? days[ST.cal.i] : null;
+  const best = act.reduce((a, d) => !a || d.p > a.p ? d : a, null), worst = act.reduce((a, d) => !a || d.p < a.p ? d : a, null);
+  const head = sel ? `<span class="x-calb ${xCls(sel.p)}">${sel.tr.length ? xUsd(sel.p) : "$0"}</span><span class="x-m">${WD[sel.dt.getDay()]} ${fd(sel.dt)} · ${sel.tr.length ? sel.tr.length + " сд." : "сделок не было"}</span>`
+    : `<span class="x-calb ${xCls(tot)}">${xUsd(tot)}</span><span class="x-m">за ${n} дн · в плюсе ${act.filter(d => d.p > 0).length} из ${act.length} дней со сделками</span>`;
+  const cells = days.map((d, i) => { const a = (.12 + Math.abs(d.p) / mx * .6).toFixed(2), bg = !d.tr.length ? "" : d.p >= 0 ? `background:rgba(var(--x-rgb),${a})` : `background:rgba(255,107,107,${a})`;
+    return `<button class="${d.tr.length ? "" : "no"}${i === n - 1 ? " td" : ""}${ST.cal.i === i ? " on" : ""}" style="${bg}" data-xcal="${i}" aria-label="${fd(d.dt)}: ${d.tr.length ? xUsd(d.p) : "нет сделок"}"><span class="d">${d.dt.getDate()}</span><span class="p">${d.tr.length ? sh(d.p) : ""}</span></button>`; }).join("");
+  const list = sel ? (sel.tr.length ? sel.tr.slice().sort((a, b) => b.p - a.p).map(x => `<div><span>${esc(x.s || "?")}${x.te ? ' <i class="x-new">нов.</i>' : ""}</span><span class="x-num ${xCls(x.p)}">${x.r > 0 ? "+" : ""}${Math.round(x.r * 100)}% · ${xUsd(x.p)}</span></div>`).join("") : "<div>в этот день копия не торговала</div>")
+    : best ? `<div><span>лучший день</span><span class="x-num x-ok">${fd(best.dt)} · ${xUsd(best.p)}</span></div><div><span>худший день</span><span class="x-num ${xCls(worst.p)}">${fd(worst.dt)} · ${xUsd(worst.p)}</span></div>` : "";
+  return `<div class="x-card x-calc"><div class="x-mh" style="padding:0"><b style="font-size:13px">PnL по дням</b> · по дню выхода из сделки</div>
+    <div class="x-calh">${head}</div><div class="x-cal">${["пн", "вт", "ср", "чт", "пт", "сб", "вс"].map(x => `<div class="wd">${x}</div>`).join("")}${"<span></span>".repeat((days[0].dt.getDay() + 6) % 7)}${cells}</div>
+    <div class="x-call">${list}</div></div>`;
+}
 function xEqDraw(){
   document.querySelectorAll(".x-eq[data-eq]").forEach(el => {
     const E = XEQ[el.dataset.eq]; if (!E) return;
@@ -1954,8 +2072,9 @@ function stDetail(D){
   if (D.api && !ST.sd[D.api] && !ST.sdErr) stLoadSim(D);
   let eqHtml = xChart(v.eq, v.mk, M.c);
   const sdD = D.api && ST.sd[D.api];
-  if (sdD && v.raw){ try { const o = SIM.backtest(sdD, xRawParams(v.raw)); eqHtml = xEqBox(xEqPts(o, sdD.stake || 100), o.mark, M.c); } catch (e) {} }
-  h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · ${stakeLbl(sdD)} на сделку</div>${eqHtml}</div>`;
+  let calHtml = "";
+  if (sdD && v.raw){ try { const o = SIM.backtest(sdD, xRawParams(v.raw)), pts = xEqPts(o, sdD.stake || 100); eqHtml = xEqBox(pts, o.mark, M.c); calHtml = xCalHTML(pts, D.p); } catch (e) {} }
+  h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · ${stakeLbl(sdD)} на сделку</div>${eqHtml}</div>` + calHtml;
   h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
   h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
   h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(xWithBuy(D, v.s)) + xBlizzBox(D, "detail");
@@ -2014,7 +2133,7 @@ function stBt(D){
     const view = {tot: o.full_total, te: o.test ? o.test.total : null, dd: o.max_dd, n: o.n, wr: o.wr, ls: o.loss_streak};
     h += `<div id="xres">${xTiles(view)}${o.verdict ? `<div class="x-note">${esc(o.verdict[0])} ${esc(o.verdict[1])}</div>` : ""}
       ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">⚠ весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
-      <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xEqBox(xEqPts(o, sd.stake || 100), o.mark, M.c)}</div></div>`;
+      <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xEqBox(xEqPts(o, sd.stake || 100), o.mark, M.c)}</div>${xCalHTML(xEqPts(o, sd.stake || 100), D.p)}</div>`;
     ST.btTrades = o;
   }
   h += `</div><div class="x-l x-btform">`;
@@ -2213,6 +2332,7 @@ async function xBuySave(){
   const v = +String((document.getElementById("xbuyin") || {}).value || "").replace(",", ".");
   if (!(v > 0)){ xToast("Впиши сумму, например 0.1"); return; }
   if (!(P.sa && P.sk)){ xToast("Нужен сервер бота — поставь в Ещё → «Покупка и газ»", 3000); return; }
+  if (AUTO()){ cur[k] = v; xBuyOpen = false; render(true); asFlush(); return; }   // общий механизм автосохранения
   try {
     const res = await fetch(`${P.sa}/api/apply?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "text/plain"},
       body: JSON.stringify({v: 3, preset: sel, set: {[k]: v}, ops: []}), cache: "no-store"});
@@ -2335,6 +2455,7 @@ document.addEventListener("click", async e => {
   if (t.closest("[data-xexclr]")){ if (ST.ex) ST.ex.set.clear(); render(true); return; }
   const xa = t.closest("[data-xexap]"); if (xa && ST.exC){ const c = ST.exC[+xa.dataset.xexap]; if (c){ ST.bt = xParamsToB(c.p); ST.v = "bt"; if (ST.ex) ST.ex.set.clear(); render(); window.scrollTo(0, 0); xToast(c.lbl + " → " + c.val); } return; }
   if (t.closest("[data-xgm]")) return;   // тап по адресу — это ссылка на GMGN, а не открытие поиска
+  const xc = t.closest("[data-xcal]"); if (xc && ST.cal){ const i = +xc.dataset.xcal; ST.cal.i = ST.cal.i === i ? null : i; render(true); return; }
   const it = t.closest("[data-xi]"); if (it){ stOpenItem(+it.dataset.xi); render(); window.scrollTo(0, 0); return; }
   const o = t.closest("[data-xo]"); if (o){ const [m, k] = o.dataset.xo.split(":"); ST.m = m; ST.k = +k; ST.v = "detail"; ST.bt = null; render(); window.scrollTo(0, 0); return; }
   const b = t.closest("[data-xb]"); if (b){ ST.v = b.dataset.xb; render(); window.scrollTo(0, 0); return; }
