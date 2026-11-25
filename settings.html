@@ -347,7 +347,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-idn{display:block;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--ic) 12%,transparent);fill:var(--ic);shape-rendering:crispEdges}
 .x-m{font-size:12px;color:var(--dim)}
 .x-num{font-variant-numeric:tabular-nums;font-weight:600}
-.x-note{font-size:12px;color:var(--dim);margin:10px 4px 0}
+.x-note{font-size:12.5px;color:var(--dim);margin:10px 4px 0}
 .x-btn{display:flex!important;align-items:center;justify-content:center!important;gap:8px;height:50px;border-radius:14px;font-weight:600;font-size:14.5px;width:100%;text-align:center!important}
 .x-ghost{border:1px solid var(--x-line)!important}
 .x-solid{background:var(--acc)!important;color:var(--acc-ink)!important}
@@ -391,17 +391,17 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}
 .x-sw.on{background:var(--acc)}.x-sw.on::after{left:21px}
 .x-tw{padding:0!important;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.x-tb{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
-.x-tb th{position:sticky;top:0;font-size:11px;font-weight:600;color:var(--hint);text-align:right;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;background:#0c0b12}
+.x-tb{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+.x-tb th{position:sticky;top:0;font-size:12.5px;font-weight:600;color:var(--hint);text-align:right;padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;background:#0c0b12}
 .x-tb th.on{color:var(--text)}
-.x-tb td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
+.x-tb td{padding:13px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
 .x-tb tr:last-child td{border-bottom:0}
 .x-tb .x-st{position:sticky;left:0;text-align:left;background:#0c0b12;z-index:1;box-shadow:1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.w .x-st{box-shadow:inset 3px 0 0 rgba(var(--x-rgb),.7),1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.l .x-st{box-shadow:inset 3px 0 0 rgba(255,107,107,.6),1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.o td{opacity:.65}
-.x-tk{display:flex;align-items:center;gap:6px}
-.x-chk{width:17px;height:17px;flex:0 0 auto;margin:0;accent-color:var(--acc);cursor:pointer}
+.x-tk{display:flex;align-items:center;gap:8px}
+.x-chk{width:20px;height:20px;flex:0 0 auto;margin:0;accent-color:var(--acc);cursor:pointer}
 .x-tb tr.xx td{opacity:.38}
 .x-tb tr.xx td.x-st{opacity:1}
 .x-tb tr.xx .x-tl{text-decoration:line-through;opacity:.5}
@@ -411,7 +411,7 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-exr{margin-top:4px}
 .x-exc{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.06)}
 .x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
-.x-ca{width:24px;height:24px;border-radius:7px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
+.x-ca{width:30px;height:30px;border-radius:9px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
 .xq-tip{position:absolute;z-index:3;background:#16141d;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:7px 9px;font-size:11.5px;line-height:1.45;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5);white-space:nowrap;color:var(--text)}
 .xq-tip b{font-size:12px}
 .xq-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--hint);margin-top:6px;flex-wrap:wrap}.xq-row b{color:var(--text)}
@@ -501,17 +501,27 @@ body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
 .x-ch b{font-family:var(--mono);font-weight:500;margin-left:5px;letter-spacing:-.3px}
 .x-ch.ex{border-color:rgba(var(--x-rgb),.45);background:rgba(var(--x-rgb),.08)}
 .x-ch.off,.x-ch.off b{color:var(--dim)}
-/* ===== Стекло намёком: тонкий блик по верхнему краю и лёгкий градиент ===== */
-.card,.tile,.hero,.list,.x-card,.x-tile{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.035))!important;border-color:rgba(255,255,255,.13)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
-.x-gp{border-color:var(--gc)!important}
-.x-mode.x-win{border-color:rgba(var(--x-rgb),.5)!important}
-.x-vd.x-g{border-color:rgba(var(--x-rgb),.45)!important;background:linear-gradient(180deg,rgba(var(--x-rgb),.10),rgba(var(--x-rgb),.05))!important}
-.x-vd.x-w{border-color:rgba(245,196,81,.45)!important;background:linear-gradient(180deg,rgba(245,196,81,.10),rgba(245,196,81,.05))!important}
-.x-vd.x-b{border-color:rgba(255,107,107,.45)!important;background:linear-gradient(180deg,rgba(255,107,107,.10),rgba(255,107,107,.05))!important}
-.x-calc{box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
-.glass{background:rgba(20,20,26,.74)!important;border-color:rgba(255,255,255,.13)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.4)!important}
+/* ===== Карточки: без обводки, чуть светлее фона. Сверху — лёгкая белая кромка по всей ширине,
+   а по центру поверх неё проступает цвет сети и гаснет к краям (--kc — цвет кромки) ===== */
+.card,.tile,.hero,.list,.job,.x-card,.x-tile{
+  --kc:var(--acc);position:relative;
+  border:0!important;background:rgba(255,255,255,.04)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important}
+.card::before,.tile::before,.hero::before,.list::before,.job::before,.x-card::before,.x-tile::before{
+  content:"";position:absolute;left:18%;right:18%;top:0;height:1px;pointer-events:none;z-index:2;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--kc) 55%,transparent),transparent)}
+/* вердикт, лучший режим, пачка — своим цветом и чуть ярче */
+.x-vd.x-g{--kc:var(--x-acc)}.x-vd.x-w{--kc:var(--x-warn)}.x-vd.x-b{--kc:var(--x-bad)}
+.x-vd{background:color-mix(in srgb,var(--kc) 7%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--kc) 45%,transparent)!important}
+.x-mode.x-win{background:rgba(var(--x-rgb),.06)!important;box-shadow:inset 0 1px 0 rgba(var(--x-rgb),.45)!important}
+.x-gp{--kc:var(--gc);box-shadow:inset 0 1.5px 0 color-mix(in srgb,var(--gc) 70%,transparent)!important}
+.x-gph{border-bottom-color:rgba(255,255,255,.08)!important}.x-gpf{border-top-color:rgba(255,255,255,.08)!important}
+/* нижняя панель и шторки — в том же духе */
+.glass{border:0!important;background:rgba(18,18,24,.86)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.45)!important}
+.sh{border:0!important;background:#0e0d13!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 -10px 40px rgba(0,0,0,.5)!important}
+/* кнопки и чипы — тонкая линия, чтобы читались как нажимаемые */
+.chip,.x-chip,.x-tab,.x-ghost,.iconbtn,.x-back,.btn,.ocref{border-color:rgba(255,255,255,.1)!important;box-shadow:none!important}
 .chip.on{background:rgba(var(--rgb),.16)}
-.x-tb th,.x-tb .x-st{background:#121119}
+.x-tb th,.x-tb .x-st{background:#0c0b10}
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -903,7 +913,7 @@ function onchainHTML(){
   return h;
 }
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "25.11 · 04:30 · автосохранение, календарь, без эмодзи";
+const BUILD = "25.11 · 04:55 · карточки без рамок, кромка цвета сети";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ return topHTML("Ещё", true) + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
 function presetSummary(v){
@@ -2071,7 +2081,7 @@ function xTrades(D, o, color, P){
   const dt = ts => new Date(ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}).replace(",", "");
   const mc = x => x == null ? "—" : x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 10000 ? 0 : 1) + "K" : "$" + Math.round(x);
   const hd = (k, l) => `<th data-xsort="${k}" class="${xSort === k ? "on" : ""}">${l}${xSort === k ? (xDir < 0 ? " ↓" : " ↑") : ""}</th>`;
-  const fl = (k, l, n) => `<button class="x-chip${xFlt === k ? " on" : ""}" data-xflt="${k}" style="flex:0 0 auto;height:30px;padding:0 10px;font-size:12px">${l} ${n}</button>`;
+  const fl = (k, l, n) => `<button class="x-chip${xFlt === k ? " on" : ""}" data-xflt="${k}" style="flex:0 0 auto;height:36px;padding:0 13px;font-size:13.5px">${l} ${n}</button>`;
   let h = `<div class="x-sec">Сделки копии · итог <b class="${xCls(sum(all))}">${xUsd(sum(all))}</b></div>
     <div class="x-chips" style="margin:0 0 8px;overflow-x:auto">${fl("all", "Все", all.length)}${fl("win", "Плюс", all.filter(x => x.roi > 0).length)}${fl("loss", "Минус", all.filter(x => x.roi <= 0).length)}${fl("new", "Новые", all.filter(x => x.test).length)}</div>
     ${xExBox(D, sd, P, all, EX, sum)}
@@ -2084,9 +2094,9 @@ function xTrades(D, o, color, P){
       <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * stake)}</span></td>
       <td class="x-m">${x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}${x.mtm ? " · ещё держит — по последней цене" : ""}${x.lots > 1 ? " · " + x.lots + " покупки" : ""}</td></tr>`).join("");
   h += `</tbody></table></div>`;
-  if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:10px 4px 0;font-size:12.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
+  if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:12px 4px 0;font-size:13.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
   if (bad.length){
-    h += `<button class="x-link" data-xbad="1" style="margin:10px 4px 0 12px;font-size:12.5px">${xShowBad ? "Скрыть" : "Показать"} не прошедшие (${bad.length})</button>`;
+    h += `<button class="x-link" data-xbad="1" style="margin:12px 4px 0 12px;font-size:13.5px">${xShowBad ? "Скрыть" : "Показать"} не прошедшие (${bad.length})</button>`;
     if (xShowBad) h += `<div class="x-card x-tw" style="margin-top:8px"><table class="x-tb"><thead><tr><th class="x-st">Токен</th><th>Вход</th><th>Капа</th><th>Сумма</th><th>Почему нет</th></tr></thead><tbody>${bad.map(x => `<tr class="o">
       <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button></div></td><td>${dt(x.t.fb)}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td><td class="x-m">✗ ${esc(x.why)}</td></tr>`).join("")}</tbody></table></div>`;
   }
