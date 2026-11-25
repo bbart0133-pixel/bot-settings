@@ -366,8 +366,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-cp{width:32px;height:32px;border-radius:9px;border:1px solid var(--x-line);display:flex;align-items:center;justify-content:center;color:var(--hint)}
 .x-s.done .x-cp{color:var(--x-acc);border-color:rgba(var(--x-rgb),.5)}
 .x-in{width:100%;height:46px;margin-top:10px;border-radius:12px;border:1px solid var(--x-line);background:rgba(255,255,255,.03);color:var(--text);font:600 14px var(--hd);padding:0 12px;outline:none}
-.x-in.x-ta{height:auto;min-height:46px;max-height:180px;padding:12px;resize:vertical;line-height:1.4;font:600 13px var(--hd);word-break:break-all}
+.x-in.x-ta{height:auto;min-height:46px;max-height:180px;padding:12px;resize:none;overflow:hidden;scrollbar-width:none;line-height:1.4;font:600 13px var(--hd);word-break:break-all}
 .x-in:focus,.x-fl input:focus{border-color:rgba(var(--x-rgb),.6)}
+.x-in.x-ta::-webkit-scrollbar{display:none}
+/* поле адреса + кнопка «Вставить» внутри справа */
+.x-inw{position:relative;margin-top:10px}.x-inw .x-in{margin-top:0;padding-right:112px}
+.x-paste{position:absolute;right:6px;top:6px;height:34px;padding:0 11px;border-radius:9px!important;display:flex;align-items:center;gap:6px;
+  background:rgba(var(--x-rgb),.12)!important;border:1px solid rgba(var(--x-rgb),.4)!important;color:var(--acc-l)!important;font:600 12.5px Onest,system-ui,sans-serif!important}
+.x-paste svg{flex:0 0 auto}
+.x-in.x-ta::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .x-chips{display:flex;gap:6px;margin-top:8px}
 .x-chip{flex:1;height:36px;border-radius:11px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:13px}
 .x-chip.on{border-color:var(--acc)!important;color:var(--text)!important;background:rgba(var(--x-rgb),.12)!important}
@@ -541,6 +548,7 @@ const IC = {
   flask: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3" stroke-linejoin="round"/><path d="M7.5 15h9"/>',
   send: '<path d="M4 12l16-8-6 16-3-7z" stroke-linejoin="round"/><path d="M11 13l9-9" stroke-linecap="round"/>',
   refresh: '<path d="M20 11a8 8 0 0 0-14.5-4.5M4 13a8 8 0 0 0 14.5 4.5" stroke-linecap="round"/><path d="M5 3v4h4M19 21v-4h-4" stroke-linecap="round" stroke-linejoin="round"/>',
+  paste: '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1" stroke-linejoin="round"/><path d="M9 10h6M9 14h4" stroke-linecap="round"/>',
   users: '<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3 2.8 3 6" stroke-linecap="round"/>',
 };
 // значок «внимание» вместо ⚠ и цветной квадратик-статус вместо ✅ 🟡 ⛔ ●
@@ -894,7 +902,10 @@ function onchainHTML(){
   h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
   return h;
 }
-function moreHTML(){ return topHTML("Ещё", true) + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div>`; }
+// метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
+const BUILD = "25.11 · 04:30 · автосохранение, календарь, без эмодзи";
+try { console.log("LUPA build", BUILD); } catch (e) {}
+function moreHTML(){ return topHTML("Ещё", true) + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
 function presetSummary(v){
   const parts = [];
   if (num(v.min_pnl_usd)) parts.push("PnL от " + money(v.min_pnl_usd));
@@ -1835,7 +1846,7 @@ function xParseW(text){
   (t.match(/0x[0-9a-fA-F]{40}(?![0-9a-fA-F])|(?<![1-9A-HJ-NP-Za-km-z])[1-9A-HJ-NP-Za-km-z]{32,44}(?![1-9A-HJ-NP-Za-km-z])/g) || []).forEach(add);
   return out.slice(0, 15);
 }
-const xRunLbl = n => n > 1 ? `Найти стратегии · ${n} кошельков` : "Найти стратегию";
+const xRunLbl = n => { if (n <= 1) return "Найти стратегию"; const m = n % 10, h = n % 100; return `Найти стратегии · ${n} ${m >= 2 && m <= 4 && (h < 12 || h > 14) ? "кошелька" : "кошельков"}`; };
 async function stRun(addr, chain){
   try {
     const r = await fetch(`${P.sa}/api/run?k=${encodeURIComponent(P.sk)}&addr=${encodeURIComponent(addr)}&chain=${chain}&period=${ST.per}`, {cache: "no-store"});
@@ -1930,11 +1941,11 @@ function stList(){
   let h = topHTML("Стратегия", true) + stJobHTML();
   const busy = ST.job && ST.job.state === "run";
   h += `<div class="x-card" style="margin-bottom:6px${busy ? ";opacity:.5;pointer-events:none" : ""}"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
-    <textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="адрес или ссылка GMGN · можно пачку до 15, каждый с новой строки" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea>
+    <div class="x-inw"><textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="адрес или ссылка GMGN" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea><button type="button" class="x-paste" data-xpaste="1">${svg("paste", 15)}Вставить</button></div>
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
     <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">${svg("search", 17)}<span>${xRunLbl(xParseW(ST.addr).length)}</span></button>
     ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">${svg("bolt", 17)}Быстро: сделки кошелька</button>` : ""}
-    <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
+    <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Можно пачку до 15 адресов, каждый с новой строки. Считается прямо здесь — окно не закроется." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
   if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
   if (ST.err === "auth") return h + `<div class="x-card x-m">Сервер не узнал тебя — отправь боту /app и открой окно из новой кнопки «📱 Open App».</div>`;
@@ -2448,6 +2459,22 @@ function xToast(t, ms){
   if (!el){ el = document.createElement("div"); el.id = "xtoast"; el.className = "x-toast"; document.body.appendChild(el); }
   el.textContent = t; el.classList.add("on"); clearTimeout(xToastT); xToastT = setTimeout(() => el.classList.remove("on"), ms || 1400);
 }
+// «Вставить»: берём текст из буфера (Telegram или браузер). Если не дали доступ — ставим курсор в поле, вставить можно руками.
+function xPasteText(txt){
+  const ta = document.getElementById("xaddr"); txt = String(txt || "").trim();
+  if (!ta) return;
+  if (!txt){ ta.focus(); xToast("Буфер пуст — скопируй адрес или ссылку GMGN"); return; }
+  ST.addr = ST.addr.trim() ? ST.addr.trim() + "\n" + txt : txt; ta.value = ST.addr;
+  ta.style.height = "auto"; ta.style.height = Math.min(180, ta.scrollHeight + 2) + "px";
+  const b = document.querySelector("[data-xrun] span"); if (b) b.textContent = xRunLbl(xParseW(ST.addr).length);
+  const n = xParseW(txt).length; xToast(n ? (n > 1 ? `Вставлено кошельков: ${n}` : "Адрес вставлен") : "В буфере нет адреса кошелька");
+}
+function xPaste(){
+  const manual = () => { const ta = document.getElementById("xaddr"); if (ta) ta.focus(); xToast("Удержи палец на поле → «Вставить»", 2600); };
+  try { if (inTG && tg.readTextFromClipboard){ tg.readTextFromClipboard(t => t == null ? manual() : xPasteText(t)); return; } } catch (e) {}
+  try { if (navigator.clipboard && navigator.clipboard.readText){ navigator.clipboard.readText().then(xPasteText, manual); return; } } catch (e) {}
+  manual();
+}
 function stBack(){
   if (screen !== "strat") return false;
   if (ST.v === "q") ST.v = QK.back === "home" && xD() ? "home" : "list"; else if (ST.v === "bt") ST.v = "detail"; else if (ST.v === "detail") ST.v = "home"; else if (ST.v === "home") ST.v = "list"; else return false;
@@ -2477,6 +2504,7 @@ document.addEventListener("click", async e => {
   if (screen !== "strat") return;
   const t = e.target;
   if (t.closest("[data-xre]")){ ST.err = ""; ST.list = null; stLoad(true); render(true); return; }
+  if (t.closest("[data-xpaste]")){ xPaste(); return; }
   const per = t.closest("[data-xper]"); if (per){ ST.per = per.dataset.xper; render(true); return; }
   if (t.closest("[data-xrun]")){
     const raw = ((document.getElementById("xaddr") || {}).value || ST.addr).trim(), ws = xParseW(raw);
