@@ -9,53 +9,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#050607; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
-  --text:#eef2f2; --hint:#afb8b8; --dim:#97a0a0; --mute:#737d7d;
+  --bg:#020304; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
+  --text:#f7f9f9; --hint:#c3caca; --dim:#aeb5b5; --mute:#889090;
   --acc:#2dd4bf; --acc-l:#5eead4; --acc-xl:#ccfbf1; --acc-ink:#032622;
   --bad:#f87171; --bad-l:#fca5a5; --warn:#fbbf24;
   --hd:Onest,system-ui,sans-serif;
-  --rgb:45,212,191; --pill:#99f6e4; --hline:#16312e; --hbg:#070b0b;
+  --rgb:45,212,191; --pill:#99f6e4; --hline:#16312e; --hbg:#040606;
   --glow:rgba(var(--rgb),.45); --glow2:transparent;
   --mk:linear-gradient(135deg,#5eead4,#2dd4bf);
   --g1:#99f6e4; --g2:#2dd4bf; --g3:#0ea5a0;   /* полый заголовок: градиент обводки */
 }
 /* Своя стилистика под сеть: меняется сразу, как выбираешь сеть на главной */
 :root[data-theme="sol"]{
-  --bg:#07050d; --card:#0e0b17; --card2:#09070f; --line:#241d3a; --line2:#17122a; --chip:#1b1430;
+  --bg:#040206; --card:#0e0b17; --card2:#09070f; --line:#241d3a; --line2:#17122a; --chip:#1b1430;
   --acc:#14f195; --acc-l:#5ff7b6; --acc-xl:#d4fde9; --acc-ink:#03210f; --rgb:20,241,149;
-  --pill:#c4a5ff; --hline:#2f2356; --hbg:#09060f; --hint:#b8b4c4; --dim:#a09cae; --mute:#767088;
+  --pill:#c4a5ff; --hline:#2f2356; --hbg:#040308; --hint:#cac7d3; --dim:#b5b2c0; --mute:#8b859a;
   --glow:rgba(153,69,255,.6); --glow2:rgba(20,241,149,.32);
   --mk:linear-gradient(135deg,#b07cff 10%,#7a5cff 45%,#14f195 90%);
   --g1:#b07cff; --g2:#7a5cff; --g3:#14f195;
 }
 :root[data-theme="bsc"]{
-  --bg:#070604; --card:#12100a; --card2:#0b0906; --line:#2c2513; --line2:#1d180d; --chip:#251e0b;
+  --bg:#040302; --card:#12100a; --card2:#0b0906; --line:#2c2513; --line2:#1d180d; --chip:#251e0b;
   --acc:#f0b90b; --acc-l:#f8d14a; --acc-xl:#fdf0c4; --acc-ink:#1f1600; --rgb:240,185,11;
-  --pill:#f8d14a; --hline:#3d3112; --hbg:#0a0805; --hint:#bab5a7; --dim:#a49e92; --mute:#7a7468;
+  --pill:#f8d14a; --hline:#3d3112; --hbg:#050402; --hint:#cbc8bd; --dim:#b8b3aa; --mute:#8e897f;
   --glow:rgba(240,185,11,.42); --glow2:rgba(240,185,11,.12);
   --mk:linear-gradient(135deg,#ffe27a,#f0b90b 60%,#c98f00);
   --g1:#ffe27a; --g2:#f0b90b; --g3:#d99a00;
 }
 :root[data-theme="rh"]{
-  --bg:#030a06; --card:#08140d; --card2:#050e09; --line:#163323; --line2:#0f2418; --chip:#0e2717;
+  --bg:#020503; --card:#08140d; --card2:#050e09; --line:#163323; --line2:#0f2418; --chip:#0e2717;
   --acc:#3ee07a; --acc-l:#7aeea6; --acc-xl:#d9fbe6; --acc-ink:#032712; --rgb:62,224,122;
-  --pill:#e7c97e; --hline:#1f4a32; --hbg:#04100a; --hint:#afc2b8; --dim:#97aba0; --mute:#6f8376;
+  --pill:#e7c97e; --hline:#1f4a32; --hbg:#020805; --hint:#c3d1ca; --dim:#aebdb5; --mute:#85968b;
   --glow:rgba(30,150,80,.55); --glow2:rgba(214,180,106,.28);
   --mk:linear-gradient(135deg,#7aeea6,#3ee07a 50%,#e7c97e);
   --g1:#b8f7cf; --g2:#3ee07a; --g3:#e7c97e;
 }
 :root[data-theme="arc"]{
-  --bg:#04060c; --card:#0a0f1b; --card2:#070b14; --line:#1a2540; --line2:#121a2e; --chip:#111c36;
+  --bg:#020306; --card:#0a0f1b; --card2:#070b14; --line:#1a2540; --line2:#121a2e; --chip:#111c36;
   --acc:#4d8dff; --acc-l:#86b2ff; --acc-xl:#dbe8ff; --acc-ink:#020c22; --rgb:77,141,255;
-  --pill:#9cc0ff; --hline:#1f3363; --hbg:#060a14; --hint:#b1b8c7; --dim:#99a0b1; --mute:#717989;
+  --pill:#9cc0ff; --hline:#1f3363; --hbg:#03050a; --hint:#c4cad5; --dim:#afb5c2; --mute:#868d9b;
   --glow:rgba(77,141,255,.5); --glow2:rgba(120,220,255,.2);
   --mk:linear-gradient(135deg,#9cc0ff,#4d8dff 55%,#78dcff);
   --g1:#c3d8ff; --g2:#4d8dff; --g3:#78dcff;
 }
 :root[data-theme="ely"]{
-  --bg:#09050b; --card:#140b17; --card2:#0d070f; --line:#33193a; --line2:#221126; --chip:#2a1231;
+  --bg:#040206; --card:#140b17; --card2:#0d070f; --line:#33193a; --line2:#221126; --chip:#2a1231;
   --acc:#e06cf5; --acc-l:#ee9ff9; --acc-xl:#fbe3fe; --acc-ink:#24052b; --rgb:224,108,245;
-  --pill:#f0b0fa; --hline:#4a2156; --hbg:#0c060e; --hint:#c0b4c4; --dim:#a89bad; --mute:#7e7283;
+  --pill:#f0b0fa; --hline:#4a2156; --hbg:#060307; --hint:#d0c7d3; --dim:#bbb1bf; --mute:#918796;
   --glow:rgba(224,108,245,.5); --glow2:rgba(255,160,120,.2);
   --mk:linear-gradient(135deg,#f5b8ff,#e06cf5 55%,#ff9f7a);
   --g1:#f5b8ff; --g2:#e06cf5; --g3:#ff9f7a;
@@ -268,14 +268,9 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 
 /* ===== Спокойный стиль: плоские карточки, один акцентный цвет, стекло только у панели и шторок ===== */
 body{background:transparent!important}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.07),transparent 70%)}
-/* Зерно только на фоне: лежит над свечением и графиком (#bgfx), но под интерфейсом.
-   Карточки с backdrop-filter размывают его под собой — текст и кнопки остаются чистыми. */
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.09;
-  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
-    repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 3px)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.05),transparent 70%)}
 /* Фон под сеть: бледный график (свечи / линия / соты), снизу ярче, к верху тает — текст не мешает */
-#bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.38;
+#bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.3;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%);mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%)}
 #bgfx svg{position:absolute;inset:0;width:100%;height:100%}
 /* карточки над графиком — матовые: график под ними размыт, текст читается */
@@ -485,6 +480,31 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 body.ext .as-toast{bottom:20px}
 body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
 .as-toast.bad{min-width:min(92vw,340px)}
+.x-btn svg{flex:0 0 auto;color:var(--acc)}.x-solid svg{color:inherit}
+.x-gph b{display:inline-flex;align-items:center;gap:6px}
+.x-sq{display:inline-block;width:9px;height:9px;border-radius:2px;flex:0 0 9px;margin-top:7px}
+.x-vdn{display:flex;align-items:center;gap:8px}.x-vdn .x-sq{margin-top:0}
+.x-wi{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:#f5c451;color:#2a1d00;font:700 11px/1 var(--mono);flex:0 0 16px;vertical-align:-3px;margin-right:6px}
+.x-tag .x-wi{margin-right:0}
+/* «Вход и выход» — таблетки */
+.x-enex{padding:0!important}
+.x-eh{font-size:11.5px;color:var(--hint);font-weight:600;padding:10px 14px 4px}
+.x-chs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 12px}
+.x-ch{border:1px solid var(--x-line);border-radius:10px;padding:5px 9px;font-size:12.5px;background:rgba(255,255,255,.04);color:var(--text);white-space:nowrap}
+.x-ch b{font-family:var(--mono);font-weight:500;margin-left:5px;letter-spacing:-.3px}
+.x-ch.ex{border-color:rgba(var(--x-rgb),.45);background:rgba(var(--x-rgb),.08)}
+.x-ch.off,.x-ch.off b{color:var(--dim)}
+/* ===== Стекло намёком: тонкий блик по верхнему краю и лёгкий градиент ===== */
+.card,.tile,.hero,.list,.x-card,.x-tile{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.035))!important;border-color:rgba(255,255,255,.13)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
+.x-gp{border-color:var(--gc)!important}
+.x-mode.x-win{border-color:rgba(var(--x-rgb),.5)!important}
+.x-vd.x-g{border-color:rgba(var(--x-rgb),.45)!important;background:linear-gradient(180deg,rgba(var(--x-rgb),.10),rgba(var(--x-rgb),.05))!important}
+.x-vd.x-w{border-color:rgba(245,196,81,.45)!important;background:linear-gradient(180deg,rgba(245,196,81,.10),rgba(245,196,81,.05))!important}
+.x-vd.x-b{border-color:rgba(255,107,107,.45)!important;background:linear-gradient(180deg,rgba(255,107,107,.10),rgba(255,107,107,.05))!important}
+.x-calc{box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important}
+.glass{background:rgba(20,20,26,.74)!important;border-color:rgba(255,255,255,.13)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.4)!important}
+.chip.on{background:rgba(var(--rgb),.16)}
+.x-tb th,.x-tb .x-st{background:#121119}
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -498,7 +518,7 @@ body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
 </div></div>
 <div class="sheet" id="sheet"><div class="sh glass" id="sh"></div></div>
 <script>
-const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «🧠 Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}, {"t": "Покупка и газ · Solana", "d": "как в TradeWiz: на сколько покупаешь и сколько платишь за каждую транзакцию (покупка и каждая продажа)", "rows": [{"t": "num", "k": "strat_buy_sol", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "SOL", "e": "$100"}, {"t": "num", "k": "strat_prio_sol", "l": "Priority Fee", "h": "за транзакцию", "u": "SOL", "e": "нет"}, {"t": "num", "k": "strat_tip_sol", "l": "Tip", "h": "Jito tip за транзакцию", "u": "SOL", "e": "нет"}]}, {"t": "Покупка и газ · BNB", "d": "то же для BSC", "rows": [{"t": "num", "k": "strat_buy_bnb", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "BNB", "e": "$100"}, {"t": "num", "k": "strat_prio_bnb", "l": "Gas Fee", "h": "за транзакцию", "u": "BNB", "e": "нет"}, {"t": "num", "k": "strat_tip_bnb", "l": "Tip / Bribe", "h": "за транзакцию", "u": "BNB", "e": "нет"}]}, {"t": "Другие сети", "d": "Robinhood, Arc, Elysium", "rows": [{"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "в $, ставка — условные $100", "u": "$", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
+const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}, {"t": "Покупка и газ · Solana", "d": "как в TradeWiz: на сколько покупаешь и сколько платишь за каждую транзакцию (покупка и каждая продажа)", "rows": [{"t": "num", "k": "strat_buy_sol", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "SOL", "e": "$100"}, {"t": "num", "k": "strat_prio_sol", "l": "Priority Fee", "h": "за транзакцию", "u": "SOL", "e": "нет"}, {"t": "num", "k": "strat_tip_sol", "l": "Tip", "h": "Jito tip за транзакцию", "u": "SOL", "e": "нет"}]}, {"t": "Покупка и газ · BNB", "d": "то же для BSC", "rows": [{"t": "num", "k": "strat_buy_bnb", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "BNB", "e": "$100"}, {"t": "num", "k": "strat_prio_bnb", "l": "Gas Fee", "h": "за транзакцию", "u": "BNB", "e": "нет"}, {"t": "num", "k": "strat_tip_bnb", "l": "Tip / Bribe", "h": "за транзакцию", "u": "BNB", "e": "нет"}]}, {"t": "Другие сети", "d": "Robinhood, Arc, Elysium", "rows": [{"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "в $, ставка — условные $100", "u": "$", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
 const tg = window.Telegram && window.Telegram.WebApp;
 const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
 const SLIDERS = {min_winrate_pct: [30, 40, 50, 60]};
@@ -516,7 +536,16 @@ const IC = {
   pulse: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
   belloff: '<path d="M9 18h6M6 16V11a6 6 0 0 1 9.5-4.9M18 11v5l1.5 2H8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3l18 18" stroke-linecap="round"/>',
   check: '<path d="M4 12.5l5.5 5.5L20 7" stroke-linecap="round" stroke-linejoin="round"/>',
+  table: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M3.5 15h17M9.5 4.5v15"/>',
+  bolt: '<path d="M13 3L5 14h6l-1 7 8-11h-6z" stroke-linejoin="round"/>',
+  flask: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3" stroke-linejoin="round"/><path d="M7.5 15h9"/>',
+  send: '<path d="M4 12l16-8-6 16-3-7z" stroke-linejoin="round"/><path d="M11 13l9-9" stroke-linecap="round"/>',
+  refresh: '<path d="M20 11a8 8 0 0 0-14.5-4.5M4 13a8 8 0 0 0 14.5 4.5" stroke-linecap="round"/><path d="M5 3v4h4M19 21v-4h-4" stroke-linecap="round" stroke-linejoin="round"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3 2.8 3 6" stroke-linecap="round"/>',
 };
+// значок «внимание» вместо ⚠ и цветной квадратик-статус вместо ✅ 🟡 ⛔ ●
+const XW = '<span class="x-wi" aria-hidden="true">!</span>';
+const xSq = c => `<span class="x-sq" style="background:${c}"></span>`;
 const svg = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${IC[n]}</svg>`;
 let P = null, start = {}, base = {}, cur = {}, sel = "", screen = "home", fsub = "", ops = [], renames = {}, review = null, picker = false, saveAsName = "", ocChain = "", runHist = "7d", runQuiet = true;
 
@@ -825,7 +854,7 @@ function ocAnomaly(o){
   if (!big && !(num(o.ch) > 200)) return "";
   const why = big ? `${Math.round(share * 100)}% объёма — ${esc(nm)} (в ${second ? Math.round(num(v) / second) : "много"} раз больше следующей биржи). Без неё ≈ ${esc(usdBig(tot - num(v)))}.`
     : `рост за сутки +${Math.round(num(o.ch))}% — необычно много.`;
-  return `<div class="sub2" style="color:var(--warn);line-height:1.4">⚠ Похоже на сбой данных DefiLlama или накрутку: ${why}</div>`;
+  return `<div class="sub2" style="color:var(--warn);line-height:1.4">${XW}Похоже на сбой данных DefiLlama или накрутку: ${why}</div>`;
 }
 function onchainHTML(){
   const ch = (P.ch || []).filter(([v]) => v !== "all");
@@ -1076,7 +1105,7 @@ async function sendLive(out){
   const msg = r.run === "busy" ? "Сохранено. Но уже идёт парс — дождись его"
     : r.run === "find" ? "Ищу токены — файл придёт в чат"
     : r.run === "full" ? "Полный парс запущен — ход виден на главной, Excel придёт в чат"
-    : r.n ? "✅ Сохранено" : "Ничего не изменилось";
+    : r.n ? "Сохранено" : "Ничего не изменилось";
   xToast(msg, r.run ? 3200 : 1600);
 }
 function pickPreset(name){
@@ -1666,7 +1695,12 @@ const xPct = v => Math.round((v || 0) * 100) + "%";
 const xCls = v => v == null ? "" : v > 0 ? "x-ok" : v < 0 ? "x-bad" : "";
 const xShort = a => a ? a.slice(0, 4) + "…" + a.slice(-4) : "";
 const xDur = s => s == null ? null : s < 60 ? Math.round(s) + " с" : s < 3600 ? Math.round(s / 60) + " мин" : Math.round(s / 3600) + " ч";
-const xNice = t => String(t).replace(/^вкл:\s*/, "").replace(/\s*\(\d+м \d+с\)/, "").replace(/продажа /g, "");
+function xBot(t){ t = String(t == null ? "" : t); const has = /вкл|выкл/i.test(t);   // «ВЫКЛ ❌» → «ВЫКЛ», «Follow ❌» → «Follow выкл»
+  return t.replace(/\s*✅/g, has ? "" : " вкл").replace(/\s*❌/g, has ? "" : " выкл").replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, "").replace(/\s{2,}/g, " ").trim(); }
+// вердикт на новых сделках (его считает SIM — сам расчёт не трогаем, меняем только как он нарисован)
+const XVD = {"✅": "var(--x-acc)", "🟡": "var(--x-warn)", "⚠️": "var(--x-bad)", "⚠": "var(--x-bad)", "⚪": "var(--dim)"};
+const xVdNote = vd => vd ? `<div class="x-note x-vdn">${xSq(XVD[vd[0]] || "var(--dim)")}${esc(xBot(vd[1]))}</div>` : "";
+const xNice = t => xBot(t).replace(/^вкл:\s*/, "").replace(/\s*\(\d+м \d+с\)/, "").replace(/продажа /g, "");
 const xCH = {sol: "SOL", bsc: "BNB", robinhood: "Robinhood", arc: "Arc", elysium: "Elysium"};
 function xSpark(eq, color, w, h){
   if (!eq || eq.length < 2) return "";
@@ -1801,7 +1835,7 @@ function xParseW(text){
   (t.match(/0x[0-9a-fA-F]{40}(?![0-9a-fA-F])|(?<![1-9A-HJ-NP-Za-km-z])[1-9A-HJ-NP-Za-km-z]{32,44}(?![1-9A-HJ-NP-Za-km-z])/g) || []).forEach(add);
   return out.slice(0, 15);
 }
-const xRunLbl = n => n > 1 ? `🧠 Найти стратегии · ${n} кошельков` : "🧠 Найти стратегию";
+const xRunLbl = n => n > 1 ? `Найти стратегии · ${n} кошельков` : "Найти стратегию";
 async function stRun(addr, chain){
   try {
     const r = await fetch(`${P.sa}/api/run?k=${encodeURIComponent(P.sk)}&addr=${encodeURIComponent(addr)}&chain=${chain}&period=${ST.per}`, {cache: "no-store"});
@@ -1837,7 +1871,7 @@ function stPoll(){
 }
 function stJobHTML(){
   const j = ST.job; if (!j || !j.state) return "";
-  if (j.state === "error") return `<div class="x-card x-vd x-b" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Не получилось</div><div class="x-vs">${esc(j.err || "")}</div></div>`;
+  if (j.state === "error") return `<div class="x-card x-vd x-b" style="margin-bottom:6px"><div class="x-vt">${xSq("var(--x-bad)")}Не получилось</div><div class="x-vs">${esc(j.err || "")}</div></div>`;
   if (j.state !== "run") return "";
   const pc = Math.round(100 * (j.done || 0) / (j.total || 5)), sec = Math.round(Date.now() / 1000 - (j.t || 0));
   return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span class="spin">⠋</span>${j.n > 1 ? `Пачка ${(j.i || 0) + 1}/${j.n} · ` : ""}Считаю ${xShort(j.addr || "")} · ${String(j.period).replace("d", " дн")}</div>
@@ -1854,10 +1888,10 @@ async function stLoadSim(d){
 }
 function xVerdict(D){
   const pk = D.pk, base = D.b != null ? ` Всё подряд без фильтров: <b class="${xCls(D.b)}">${xUsd(D.b)}</b>.` : "";
-  const cap = s => esc(s.replace(/^./, c => c.toUpperCase()));
-  if (pk.w) return `<div class="x-card x-vd x-w"><div class="x-vt"><span style="color:var(--x-warn)">⚠</span>Надёжной стратегии нет</div><div class="x-vs">${cap(pk.y.replace(/^надёжной стратегии нет:\s*/, ""))}.${base}</div></div>`;
-  if (!pk.m) return `<div class="x-card x-vd x-b"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Копировать не стоит</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
-  return `<div class="x-card x-vd x-g"><div class="x-vt"><span style="color:var(--x-acc)">●</span>Больше подходит: ${pk.m === "normal" ? "обычное копирование" : "флипы"}</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
+  const cap = s => esc(xBot(s).replace(/^./, c => c.toUpperCase()));
+  if (pk.w) return `<div class="x-card x-vd x-w"><div class="x-vt">${xSq("var(--x-warn)")}Надёжной стратегии нет</div><div class="x-vs">${cap(pk.y.replace(/^надёжной стратегии нет:\s*/, ""))}.${base}</div></div>`;
+  if (!pk.m) return `<div class="x-card x-vd x-b"><div class="x-vt">${xSq("var(--x-bad)")}Копировать не стоит</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
+  return `<div class="x-card x-vd x-g"><div class="x-vt">${xSq("var(--x-acc)")}Больше подходит: ${pk.m === "normal" ? "обычное копирование" : "флипы"}</div><div class="x-vs">${cap(pk.y)}.${base}</div></div>`;
 }
 function xModeCard(D, k){
   const md = D.m[k], M = X_MODES[k];
@@ -1869,7 +1903,7 @@ function xModeCard(D, k){
     <div class="x-big ${xCls(v.tot)}">${xUsd(v.tot)}</div>
     <div class="x-row"><span>${v.n} сделок · WR <b>${xPct(v.wr)}</b></span><span>просадка <b>−${xAbs(v.dd)}</b></span>${v.h != null ? `<span>холд ~${xDur(v.h)}</span>` : ""}</div>
     <div class="x-row" style="margin-top:4px"><span>на новых сделках ${v.te != null ? `<b class="${xCls(v.te)}">${xUsd(v.te)}</b>` : "<b>—</b>"}</span></div>
-    ${v.oh ? `<div class="x-tag">⚠ ${esc(v.oh)}</div>` : ""}<div class="x-chev">›</div></button>`;
+    ${v.oh ? `<div class="x-tag">${XW}${esc(xBot(v.oh))}</div>` : ""}<div class="x-chev">›</div></button>`;
 }
 // адрес кошелька — ссылка на его страницу GMGN (в шапке — <a>, внутри строки-кнопки — <span>: <a> в <button> нельзя)
 const xGmA = (a, c) => `<a class="x-gma" href="https://gmgn.ai/${esc(c || "sol")}/address/${esc(a)}" data-xgm="1" title="открыть на GMGN">${xShort(a)} ↗</a>`;
@@ -1898,8 +1932,8 @@ function stList(){
   h += `<div class="x-card" style="margin-bottom:6px${busy ? ";opacity:.5;pointer-events:none" : ""}"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
     <textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="адрес или ссылка GMGN · можно пачку до 15, каждый с новой строки" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea>
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
-    <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">${xRunLbl(xParseW(ST.addr).length)}</button>
-    ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">⚡ Быстро: сделки кошелька</button>` : ""}
+    <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">${svg("search", 17)}<span>${xRunLbl(xParseW(ST.addr).length)}</span></button>
+    ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">${svg("bolt", 17)}Быстро: сделки кошелька</button>` : ""}
     <div class="x-note" style="margin:8px 2px 0">${P.sa && P.sk ? "Считается прямо здесь — окно не закроется, результат откроется сам." : "Окно закроется, бот посчитает и пришлёт итог в чат; потом он появится здесь в списке."}</div></div>`;
   h += `<div class="x-sec">Мои поиски</div>`;
   if (ST.err === "nosrv") return h + `<div class="x-card x-m">Сервер для вкладки не подключён: в .env бота нужна строка STRAT_API_URL=https://… (адрес DuckDNS).</div>`;
@@ -1930,7 +1964,7 @@ function stList(){
     const mem = ST.list.map((x, j) => [x, j]).filter(([x]) => x.gp && x.gp.id === d.gp.id).sort((a, b) => a[0].gp.pl - b[0].gp.pl);
     const g = d.gp, c = gcol(g.id), top = mem[0][0];
     const when = new Date((g.t || d.t) * 1000).toLocaleDateString("ru-RU", {day: "2-digit", month: "2-digit"});
-    out += `<div class="x-card x-list x-gp" style="--gc:${c}"><div class="x-gph"><b>👥 Пачка · ${mem.length} кош.</b><span>${when}${g.sh != null ? ` · общих токенов ${g.sh} из ${g.tk}` : ""}${g.op ? " · похоже на одного оператора" : ""}</span></div>
+    out += `<div class="x-card x-list x-gp" style="--gc:${c}"><div class="x-gph"><b>${svg("users", 15)}Пачка · ${mem.length} кош.</b><span>${when}${g.sh != null ? ` · общих токенов ${g.sh} из ${g.tk}` : ""}${g.op ? " · похоже на одного оператора" : ""}</span></div>
       ${mem.map(([x, j]) => item(x, j)).join("")}
       <div class="x-gpf">→ Копируй <b>${xShort(top.a)}</b>: раньше заходит и/или меньше плохих сделок</div></div>`;
   });
@@ -1939,12 +1973,12 @@ function stList(){
 }
 function stHome(D){
   let h = xHead("Стратегия", `${xGmA(D.a, D.c)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
-  h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">📊 Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">⚡ Сделки кошелька</button></div>` : "")
-    + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">🧪 Свой бэктест</button>`
+  h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">${svg("table", 17)}Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">${svg("bolt", 17)}Сделки кошелька</button></div>` : "")
+    + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">${svg("flask", 17)}Свой бэктест</button>`
     + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
-    <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(v.ex)} · ${v.n} сд.</div></div>
+    <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(xBot(v.ex))} · ${v.n} сд.</div></div>
     <span class="x-m ${xCls(v.te)}">${v.te != null ? (v.vd && v.vd[0] === "✅" ? "✓ " : "") + xUsd(v.te) : "—"}</span><span class="x-num ${xCls(v.tot)}">${xUsd(v.tot)}</span></button>`));
   if (rows.length) h += `<div class="x-sec">Все варианты</div><div class="x-card x-list">${rows.join("")}</div><div class="x-note">Справа — итог за период (${stakeLbl(D.api && ST.sd[D.api])} на сделку), рядом — на новых сделках.</div>`;
   return h + `</div></div>`;
@@ -2068,17 +2102,17 @@ function stDetail(D){
   h += `<div class="x-2"><div class="x-l">`;
   h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
   h += xTiles(v);
-  if (v.vd) h += `<div class="x-note">${esc(v.vd[0])} ${esc(v.vd[1])}</div>`;
+  if (v.vd) h += `${xVdNote(v.vd)}`;
   if (D.api && !ST.sd[D.api] && !ST.sdErr) stLoadSim(D);
   let eqHtml = xChart(v.eq, v.mk, M.c);
   const sdD = D.api && ST.sd[D.api];
   let calHtml = "";
   if (sdD && v.raw){ try { const o = SIM.backtest(sdD, xRawParams(v.raw)), pts = xEqPts(o, sdD.stake || 100); eqHtml = xEqBox(pts, o.mark, M.c); calHtml = xCalHTML(pts, D.p); } catch (e) {} }
   h += `<div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · ${stakeLbl(sdD)} на сделку</div>${eqHtml}</div>` + calHtml;
-  h += `<div class="x-sec">Вход и выход</div><div class="x-card" style="font-size:13.5px"><div><span class="x-m">Вход:</span> ${esc(v.en)}</div><div style="margin-top:4px"><span class="x-m">Выход:</span> ${esc(v.ex)}</div></div>`;
-  h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">🧪 Свой бэктест на этих сделках</button>`;
+  h += `<div class="x-sec">Вход и выход</div>${xEnEx(v.en, v.ex)}`;
+  h += `<button class="x-btn x-ghost" data-xbt="1" style="margin-top:12px">${svg("flask", 17)}Свой бэктест на этих сделках</button>`;
   h += `<div class="x-sec">Настройки для TradeWiz</div>` + xSettings(xWithBuy(D, v.s)) + xBlizzBox(D, "detail");
-  if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">⚠ ${esc(v.oh)}</div>`;
+  if (v.oh) h += `<div class="x-tag" style="margin:10px 2px 0">${XW}${esc(xBot(v.oh))}</div>`;
   h += `</div><div class="x-r">`;
   if (D.api){
     const sd = ST.sd[D.api];
@@ -2117,6 +2151,29 @@ function stOpenItem(i){   // открыть поиск из списка: туд
   if (sv && D.m[sv.m] && D.m[sv.m].v[sv.k]){ ST.m = sv.m; ST.k = sv.k; ST.v = sv.v; ST.bt = sv.v === "bt" ? sv.bt : null; }
   else ST.v = "home";
 }
+// «Вход и выход»: строку бота («MC $5K–$10K · токен до 30 мин · вход $3–$50» / «TP 250%→40%, 400%→100% · таймаут 4ч 0м · Follow ❌»)
+// разбираем на таблетки. Незнакомый кусок — просто отдельная таблетка, ничего не теряется.
+function xTime(t){ let m;
+  if ((m = t.match(/^(\d+)ч\s*(\d+)м$/))) return +m[2] ? `${m[1]} ч ${m[2]} мин` : `${m[1]} ч`;
+  if ((m = t.match(/^(\d+)м\s*(\d+)с$/))) return +m[2] ? `${m[1]} мин ${m[2]} с` : `${m[1]} мин`;
+  if ((m = t.match(/^(\d+)с$/))) return m[1] + " с";
+  return t; }
+function xEnEx(en, ex){
+  const chip = (k, v, cls) => `<span class="x-ch${cls ? " " + cls : ""}">${k ? esc(k) : ""}${v ? `<b>${esc(v)}</b>` : ""}</span>`;
+  const parts = t => xBot(t).split(/\s*·\s*/).filter(Boolean);
+  const inC = parts(en).map(p => { let m;
+    if ((m = p.match(/^MC\s+(.+)/i))) return chip("Капа", m[1]);
+    if ((m = p.match(/^токен\s+(.+)/i))) return chip("Токен", m[1]);
+    if ((m = p.match(/^вход\s+(.+)/i))) return chip("Его покупка", m[1]);
+    return chip("", p); }).join("");
+  const outC = parts(ex).flatMap(p => { let m;
+    if ((m = p.match(/^TP\s+(.+)/i))) return m[1].split(/\s*,\s*/).map(x => { const q = x.match(/^(\d+(?:\.\d+)?)%\s*→\s*(\d+(?:\.\d+)?)%$/);
+      return q ? chip("+" + q[1] + "%", "→ " + (+q[2] >= 100 ? "всё" : q[2] + "%"), "ex") : chip("", x, "ex"); });
+    if ((m = p.match(/^таймаут\s+(.+)/i))) return [chip("Таймаут", xTime(m[1]))];
+    if ((m = p.match(/^Follow(?:\s+Sell)?\s*(.*)$/i))) { const off = /выкл|нет|off/i.test(m[1]); return [chip("Follow Sell", off ? "выкл" : "вкл", off ? "off" : "")]; }
+    return [chip("", p)]; }).join("");
+  return `<div class="x-card x-enex"><div class="x-eh">Вход</div><div class="x-chs">${inC || chip("", "без фильтров")}</div><div class="x-eh">Выход</div><div class="x-chs">${outC || chip("", "—")}</div></div>`;
+}
 function stBt(D){
   const k = ST.m, M = X_MODES[k], base = D.m[k].v[ST.k];
   if (!ST.bt){
@@ -2131,8 +2188,8 @@ function stBt(D){
   else {
     const v = btParams(), o = SIM.backtest(sd, v);
     const view = {tot: o.full_total, te: o.test ? o.test.total : null, dd: o.max_dd, n: o.n, wr: o.wr, ls: o.loss_streak};
-    h += `<div id="xres">${xTiles(view)}${o.verdict ? `<div class="x-note">${esc(o.verdict[0])} ${esc(o.verdict[1])}</div>` : ""}
-      ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">⚠ весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
+    h += `<div id="xres">${xTiles(view)}${xVdNote(o.verdict)}
+      ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">${XW}весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
       <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xEqBox(xEqPts(o, sd.stake || 100), o.mark, M.c)}</div>${xCalHTML(xEqPts(o, sd.stake || 100), D.p)}</div>`;
     ST.btTrades = o;
   }
@@ -2143,7 +2200,7 @@ function stBt(D){
     <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
       <button class="x-tg" data-xsw="f"><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
     ${B.o ? "" : `<div class="x-note" style="margin:6px 2px 0">Buy Once выкл: копия покупает на каждую его покупку (если та проходит фильтры: сумма, капа и возраст в момент покупки) по ${stakeLbl(sd)} — у каждой свои тейки и таймаут, Follow Sell продаёт у всех ту же долю.</div>`}
-    ${!B.f && !(+B.t1 > 0 || +B.t2 > 0) && !(+B.to > 0) ? `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">⚠ <b>У копии нет выхода:</b> Follow Sell выключен, а тейков и таймаута нет — копия так и держит, итог не посчитать (поэтому 0 сделок). Поставь тейк (TP1) или таймаут, или включи Follow Sell.</div></div>` : ""}
+    ${!B.f && !(+B.t1 > 0 || +B.t2 > 0) && !(+B.to > 0) ? `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">${XW}<b>У копии нет выхода:</b> Follow Sell выключен, а тейков и таймаута нет — копия так и держит, итог не посчитать (поэтому 0 сделок). Поставь тейк (TP1) или таймаут, или включи Follow Sell.</div></div>` : ""}
     <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
     <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
@@ -2214,7 +2271,7 @@ function qResHTML(){
     ${tile("Позиций", s.n, a.n)}${tile("Винрейт", s.wr == null ? "—" : Math.round(s.wr * 100) + "%", a.wr == null ? "—" : Math.round(a.wr * 100) + "%")}
     ${tile("Медианный ROI", qPct(s.mroi), qPct(a.mroi), xCls(s.mroi))}${tile("Средний ROI", qPct(s.aroi), qPct(a.aroi), xCls(s.aroi))}
     ${tile("PnL", xUsd(s.pnl), xUsd(a.pnl), xCls(s.pnl))}${tile("Медиана холда", qHold(s.mhold), qHold(a.mhold))}</div>
-    <div class="x-note" style="margin:8px 2px 0">Позиция — все его покупки и продажи одного токена. ROI и PnL — по уже проданной части. ${QK.data.tr ? "⚠️ История длинная — показаны последние сделки периода." : ""}</div></div>`;
+    <div class="x-note" style="margin:8px 2px 0">Позиция — все его покупки и продажи одного токена. ROI и PnL — по уже проданной части. ${QK.data.tr ? "История длинная — показаны последние сделки периода." : ""}</div></div>`;
 }
 function qTabHTML(){
   const rows = qFilter(QK.data.rows);
@@ -2243,8 +2300,8 @@ function stQuick(){
   const chip = (k, v, l) => `<button class="x-chip${(f[k] || "all") === v ? " on" : ""}" data-qset="${k}:${v}" style="flex:0 0 auto;padding:0 12px;height:32px;font-size:12.5px">${l}</button>`;
   const lps = QK.data ? [...new Set(QK.data.rows.map(r => r.lp).filter(Boolean))] : [];
   const left = `<div class="x-chips" style="margin:0 0 10px">${per.map(p => `<button class="x-chip${QK.per === p ? " on" : ""}" data-qper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
-    <div class="x-chips" style="margin:0 0 4px;flex-wrap:wrap">${have >= 0 ? `<button class="x-btn x-ghost" data-xi="${have}" style="height:42px;flex:1">🧠 Открыть стратегию</button>` : ""}
-      <button class="x-btn x-solid" data-qrun="1" style="height:42px;flex:1${busy ? ";opacity:.5;pointer-events:none" : ""}">${have >= 0 ? "🔁 Пересчитать стратегию" : "🧠 Полный поиск стратегии"}</button></div>
+    <div class="x-chips" style="margin:0 0 4px;flex-wrap:wrap">${have >= 0 ? `<button class="x-btn x-ghost" data-xi="${have}" style="height:42px;flex:1">${svg("strat", 16)}Открыть стратегию</button>` : ""}
+      <button class="x-btn x-solid" data-qrun="1" style="height:42px;flex:1${busy ? ";opacity:.5;pointer-events:none" : ""}">${have >= 0 ? svg("refresh", 16) + "Пересчитать стратегию" : svg("search", 16) + "Полный поиск стратегии"}</button></div>
     ${stJobHTML()}
     <div class="x-sec" style="display:flex;justify-content:space-between">Фильтры <button class="x-link" data-qreset="1" style="font-size:12.5px">сбросить</button></div>
     <div class="x-card">
@@ -2339,7 +2396,7 @@ async function xBuySave(){
     const r = res.ok ? await res.json() : null;
     if (!r || !r.ok){ xToast(res.status === 403 ? "Ключ устарел — отправь боту /app" : "Не сохранилось — попробуй ещё раз", 3000); return; }
     cur[k] = v; base[k] = v; start[k] = v; if (P.s) P.s[k] = v;
-    xBuyOpen = false; render(true); xToast("✅ Buy Amount сохранён");
+    xBuyOpen = false; render(true); xToast("Buy Amount сохранён");
   } catch (e) { xToast("Сервер бота не отвечает", 3000); }
 }
 const xWithBuy = (D, rows) => { const b = xBuyRow(D); return b ? [b].concat(rows) : rows; };
@@ -2361,7 +2418,7 @@ function xBlizzBox(D, where){
   const st = ST.blz && ST.blz.key === xBlizzKey(D, where) ? ST.blz : null;
   let msg = "";
   if (st){
-    const warn = (st.warn || []).map(w => `<div class="x-m" style="margin-top:4px">⚠ ${esc(w)}</div>`).join("");
+    const warn = (st.warn || []).map(w => `<div class="x-m" style="margin-top:4px">${XW}${esc(w)}</div>`).join("");
     msg = st.s === "send" ? `<div class="x-m">Отправляю в Blizz…</div>`
       : st.s === "created" ? `<div><b class="x-ok">✓ Ордер создан в Blizz — на паузе.</b> Открой Blizz, проверь и включи.</div>`
       : st.s === "updated" ? `<div><b class="x-ok">✓ Настройки ордера в Blizz обновлены.</b> Пауза/вкл — как было.</div>`
@@ -2369,7 +2426,7 @@ function xBlizzBox(D, where){
       : `<div class="x-bad">✗ ${esc(st.err || "не получилось")}</div>`;
     msg = `<div class="x-card" style="margin-top:8px;font-size:13px">${msg}${warn}</div>`;
   }
-  return `<button class="x-btn x-ghost" data-xblz="${where}" style="margin-top:10px"${st && st.s === "send" ? " disabled" : ""}>📤 В Blizz — создать копи-ордер (на паузе)</button>${msg}`;
+  return `<button class="x-btn x-ghost" data-xblz="${where}" style="margin-top:10px"${st && st.s === "send" ? " disabled" : ""}>${svg("send", 17)}В Blizz — создать копи-ордер (на паузе)</button>${msg}`;
 }
 async function xBlizzSend(where, upd){
   const D = xD(); if (!D) return;
@@ -2399,7 +2456,7 @@ function stBack(){
 let xRecalcT;
 document.addEventListener("input", e => {
   const f = e.target.dataset && e.target.dataset.xf;
-  if (e.target.id === "xaddr"){ ST.addr = e.target.value; e.target.style.height = "auto"; e.target.style.height = Math.min(180, e.target.scrollHeight + 2) + "px"; const b = document.querySelector("[data-xrun]"); if (b) b.textContent = xRunLbl(xParseW(ST.addr).length); return; }
+  if (e.target.id === "xaddr"){ ST.addr = e.target.value; e.target.style.height = "auto"; e.target.style.height = Math.min(180, e.target.scrollHeight + 2) + "px"; const b = document.querySelector("[data-xrun]"); if (b && b.querySelector("span")) b.querySelector("span").textContent = xRunLbl(xParseW(ST.addr).length); return; }
   if (!f || !ST.bt) return;
   ST.bt[f] = e.target.value.replace(",", ".").replace(/[^\d.]/g, "");
   xMemSave();
@@ -2443,7 +2500,7 @@ document.addEventListener("click", async e => {
     const D = xD(); xToast("Собираю Excel…");
     try {
       const r = await (await fetch(`${P.sa}/api/excel?k=${encodeURIComponent(P.sk)}&a=${encodeURIComponent(D.a)}&p=${D.p}`, {cache: "no-store"})).json();
-      xToast(r.r === "ok" ? "📊 Отправил Excel в чат" : r.r === "old" ? "Бот перезапускали — запусти поиск заново, тогда будет Excel" : "Не получилось отправить");
+      xToast(r.r === "ok" ? "Excel отправлен в чат" : r.r === "old" ? "Бот перезапускали — запусти поиск заново, тогда будет Excel" : "Не получилось отправить");
     } catch (e) { xToast("Сервер бота не отвечает"); }
     return;
   }
