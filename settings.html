@@ -6,7 +6,7 @@
 <title>Настройки бота</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#050607; --card:#0b1111; --card2:#070b0b; --line:#1d2a2a; --line2:#141c1c; --chip:#12201f;
@@ -268,7 +268,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 
 /* ===== Спокойный стиль: плоские карточки, один акцентный цвет, стекло только у панели и шторок ===== */
 body{background:transparent!important}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.10),transparent 70%)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg) radial-gradient(70% 40% at 50% -8%,rgba(var(--rgb),.07),transparent 70%)}
+/* Зерно только на фоне: лежит над свечением и графиком (#bgfx), но под интерфейсом.
+   Карточки с backdrop-filter размывают его под собой — текст и кнопки остаются чистыми. */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.09;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 3px)}
 /* Фон под сеть: бледный график (свечи / линия / соты), снизу ярче, к верху тает — текст не мешает */
 #bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%);mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 30%,#000 75%)}
@@ -346,6 +351,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .x-list{padding:2px 14px}
 .x-it{display:grid!important;grid-template-columns:18px 1fr auto auto;gap:10px;align-items:center;padding:11px 2px!important;border-bottom:1px solid rgba(255,255,255,.05)!important;font-size:13.5px;width:100%}
 .x-it:last-child{border-bottom:0!important}
+.x-it.x-iw{grid-template-columns:30px 1fr auto auto}
+/* значок кошелька: узор 5×5 из адреса, цвет — тип стратегии */
+.x-idn{display:block;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--ic) 12%,transparent);fill:var(--ic);shape-rendering:crispEdges}
 .x-m{font-size:12px;color:var(--dim)}
 .x-num{font-variant-numeric:tabular-nums;font-weight:600}
 .x-note{font-size:12px;color:var(--dim);margin:10px 4px 0}
@@ -444,6 +452,17 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
   .x-btl .x-bttab{grid-column:2;grid-row:2;position:static}
 }
 
+/* ===== Моно для мелких цифр: таблицы, суммы, адреса. Крупные цифры остаются на Onest ===== */
+:root{--mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.x-tb td,.x-num,.x-gma,.x-s .x-v,.ci .o,.ci .n,.chg,.bar .bt span,.xq-row b,.xq-tip,.ocbar span{font-family:var(--mono);letter-spacing:-.3px}
+.x-tb td,.x-num,.bar .bt span{font-weight:500}
+/* прогресс из 20 сегментов — одинаково на телефоне и ПК, без символов-блоков */
+.seg{display:flex;gap:2px;margin-top:10px}
+.seg i{flex:1;height:6px;border-radius:1.5px;background:rgba(255,255,255,.08)}
+.seg i.on{background:var(--acc)}
+/* спиннер «бот работает» */
+.spin{display:inline-block;width:10px;font-family:var(--mono);color:var(--acc);line-height:1}
+@media (prefers-reduced-motion:reduce){.seg i{transition:none}}
 .x-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#1b1e22;border:1px solid rgba(255,255,255,.1);padding:9px 14px;border-radius:12px;font-size:13px;pointer-events:none;z-index:99;color:#eef1f3}
 .x-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
@@ -601,19 +620,24 @@ const groupHTML = (g, cnt) => `<div class="sec">${esc(g.t.replace(/^\S+\s/, m =>
 function topHTML(title, back){
   const when = P.t ? new Date(P.t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
   return `<div class="top">${back ? `<button class="iconbtn" data-go="home" aria-label="Назад">${svg("back")}</button>` : ""}
-    <div class="tt"><div class="h1">${esc(title)}</div>${back ? "" : `<div class="st"><span class="dot${P.busy ? " busy" : ""}"></span>${P.busy ? "бот сейчас парсит" : "бот свободен"}${when ? " · данные на " + when : ""}</div>`}</div>
+    <div class="tt"><div class="h1">${esc(title)}</div>${back ? "" : `<div class="st">${P.busy ? `<span class="spin">⠋</span>` : `<span class="dot"></span>`}${P.busy ? "бот сейчас парсит" : "бот свободен"}${when ? " · данные на " + when : ""}</div>`}</div>
     <button class="pill glass" data-pick="1" aria-label="Выбрать пресет"><span>${esc(sel ? (renames[sel] || sel) : "без пресета")}</span>▾</button></div>`;
 }
+const segHTML = pct => { const f = Math.round(Math.max(0, Math.min(100, pct)) / 5); return `<div class="seg" role="progressbar" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100">${"<i class=\"on\"></i>".repeat(f)}${"<i></i>".repeat(20 - f)}</div>`; };
+// спиннер из шрифта Брайля: один таймер на все .spin на странице
+(() => { const BR = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"; let k = 0;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  setInterval(() => { if (document.hidden) return; k = (k + 1) % BR.length; document.querySelectorAll(".spin").forEach(e => e.textContent = BR[k]); }, 90); })();
 function jobHTML(){
   const j = P.job; if (!j) return "";
   const hm = t => t ? new Date(t * 1000).toLocaleTimeString("ru-RU", {hour: "2-digit", minute: "2-digit"}) : "";
   const pct = j.total ? Math.round((j.done || 0) / j.total * 100) : null;
   const parts = j.kind === "job" ? (j.total ? `${j.done || 0}/${j.total} · ${pct}%` : "")
     : (j.total > 1 ? `часть ${Math.min((j.done || 0) + 1, j.total)} из ${j.total}` : "");
-  return `<div class="job"><div class="jh"><span class="pulse"></span>Сейчас идёт</div>
+  return `<div class="job"><div class="jh"><span class="spin">⠋</span>Сейчас идёт</div>
     <div class="jt">${esc(j.title || "Парсинг")}${parts ? " · " + esc(parts) : ""}</div>
     ${j.st ? `<div class="js">${esc(j.st)}</div>` : (j.cur ? `<div class="js">${esc(j.cur)}</div>` : "")}
-    ${pct !== null && j.total > 1 ? `<div class="jb"><i style="width:${Math.max(4, pct)}%"></i></div>` : ""}
+    ${pct !== null && j.total > 1 ? segHTML(pct) : ""}
     ${j.queue ? `<div class="js">в очереди: ${esc(j.queue)}</div>` : ""}
     <div class="jf">${j.started ? "начат в " + hm(j.started) + " · " : ""}${P.sa && P.sk ? "обновляется само" : "данные на " + hm(P.t) + " · кнопка обновляется сама раз в 3 мин — переоткрой окно"}${j.wait ? ` · в очереди ещё ${j.wait}` : ""}</div></div>`;
 }
@@ -1463,14 +1487,16 @@ const SIM = (() => {
     if (v.lp_mode === "not" && t.lp === v.lp) return "лаунчпад";
     const mc = t.mc;
     if ((v.cap || v.cap_min) && mc == null) return "капа неизвестна";
-    if (v.cap && mc > v.cap) return "капа";
-    if (v.cap_min && mc < v.cap_min) return "капа";
+    const $k = x => x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 1e4 ? 0 : 1) + "K" : "$" + Math.round(x);
+    if (v.cap && mc > v.cap) return `капа: его вход на ${$k(mc)}, а Max MC ${$k(v.cap)}`;
+    if (v.cap_min && mc < v.cap_min) return `капа: его вход на ${$k(mc)}, а Min MC ${$k(v.cap_min)}`;
     const ta = t.age;
     if ((v.age || v.age_min) && ta == null) return "возраст неизвестен";
-    if (v.age && ta > v.age * 60) return "возраст";
-    if (v.age_min && ta < v.age_min * 60) return "возраст";
-    if (v.min_usd && t.usd < v.min_usd) return "вход";
-    if (v.max_usd && t.usd > v.max_usd) return "вход";
+    const ag = x => x < 60 ? Math.round(x) + " с" : x < 3600 ? Math.round(x / 60) + " мин" : (x / 3600).toFixed(1).replace(".0", "") + " ч";
+    if (v.age && ta > v.age * 60) return `возраст: токену было ${ag(ta)}, а Max Token Age ${v.age} мин`;
+    if (v.age_min && ta < v.age_min * 60) return `возраст: токену было ${ag(ta)}, а Min Token Age ${v.age_min} мин`;
+    if (v.min_usd && t.usd < v.min_usd) return `его покупка $${Math.round(t.usd)} меньше Min Trigger Buy $${Math.round(v.min_usd)}`;
+    if (v.max_usd && t.usd > v.max_usd) return `его покупка $${Math.round(t.usd)} больше Max Trigger Buy $${Math.round(v.max_usd)}`;
     return "";
   }
   const med = a => { const v = a.slice().sort((x, y) => x - y), n = v.length; return !n ? null : n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2; };
@@ -1696,8 +1722,8 @@ function stJobHTML(){
   if (j.state === "error") return `<div class="x-card x-vd x-b" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-bad)">⛔</span>Не получилось</div><div class="x-vs">${esc(j.err || "")}</div></div>`;
   if (j.state !== "run") return "";
   const pc = Math.round(100 * (j.done || 0) / (j.total || 5)), sec = Math.round(Date.now() / 1000 - (j.t || 0));
-  return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span style="color:var(--x-acc)">●</span>${j.n > 1 ? `Пачка ${(j.i || 0) + 1}/${j.n} · ` : ""}Считаю ${xShort(j.addr || "")} · ${String(j.period).replace("d", " дн")}</div>
-    <div class="x-vs">${esc(j.msg || "")} · ${sec} с</div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${Math.max(4, pc)}%;background:var(--acc);transition:width .4s"></i></div>
+  return `<div class="x-card x-vd x-g" id="xjob" style="margin-bottom:6px"><div class="x-vt"><span class="spin">⠋</span>${j.n > 1 ? `Пачка ${(j.i || 0) + 1}/${j.n} · ` : ""}Считаю ${xShort(j.addr || "")} · ${String(j.period).replace("d", " дн")}</div>
+    <div class="x-vs">${esc(j.msg || "")} · ${sec} с</div>${segHTML(pc)}
     <div class="x-note" style="margin:8px 0 0">${j.n > 1 ? "Кошельки по очереди, 1–3 минуты на каждый. Каждый появится в «Мои поиски», сравнение пачки (кого копировать) придёт в чат." : "Окно можно не закрывать — результат откроется сам. Обычно 1–3 минуты."}</div></div>`;
 }
 function stJobPatch(){ const el = document.getElementById("xjob"); if (!el) { render(true); return; } const tmp = document.createElement("div"); tmp.innerHTML = stJobHTML(); if (tmp.firstElementChild) el.replaceWith(tmp.firstElementChild); }
@@ -1738,6 +1764,15 @@ document.addEventListener("click", e => {
 function xHead(title, pill, back){
   return `<div class="x-top">${back ? `<button class="x-back" data-xb="${back}">‹</button>` : ""}<div class="x-h">${esc(title)}</div>${pill ? `<div class="x-pill">${pill}</div>` : ""}</div>`;
 }
+// Значок кошелька: симметричный узор 5×5 из адреса (один адрес — всегда один узор). Цвет — тип стратегии.
+function xIdent(a, col){
+  let s = 2166136261; for (const ch of String(a)) s = Math.imul(s ^ ch.charCodeAt(0), 16777619) >>> 0;
+  const bit = () => ((s = (Math.imul(s, 1103515245) + 12345) >>> 0) >>> 16) & 1;
+  let cells = [], n = 0;
+  do { cells = []; for (let y = 0; y < 5; y++) for (let x = 0; x < 3; x++) if (bit()){ cells.push([x, y]); if (x < 2) cells.push([4 - x, y]); } }
+  while (cells.length < 6 && ++n < 6);
+  return `<svg class="x-idn" viewBox="-1 -1 7 7" style="--ic:${col}"><title>${esc(a)}</title>${cells.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1"/>`).join("")}</svg>`;
+}
 function stList(){
   const per = ["7d", "30d", "60d", "90d"];
   let h = topHTML("Стратегия", true) + stJobHTML();
@@ -1756,12 +1791,12 @@ function stList(){
   if (!ST.list.length) return h + `<div class="x-card x-m">Пока пусто — найди стратегию первого кошелька.</div>`;
   const item = (d, i) => {
     const pk = d.pk, rk = pk.m === "flip" ? "f" : "n", rep = d.m[rk] && d.m[rk].v[d.m[rk].r || 0];
-    const em = pk.w ? "⚠️" : !pk.m ? "⛔" : pk.m === "flip" ? "⚡" : "🎯";
+    const col = pk.w ? "var(--x-warn)" : !pk.m ? "var(--x-bad)" : pk.m === "flip" ? "var(--x-flip)" : "var(--x-acc)";
     const when = new Date(d.t * 1000).toLocaleDateString("ru-RU", {day: "2-digit", month: "2-digit"});
-    const g = d.gp, medal = g ? (["🥇", "🥈", "🥉"][g.pl - 1] || g.pl + ".") : "";
-    const gl = g ? [g.ns ? `первым в ${g.fi} из ${g.ns}` + (g.lg != null ? (g.lg <= 0 ? " · обычно первый" : ` · отстаёт ${xDur(g.lg)}`) : "") : "",
+    const g = d.gp;
+    const gl = g ? [`место ${g.pl}`, g.ns ? `первым в ${g.fi} из ${g.ns}` + (g.lg != null ? (g.lg <= 0 ? " · обычно первый" : ` · отстаёт ${xDur(g.lg)}`) : "") : "",
                     g.bd != null ? `плохих ${Math.round(g.bd * 100)}%` : ""].filter(Boolean).join(" · ") : "";
-    return `<button class="x-it" data-xi="${i}"><span style="font-size:${g && g.pl > 3 ? 13 : 16}px;${g && g.pl > 3 ? "color:var(--hint);font-weight:700;text-align:center" : ""}">${g ? medal : em}</span><div>${xGmS(d.a, d.c)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
+    return `<button class="x-it x-iw" data-xi="${i}">${xIdent(d.a, col)}<div>${xGmS(d.a, d.c)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
       <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}${gl ? " · " + esc(gl) : ""}</div></div>
       <span></span><span class="x-num ${xCls(rep && rep.tot)}">${rep ? xUsd(rep.tot) : "—"}</span></button>`;
   };
