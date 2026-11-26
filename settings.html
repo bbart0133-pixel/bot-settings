@@ -936,7 +936,7 @@ function onchainHTML(){
   return h;
 }
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 09:00 · что стоит в Blizz";
+const BUILD = "26.11 · 09:20 · кнопка «Вставить»";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -2551,10 +2551,26 @@ function xPasteText(txt){
   const n = xParseW(txt).length; xToast(n ? (n > 1 ? `Вставлено кошельков: ${n}` : "Адрес вставлен") : "В буфере нет адреса кошелька");
 }
 function xPaste(){
-  const manual = () => { const ta = document.getElementById("xaddr"); if (ta) ta.focus(); xToast("Удержи палец на поле → «Вставить»", 2600); };
-  try { if (inTG && tg.readTextFromClipboard){ tg.readTextFromClipboard(t => t == null ? manual() : xPasteText(t)); return; } } catch (e) {}
-  try { if (navigator.clipboard && navigator.clipboard.readText){ navigator.clipboard.readText().then(xPasteText, manual); return; } } catch (e) {}
-  manual();
+  // ПК (мышь): «Ctrl+V в поле»; телефон: «удержи палец». Сначала буфер браузера (пока жив клик), потом Telegram.
+  const pc = window.matchMedia && matchMedia("(pointer: fine)").matches;
+  const manual = () => { const ta = document.getElementById("xaddr"); if (ta) ta.focus(); xToast(pc ? "Поле выбрано — нажми Ctrl+V" : "Удержи палец на поле → «Вставить»", 2600); };
+  const viaTG = () => {
+    try {
+      if (inTG && tg.readTextFromClipboard){
+        let done = false; const t0 = setTimeout(() => { if (!done){ done = true; manual(); } }, 1500);
+        tg.readTextFromClipboard(t => { if (done) return; done = true; clearTimeout(t0); t ? xPasteText(t) : manual(); });
+        return;
+      }
+    } catch (e) {}
+    manual();
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(t => t ? xPasteText(t) : viaTG(), viaTG);
+      return;
+    }
+  } catch (e) {}
+  viaTG();
 }
 // Таблицы, которые листаются вбок (.x-tw): на ПК — тянуть мышью, стрелки ‹ ›, тень у края, ← → с клавиатуры.
 // Таблицы перерисовываются часто, поэтому подхватываем новые через MutationObserver.
