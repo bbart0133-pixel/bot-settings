@@ -983,7 +983,7 @@ async function wtPost(body){
 const WT_ST = {moved: ["переехал", "var(--x-acc)"], maybe: ["похоже на переезд", "var(--x-warn)"], dead: ["не торгует", "var(--x-bad)"],
   routine: ["торгует", "var(--x-acc)"], ok: ["торгует", "var(--x-acc)"], silent: ["замолчал", "var(--x-warn)"]};
 function wtRow(a, w){
-  const k = w ? (w.v === "ok" && w.st === "silent" ? "silent" : w.v) : "";
+  const k = w ? ((w.v === "ok" || w.v === "maybe") && w.st === "silent" ? "silent" : w.v) : "";
   const [lbl, col] = WT_ST[k] || ["не проверен", "var(--dim)"];
   const nm = w && w.nm || (ST.bm || {})[a] && ST.bm[a].nm || (w && w.extra ? "свой" : "");
   const hot = w && (w.v === "moved" || w.v === "maybe");
@@ -995,7 +995,7 @@ function wtRow(a, w){
 }
 function wtSubs(a, w){
   const c = (w.cands || []).slice(0, 2).map(c => `<div class="x-it wt-sub"><span class="x-dot" style="background:${c.sc >= 4 ? "var(--x-acc)" : "var(--x-warn)"}"></span>
-    <div>→ ${xGmS(c.a, "sol")}<div class="x-m">${esc([c.nw ? (c.cr ? "новый, создан " + wtAgo(c.cr) + " назад" : "новый") : "старый кошелёк", c.r ? "вход ×" + c.r : "", c.farm ? "похоже на ферму" : ""].filter(Boolean).join(" · "))}</div></div>
+    <div>→ ${xGmS(c.a, "sol")}<div class="x-m">${esc([c.co ? "совпали сделки: " + c.co + " из " + c.cof : "", c.nw ? (c.cr ? "новый, создан " + wtAgo(c.cr) + " назад" : "новый") : "старый кошелёк", c.r ? "вход ×" + c.r : "", c.farm ? "похоже на ферму" : ""].filter(Boolean).join(" · "))}</div></div>
     <span></span><button class="x-btn x-ghost wt-go" data-wtq="${esc(c.a)}">Стратегия</button></div>`).join("");
   const p = !c ? (w.parked || []).slice(0, 1).map(x => `<div class="x-it wt-sub"><span class="x-dot" style="background:var(--dim)"></span>
     <div>деньги на ${xGmS(x.a, "sol")}<div class="x-m">${esc(wtSol(x.sol))} · жду, куда пойдут</div></div><span></span><span></span></div>`).join("") : "";
@@ -1035,7 +1035,7 @@ document.addEventListener("click", e => {
   const q = e.target.closest("[data-wtq]"); if (q){ screen = "strat"; stLoad(); qOpen(q.dataset.wtq, "sol", "30d", "list"); return; }
 });
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 17:30 · слежка за кошельками";
+const BUILD = "26.11 · 18:40 · слежка за кошельками";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
