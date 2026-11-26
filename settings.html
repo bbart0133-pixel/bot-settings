@@ -1119,10 +1119,14 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-pimp]")){ const f = document.getElementById("pimpf"); if (f){ f.value = ""; f.click(); } return; }
 });
 document.addEventListener("change", e => { if (e.target.id === "pimpf" && e.target.files && e.target.files[0]) pxImport(e.target.files[0]); });
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-weblogout]")){ lsS(WEBK, ""); lsS(WEBS, ""); WEBMODE = false; P = null;
+    bootEmpty("Ты вышел на этом устройстве.<br><br>Войти снова — кнопка «🌐 Web App» в боте (или /web)."); }
+});
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 20:50 · создать пресет";
+const BUILD = "26.11 · 22:00 · вход в веб по одноразовой ссылке";
 try { console.log("LUPA build", BUILD); } catch (e) {}
-function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
+function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (WEBMODE ? `<div class="sec">Веб-версия</div><div class="card" style="margin-bottom:4px"><div class="pc"><button class="btn" data-weblogout="1" style="width:100%;height:44px">Выйти на этом устройстве</button><div class="sm">Браузер забудет вход. Снова войти — кнопка «🌐 Web App» в боте.</div></div></div>` : "") + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
 function presetSummary(v){
   const parts = [];
@@ -1521,13 +1525,38 @@ function bootWith(x){
 // Расширение Chrome открывает апку с #ext=1&sa=…&k=…&addr=…&chain=… (в «#» — чтобы ключ не уходил на GitHub)
 const HASHQ = new URLSearchParams((location.hash || "").replace(/^#/, ""));
 const EXT = HASHQ.get("ext") ? {addr: (HASHQ.get("addr") || "").trim(), chain: HASHQ.get("chain") || ""} : null;
+// Веб-версия (обычный браузер): ссылка из бота несёт ОДНОРАЗОВЫЙ пропуск #t=… — меняем его на ключ, ключ храним
+// в этом браузере (localStorage), а из адреса всё убираем. Дальше страница открывается по закладке без ключа.
+const WEBK = "lupa_web_k", WEBS = "lupa_web_sa";
+const lsG = k => { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } };
+const lsS = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} };
+let WEBMODE = false;
 async function bootFromServer(){
-  const sa = new URLSearchParams(location.search).get("sa") || HASHQ.get("sa") || "";
-  const init = (tg && tg.initData) || "", key = HASHQ.get("k") || "";
-  if (!/^https:\/\//.test(sa) || (!init && !key)){ bootEmpty(); return; }
+  const init = (tg && tg.initData) || "", web = !init && !EXT;
+  let sa = new URLSearchParams(location.search).get("sa") || HASHQ.get("sa") || "";
+  let key = HASHQ.get("k") || "";
+  if (web){
+    const t = HASHQ.get("t") || "";
+    if (!sa) sa = lsG(WEBS);
+    const clean = () => { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} };
+    if (t && /^https:\/\//.test(sa)){
+      document.getElementById("app").innerHTML = '<div class="empty">Вхожу…</div>';
+      try {
+        const r = await fetch(sa.replace(/\/$/, "") + "/api/login", {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify({t}), cache: "no-store"});
+        const j = r.ok ? await r.json() : null;
+        clean();
+        if (!j || !j.k){ if (!lsG(WEBK)){ bootEmpty("Ссылка уже использована или устарела.<br><br>Нажми «🌐 Web App» в боте (или /web) — придёт новая."); return; } }
+        else { key = j.k; lsS(WEBK, key); lsS(WEBS, sa); }
+      } catch (e) { bootEmpty("Сервер бота не отвечает. Попробуй ещё раз чуть позже."); return; }
+    } else if (key && /^https:\/\//.test(sa)){ lsS(WEBK, key); lsS(WEBS, sa); clean(); }   // старая ссылка с ключом
+    if (!key) key = lsG(WEBK);
+    WEBMODE = !!key;
+  }
+  if (!/^https:\/\//.test(sa) || (!init && !key)){ bootEmpty(web ? "Открой веб-версию кнопкой «🌐 Web App» в боте (или команда /web)." : ""); return; }
   document.getElementById("app").innerHTML = '<div class="empty">Загружаю…</div>';
   try {
     const r = await fetch(sa.replace(/\/$/, "") + "/api/boot?" + (init ? "init=" + encodeURIComponent(init) : "k=" + encodeURIComponent(key)), {cache: "no-store"});
+    if (r.status === 403 && WEBMODE){ lsS(WEBK, ""); bootEmpty("Вход устарел или сброшен.<br><br>Нажми «🌐 Web App» в боте (или /web) — придёт новая ссылка."); return; }
     if (r.status === 403){ bootEmpty(init ? "Бот тебя не узнал. Открой окно кнопкой «📱 Open App» в чате с ботом."
       : "Ключ не подошёл или устарел. Отправь боту /ext и вставь новый ключ в параметрах расширения."); return; }
     const j = await r.json();
