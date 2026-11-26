@@ -203,9 +203,19 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .dock>*{pointer-events:auto}
 .dockin{max-width:560px;margin:0 auto;padding:0 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
 .abar{display:none;gap:8px}
+.ibtn{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;height:44px}
+.ibtn:not(.pri) svg{color:var(--acc)}
+.npbar{display:none;border-radius:20px;padding:10px;gap:8px;flex-direction:column;border:1px solid rgba(var(--rgb),.45)!important}
+.npbar.on{display:flex}
+.npbar .nph{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--hint)}
+.npbar .nph b{color:var(--text);font-size:14px}
+.npbar .npr{display:flex;gap:8px}
+.npbar .ti{height:44px;font-size:14px}
+.npbar .btn{height:44px;flex:none}
+.npbar .npx{border:0;background:none;color:var(--hint);font-size:13px;padding:2px 4px}
 .abar.on{display:flex}
 .abar .cta{height:50px;white-space:nowrap;font-size:15px}
-.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;padding:5px}
+.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));max-width:560px;margin:0 auto;align-items:center;padding:5px}
 .nav button{position:relative;height:50px;border-radius:17px;border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px}
 .nav button.on{background:var(--chip);color:var(--acc-l);font-weight:600}
 .nav .n{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;padding:0 4px;background:var(--acc);color:var(--acc-ink);font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
@@ -290,8 +300,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .wt-add{display:flex;gap:8px;margin:8px 0 0}
 .wt-add .ti{height:40px;font-size:13.5px}
 .wt-add .btn{height:40px;flex:none}
-@media (max-width:460px){.nav{padding:5px 3px}.nav button{font-size:9.2px;letter-spacing:-.25px;padding:0;white-space:nowrap}}
-@media (max-width:385px){.nav button{font-size:8.4px;letter-spacing:-.3px}}
 .nav{border-radius:24px}
 .nav button{border-radius:18px}
 .nav button.on{background:rgba(255,255,255,.08);color:var(--text);box-shadow:none}
@@ -567,6 +575,7 @@ body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
 <div id="bgfx" aria-hidden="true"></div>
 <div class="app" id="app"></div>
 <div class="dock"><div class="dockin">
+  <div class="npbar glass" id="npbar"></div>
   <div class="abar" id="abar"><button class="cta ghost" id="bfind" style="width:auto;padding:0 16px">Найти токены</button><button class="cta" id="bsave"></button></div>
   <nav class="nav glass" id="nav"></nav>
 </div></div>
@@ -589,6 +598,9 @@ const IC = {
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
   coins: '<circle cx="9" cy="9" r="5"/><path d="M14.5 6.5A5 5 0 1 1 9 18" stroke-linecap="round"/>',
   back: '<path d="M15 5l-7 7 7 7" stroke-linecap="round"/>',
+  up: '<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" stroke-linecap="round"/>',
+  down: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" stroke-linecap="round"/>',
+  plus: '<path d="M12 5v14M5 12h14" stroke-linecap="round"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/>',
   pulse: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
   belloff: '<path d="M9 18h6M6 16V11a6 6 0 0 1 9.5-4.9M18 11v5l1.5 2H8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3l18 18" stroke-linecap="round"/>',
@@ -1034,8 +1046,81 @@ document.addEventListener("click", e => {
   const dl = e.target.closest("[data-wtdel]"); if (dl){ wtPost({act: "del", addr: dl.dataset.wtdel}); return; }
   const q = e.target.closest("[data-wtq]"); if (q){ screen = "strat"; stLoad(); qOpen(q.dataset.wtq, "sol", "30d", "list"); return; }
 });
+// ───────── Новый пресет: «Создать пресет» → фильтры → «Сохранить». Пока создаёшь — автосохранение в текущий пресет
+// на паузе, все правки копятся и уходят в НОВЫЙ пресет одним запросом (старый не меняется).
+const NP = {on: false, name: "", err: ""};
+function npBar(){
+  const el = document.getElementById("npbar"); if (!el) return;
+  el.classList.toggle("on", NP.on);
+  if (!NP.on){ el.innerHTML = ""; return; }
+  if (el.querySelector("#npname")){       // не перерисовываем поле, пока в нём печатают
+    const c = el.querySelector("[data-npcnt]"); if (c) c.textContent = npCnt(); return;
+  }
+  el.innerHTML = `<div class="nph"><span><b>Новый пресет</b> · <span data-npcnt>${npCnt()}</span></span><button class="npx" data-npcancel="1">Отмена ✕</button></div>
+    <div class="npr"><input class="ti" id="npname" maxlength="40" placeholder="название пресета" value="${esc(NP.name)}" autocomplete="off">
+    <button class="btn pri" data-npsave="1">Сохранить</button></div>
+    <div class="ferr" id="nperr" style="${NP.err ? "" : "display:none"}">${esc(NP.err)}</div>`;
+}
+const npCnt = () => { const n = changedKeys().filter(k => !k.startsWith("m.")).length; return n ? "изменено " + n : "настрой фильтры"; };
+function npStart(){
+  NP.on = true; NP.name = ""; NP.err = "";
+  clearTimeout(AS.t);
+  go("filters");
+  setTimeout(() => { const i = document.getElementById("npname"); if (i) i.focus(); }, 50);
+}
+function npCancel(){
+  changedKeys().forEach(k => { cur[k] = base[k]; });
+  NP.on = false; NP.name = ""; NP.err = "";
+  go("presets");
+}
+function npSave(){
+  const v = (NP.name || "").trim();
+  const taken = Object.keys(P.ps || {}).map(x => renames[x] || x).includes(v);
+  NP.err = !v ? "Впиши название пресета" : taken ? "Такой пресет уже есть — выбери другое имя" : "";
+  if (NP.err){ const e = document.getElementById("nperr"); if (e){ e.textContent = NP.err; e.style.display = ""; } return; }
+  saveAsName = v; AS.saveAs = true; NP.on = false; NP.name = "";
+  updateDock(); asFlush();
+}
+document.addEventListener("input", e => { if (e.target.id === "npname"){ NP.name = e.target.value; NP.err = ""; const x = document.getElementById("nperr"); if (x) x.style.display = "none"; } });
+document.addEventListener("keydown", e => { if (e.target.id === "npname" && e.key === "Enter"){ e.preventDefault(); npSave(); } });
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-npnew]")){ npStart(); return; }
+  if (e.target.closest("[data-npcancel]")){ npCancel(); return; }
+  if (e.target.closest("[data-npsave]")){ npSave(); return; }
+});
+// ───────── Экспорт / импорт пресетов из окна
+async function pxPost(body){
+  const r = await fetch(`${P.sa}/api/presets?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify(body), cache: "no-store"});
+  if (r.status === 403) throw new Error("Ключ устарел — открой окно заново");
+  const j = await r.json(); if (!j.ok) throw new Error(j.err || "не получилось"); return j;
+}
+async function pxExport(){
+  try {
+    const j = await pxPost({act: "export", to_chat: !!inTG});
+    if (inTG){ asToast("Файл с пресетами отправлен в чат"); return; }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([j.json], {type: "application/json"}));
+    a.download = j.file || "presets.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    asToast("Файл скачан");
+  } catch (e) { asToast("Экспорт: " + e.message, null, 4000, true); }
+}
+async function pxImport(file){
+  try {
+    if (file.size > 900000) throw new Error("файл слишком большой");
+    const text = await file.text();
+    const j = await pxPost({act: "import", data: text});
+    const np = norm(j.d && decode(j.d)); if (np && np.ps) P.ps = np.ps;
+    const a = (j.added || []).length, rp = (j.replaced || []).length;
+    asToast(`Загружено: новых ${a}` + (rp ? `, перезаписано ${rp}` : ""));
+    render(true);
+  } catch (e) { asToast("Импорт: " + e.message, null, 4500, true); }
+}
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-pexp]")){ pxExport(); return; }
+  if (e.target.closest("[data-pimp]")){ const f = document.getElementById("pimpf"); if (f){ f.value = ""; f.click(); } return; }
+});
+document.addEventListener("change", e => { if (e.target.id === "pimpf" && e.target.files && e.target.files[0]) pxImport(e.target.files[0]); });
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 18:40 · слежка за кошельками";
+const BUILD = "26.11 · 20:50 · создать пресет";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -1049,12 +1134,16 @@ function presetSummary(v){
 }
 function presetsHTML(){
   const names = Object.keys(P.ps || {});
-  let h = topHTML("Пресеты", true) + `<div class="dk"><div class="dl"><div class="sec">Сохранить текущие как новый</div><div class="card"><div class="pc">
-    <input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета">
-    ${AUTO() ? `<button class="btn pri" data-saveas="1" style="margin-top:8px;width:100%;height:42px">Сохранить как новый</button><div class="sm">Сохранятся текущие настройки, выбранный пресет не изменится.</div>`
-      : `<div class="sm">Сохранится вместе с остальными изменениями.</div>`}<div class="ferr" id="saerr" style="display:none"></div></div></div></div><div class="dr">
+  let h = topHTML("Пресеты", true) + `<div class="dk"><div class="dl"><div class="sec">Создать пресет</div><div class="card"><div class="pc">
+    ${AUTO() ? `<button class="btn pri ibtn" data-npnew="1" style="width:100%;height:46px">${svg("plus", 18)}Создать пресет</button><div class="sm">Откроются фильтры: настрой их и нажми «Сохранить» внизу. Выбранный пресет не изменится.</div>`
+      : `<input class="ti" id="saname" maxlength="40" placeholder="например, sol1 v3" value="${esc(saveAsName)}" aria-label="Название нового пресета"><div class="sm">Сохранится вместе с остальными изменениями.</div><div class="ferr" id="saerr" style="display:none"></div>`}</div></div>
+    ${AUTO() ? `<div class="sec">Перенос</div><div class="card"><div class="pc"><div style="display:flex;gap:8px">
+      <button class="btn ibtn" data-pexp="1">${svg("up", 17)}Экспорт</button><button class="btn ibtn" data-pimp="1">${svg("down", 17)}Импорт</button></div>
+      <input type="file" id="pimpf" accept=".json,application/json" style="display:none">
+      <div class="sm">${inTG ? "Экспорт пришлёт файл в чат с ботом." : "Экспорт скачает файл."} Импорт — файл .json из экспорта: пресеты с теми же названиями перезапишутся.</div></div></div>` : ""}
+    </div><div class="dr">
     <div class="sec">Мои пресеты<i>${names.length}</i></div><div class="card">`;
-  if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — сохрани текущие настройки как новый.</div></div>`;
+  if (!names.length) h += `<div class="pc"><div class="sm">Пока нет ни одного — создай первый.</div></div>`;
   names.forEach(n => {
     const del = ops.some(o => o[0] === "delete" && o[1] === n), ren = renames[n], isCur = sel === n;
     h += `<div class="pc" data-p="${esc(n)}"><div class="pt"><div class="nm"${del ? ' style="text-decoration:line-through;color:var(--dim)"' : ""}>${esc(ren || n)}</div>
@@ -1066,9 +1155,11 @@ function presetsHTML(){
   return h + `</div></div></div>`;
 }
 function navHTML(){
-  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["strat", "strat", "Стратегия"], ["watch", "eye", "Слежка"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
-  return it.map(([s, i, l]) => { const n = scrCount(s);
-    return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
+  // «Фильтры» и «Пресеты» открываются с главной (плитка и строка) — в меню их нет; пока они открыты, горит «Главная»
+  const it = [["home", "home", "Главная"], ["strat", "strat", "Стратегия"], ["watch", "eye", "Слежка"], ["onchain", "pulse", "Ончейн"], ["more", "more", "Ещё"]];
+  return it.map(([s, i, l]) => { const n = s === "home" ? scrCount("home") + scrCount("filters") + scrCount("presets") : scrCount(s);
+    const on = screen === s || (s === "home" && (screen === "filters" || screen === "presets"));
+    return `<button class="${on ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
 }
 const THEME_OF = {sol: "sol", bsc: "bsc", robinhood: "rh", arc: "arc", elysium: "ely"};
 function ensureOc(){
@@ -1157,9 +1248,10 @@ function refreshRow(k){
 function updateDock(){
   const n = changeList().length;
   document.getElementById("nav").innerHTML = navHTML();
+  npBar();
   const ab = document.getElementById("abar"); ab.classList.toggle("on", n > 0 && (!AUTO() || !!AS.fail));
   document.getElementById("bsave").textContent = `Сохранить (${n})`;
-  document.getElementById("app").style.paddingBottom = ab.classList.contains("on") ? "230px" : "170px";
+  document.getElementById("app").style.paddingBottom = NP.on ? "290px" : ab.classList.contains("on") ? "230px" : "170px";
 }
 function openRun(){
   const n = changeList().length;
@@ -1331,7 +1423,7 @@ document.addEventListener("change", e => { const i = e.target; if (i.dataset && 
 // • без сервера бота (P.sa/P.sk нет) — всё как раньше: кнопка «Сохранить» и отправка через чат
 const AS = {t: null, busy: false, again: false, fail: "", saveAs: false};
 function AUTO(){ return !!(P && P.sa && P.sk); }
-function asQueue(ms){ if (!AUTO()){ updateDock(); return; } clearTimeout(AS.t); AS.t = setTimeout(() => asFlush(), ms == null ? 1000 : ms); }
+function asQueue(ms){ if (!AUTO() || NP.on){ updateDock(); return; } clearTimeout(AS.t); AS.t = setTimeout(() => asFlush(), ms == null ? 1000 : ms); }
 function asBadRange(k){ const r = findRow(k); if (!r || r.t !== "range") return false; const a = num(cur[r.k]), b = num(cur[r.k2]); return !!(a && b && a > b); }
 // выбор пресета: сразу переключает активный пресет у бота (и для ночного парса) — поэтому тост с «Отменить»
 function asPreset(name){
@@ -1464,7 +1556,20 @@ function zoomSet(z, save){
 zoomSet(zoomGet());
 document.addEventListener("click", e => { const z = e.target.closest && e.target.closest("[data-zoom]"); if (!z) return; zoomSet(+z.dataset.zoom, true); render(true); });
 const _boot = payload();
-if (_boot) bootWith(_boot); else bootFromServer();
+if (_boot){
+  bootWith(_boot);
+  // Кнопка внизу чата хранит настройки в адресе — после сохранения из окна они устаревают (бот больше не шлёт
+  // сообщение с новой кнопкой). Поэтому сразу тихо берём свежие у сервера, пока ничего не тронуто.
+  (async () => { try {
+    if (!P || !P.sa || !P.sk || typeof EXT !== "undefined" && EXT) return;
+    const r = await fetch(P.sa.replace(/\/$/, "") + "/api/boot?k=" + encodeURIComponent(P.sk), {cache: "no-store"});
+    if (!r.ok) return;
+    const j = await r.json(), x = decode(j.d);
+    if (x && x.s && !changedKeys().length && !ops.length && !Object.keys(renames).length && !saveAsName){
+      const sc = screen; bootWith(x); if (sc !== screen){ screen = sc; render(true); }
+    }
+  } catch (e) {} })();
+} else bootFromServer();
 // Расширение уже открыло окно и прислало другой кошелёк: меняется только «#…» — страница не перезагружается,
 // просто открываем его поиск (или подставляем адрес) — мгновенно, без новой загрузки.
 window.addEventListener("hashchange", () => {
