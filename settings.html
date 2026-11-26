@@ -563,6 +563,8 @@ body:has(#abar.on) .as-toast{bottom:calc(156px + env(safe-area-inset-bottom))}
 const SCHEMA = [{"id": "search", "i": "🔎", "t": "Поиск", "groups": [{"t": "Где ищем", "rows": [{"t": "seg", "k": "m.chain", "l": "Сеть", "opts": "chains"}, {"t": "seg", "k": "m.period", "l": "Период", "opts": "periods"}]}, {"t": "Площадки Solana", "d": "работает только для сети SOL", "rows": [{"t": "toggle", "k": "sol_pumpfun", "l": "Pump.fun", "h": ""}, {"t": "seg", "k": "sol_meteora", "l": "Meteora", "h": "там много рагов", "opts": [[0, "выкл"], [1, "все"], [2, "только etchy"]]}]}, {"t": "Какие токены брать", "rows": [{"t": "range", "k": "min_token_market_cap", "k2": "max_token_market_cap", "l": "Капа токена", "h": "отсечь рагнутые и уже запампленные", "u": "$", "e": "нет"}, {"t": "num", "k": "max_entry_mc", "l": "Капа входа до", "h": "покупатели, зашедшие дешевле этой капы", "u": "$", "e": "нет"}, {"t": "range", "k": "min_bond_minutes", "k2": "max_bond_minutes", "l": "Bond", "h": "от создания токена до миграции", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_tokens_per_chain", "l": "Токенов на сеть", "h": "0 = все найденные", "u": "", "e": "все"}]}]}, {"id": "filters", "i": "🧹", "t": "Фильтры", "groups": [{"t": "📈 Прибыль", "d": "насколько он прибыльный за период", "rows": [{"t": "range", "k": "min_pnl_usd", "k2": "max_pnl_usd", "l": "PnL", "h": "заработал за период, $", "u": "$", "e": "нет"}, {"t": "range", "k": "min_winrate_pct", "k2": "max_winrate_pct", "l": "Винрейт", "h": "доля прибыльных токенов", "u": "%", "e": "нет"}, {"t": "range", "k": "min_median_roi_pct", "k2": "max_median_roi_pct", "l": "Мед. ROI", "h": "обычная сделка в плюсе, а не только редкие иксы", "u": "%", "e": "нет"}, {"t": "num", "k": "min_pnl_pct", "l": "ROI от", "h": "прибыль к вложенному", "u": "%", "e": "нет"}, {"t": "num", "k": "min_x2_exit_pct", "l": "Выход ×2 от", "h": "как часто продаёт на x2+", "u": "%", "e": "нет"}]}, {"t": "🔁 Активность", "d": "сколько и как часто торгует", "rows": [{"t": "range", "k": "min_tokens_traded", "k2": "max_tokens_traded", "l": "Токенов за период", "h": "меньше — ничего не понять", "u": "", "e": "нет"}, {"t": "num", "k": "min_total_cost", "l": "Оборот от", "h": "сколько всего вложил", "u": "$", "e": "нет"}, {"t": "num", "k": "dust_usd", "l": "Пыль до", "h": "покупки меньше — не считать", "u": "$", "e": "нет"}, {"t": "num", "k": "min_trades", "l": "Сделок от", "h": "покупки + продажи (не токены!)", "u": "", "e": "нет"}]}, {"t": "👛 Кошелёк", "d": "сам кошелёк и размер его входов", "rows": [{"t": "num", "k": "min_wallet_age_days", "l": "Возраст от", "h": "первая сделка не моложе", "u": "дн", "e": "нет"}, {"t": "num", "k": "min_native_balance", "l": "Баланс от", "h": "SOL/BNB на кошельке", "u": "SOL", "e": "нет"}, {"t": "range", "k": "min_median_buy_usd", "k2": "max_median_buy_usd", "l": "Обычный вход", "h": "обычный размер входа", "u": "$", "e": "нет"}]}, {"t": "⏱ Стиль", "d": "как долго держит и продаёт ли", "rows": [{"t": "range", "k": "min_hold_min", "k2": "max_hold_min", "l": "Холд", "h": "до первой продажи", "u": "мин", "e": "нет"}, {"t": "num", "k": "max_no_sell_pct", "l": "Без продаж до", "h": "токены, которые так и не продал", "u": "%", "e": "нет"}]}, {"t": "🛡 Скам", "d": "девы, бандлы, раггеры, спам", "rows": [{"t": "toggle", "k": "drop_inconsistent", "l": "Анти-дев", "h": "прибыль у GMGN есть, а продаж нет"}, {"t": "toggle", "k": "exclude_ruggers", "l": "Раггеры", "h": "убирать раггеров из топа"}, {"t": "num", "k": "max_snipe_pct", "l": "Снайп/бандл до", "h": "вход в первые 3 с жизни токена", "u": "%", "e": "нет"}, {"t": "num", "k": "max_rug_token_pct", "l": "Раг-токенов до", "h": "токены, рухнувшие −90% после входа", "u": "%", "e": "нет"}, {"t": "num", "k": "max_not_bought_pct", "l": "Спам до", "h": "токены, которые он не покупал (аирдропы)", "u": "%", "e": "нет"}]}, {"t": "🎯 Мои условия", "d": "какие его сделки повторил бы копи-бот с твоими настройками", "rows": [{"t": "toggle", "k": "cc_enabled", "l": "Условия", "h": "оценивать по сделкам под твои условия"}, {"t": "num", "k": "cc_max_mc", "l": "Капа до", "h": "капа токена при его входе", "u": "$", "e": "любая"}, {"t": "num", "k": "cc_max_age_min", "l": "Возраст ток. до", "h": "возраст токена при его входе", "u": "мин", "e": "любой"}, {"t": "num", "k": "cc_min_buy_native", "l": "Покупка от", "h": "его покупка не меньше", "u": "SOL", "e": "любая"}, {"t": "toggle", "k": "cc_first_buy_only", "l": "Только 1-я", "h": "копировать только 1-ю покупку"}, {"t": "num", "k": "cc_min_trades", "l": "Мин. сделок", "h": "закрытых сделок под условия", "u": "", "e": "нет"}, {"t": "num", "k": "cc_min_share_pct", "l": "Доля под усл. от", "h": "какая доля его сделок подходит", "u": "%", "e": "нет"}]}, {"t": "📥 Сбор", "d": "откуда берём кошельки", "rows": [{"t": "toggle", "k": "token_count_by_gmgn", "l": "Токены", "h": "как считать токены на SOL", "on": "по GMGN", "off": "по истории"}]}]}, {"id": "strat", "i": "🧠", "t": "Стратегия", "groups": [{"t": "Издержки копировщика", "d": "для «Поиск стратегии»: сколько теряет копия на каждой сделке", "rows": [{"t": "num", "k": "strat_slip_in_pct", "l": "Проскальзывание входа", "h": "копия покупает дороже кошелька", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_slip_out_pct", "l": "Проскальзывание выхода", "h": "и продаёт дешевле", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_fee_pct", "l": "Комиссия", "h": "комиссия бота за сделку", "u": "%", "e": "нет"}, {"t": "num", "k": "strat_max_slip_pct", "l": "Макс. проскальзывание", "h": "выше — копия не прошла бы", "u": "%", "e": "нет"}]}, {"t": "Покупка и газ · Solana", "d": "как в TradeWiz: на сколько покупаешь и сколько платишь за каждую транзакцию (покупка и каждая продажа)", "rows": [{"t": "num", "k": "strat_buy_sol", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "SOL", "e": "$100"}, {"t": "num", "k": "strat_prio_sol", "l": "Priority Fee", "h": "за транзакцию", "u": "SOL", "e": "нет"}, {"t": "num", "k": "strat_tip_sol", "l": "Tip", "h": "Jito tip за транзакцию", "u": "SOL", "e": "нет"}]}, {"t": "Покупка и газ · BNB", "d": "то же для BSC", "rows": [{"t": "num", "k": "strat_buy_bnb", "l": "Сумма покупки", "h": "Buy Amount копии", "u": "BNB", "e": "$100"}, {"t": "num", "k": "strat_prio_bnb", "l": "Gas Fee", "h": "за транзакцию", "u": "BNB", "e": "нет"}, {"t": "num", "k": "strat_tip_bnb", "l": "Tip / Bribe", "h": "за транзакцию", "u": "BNB", "e": "нет"}]}, {"t": "Другие сети", "d": "Robinhood, Arc, Elysium", "rows": [{"t": "num", "k": "strat_gas_usd", "l": "Газ за транзакцию", "h": "в $, ставка — условные $100", "u": "$", "e": "нет"}]}]}, {"id": "excel", "i": "📊", "t": "Excel", "groups": [{"t": "Отчёт", "d": "больше досье и расчётов — подробнее, но дольше", "rows": [{"t": "num", "k": "excel_cards_max", "l": "Досье кошельков", "h": "по скольким кошелькам делать подробные листы", "u": "", "e": "нет", "quick": [0, 50, 100, 200, 300]}, {"t": "toggle", "k": "excel_ath", "l": "ATH после входа", "h": "пик цены за 24 ч после входа"}, {"t": "toggle", "k": "excel_token_age", "l": "Возраст токена", "h": "сколько жил токен при покупке"}]}]}, {"id": "presets", "i": "📦", "t": "Пресеты", "groups": []}];
 const tg = window.Telegram && window.Telegram.WebApp;
 const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
+// Telegram на ПК не даёт мини-приложениям читать буфер — кнопку там не показываем, в поле подсказка Ctrl+V
+const X_TGPC = (() => { try { return !!(inTG && window.matchMedia && matchMedia("(pointer: fine)").matches); } catch (e) { return false; } })();
 const SLIDERS = {min_winrate_pct: [30, 40, 50, 60]};
 const IC = {
   strat: '<path d="M3 17l5-5 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h5v5" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -938,7 +940,7 @@ function onchainHTML(){
   return h;
 }
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 09:35 · узкая колонка токенов";
+const BUILD = "26.11 · 15:00 · стратегия: trailing, anti-PvP";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -1407,7 +1409,14 @@ if (tg){
 // SIM-BEGIN — перенос расчёта бота (_strat_check, _sim_tp, _follow_sim, _net_roi, _risk_stats, _oos_verdict) один в один
 const SIM = (() => {
   const netRoi = (g, nSells, cost, stake) => !cost ? g - 1
-    : g * (1 - cost.f) ** 2 * (1 - cost.so) / (1 + cost.si) - 1 - cost.gas * (1 + Math.max(1, nSells)) / stake;
+    : g * (1 - cost.f) ** 2 * (1 - cost.so) / (1 + cost.si) - 1
+      - (cost.gb != null ? cost.gb + cost.gs * Math.max(1, nSells) : cost.gas * (1 + Math.max(1, nSells))) / stake;
+  // таймер продажи: [сек, %] (как у бота) или несколько точек [[сек, %], …] («Свой бэктест», как sell.timed в Blizz)
+  const toList = to => !to ? [] : Array.isArray(to[0]) ? to.filter(x => x && x[0] > 0).slice().sort((a, b) => a[0] - b[0]) : [to];
+  // trailing stop (Blizz «tsl»): после роста на act% от входа — продать всё, когда цена на trig% ниже максимума с покупки.
+  // Как и стоп-лосс — по открытию свечи (минимумов в свечах нет); максимум — по high прошлых свечей.
+  const tslHit = (S, o, p0) => S.tsl && S.on && o && o <= S.pk * (1 - S.tsl.t / 100);
+  const tslUpd = (S, h, p0) => { if (!S.tsl) return; if (h > S.pk) S.pk = h; if (!S.on && S.pk >= p0 * (1 + (S.tsl.a || 0) / 100)) S.on = true; };
   const cmpC = (a, b) => (a[0] - b[0]) || (a[1] - b[1]) || (a[2] - b[2]);
   const evCmp = (a, b) => (a[0] - b[0]) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) || (a[2] - b[2]) || (a[3] - b[3]);
   function priceAt(cs, ts){
@@ -1425,7 +1434,7 @@ const SIM = (() => {
   const cdur = (cs, i) => i + 1 < cs.length ? Math.max(1, Math.min(900, cs[i + 1][0] - cs[i][0]))
     : i > 0 ? Math.max(1, Math.min(900, cs[i][0] - cs[i - 1][0])) : 60;
   // Buy Once ВЫКЛ: копия покупает на каждую его покупку (прошедшую фильтры) — отдельный лот (= _lot_mask/_multi_sim бота)
-  function lotMask(t, v){
+  function lotMask(t, v, ban){
     const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
     const first = ev.findIndex(e => e[1] === "buy"); if (first < 0) return [];
     const mc0 = t.mc, p0 = t.p0, supply = (mc0 && p0) ? mc0 / p0 : null, age0 = t.age;
@@ -1441,22 +1450,26 @@ const SIM = (() => {
         if (mc === null || (v.cap && mc > v.cap) || (v.cap_min && mc < v.cap_min)) ok = false; }
       if (ok && (v.age || v.age_min)){ const ag = age0 != null ? age0 + (ts - t.fb) : null;
         if (ag === null || (v.age && ag > v.age * 60) || (v.age_min && ag < v.age_min * 60)) ok = false; }
+      if (ok && ban && ban(ts)) ok = false;
       out.push(ok);
     });
     return out;
   }
   function multiSim(t, tp, candles, follow, timeout, mask, cost, D, sl){
-    if (!follow && !(tp && tp.length) && !timeout) return null;
+    const TOs = toList(timeout), TSL = D.tsl || null;
+    if (!follow && !(tp && tp.length) && !TOs.length && !TSL) return null;
     const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
     const first = ev.findIndex(e => e[1] === "buy");
     let held = +(t.amt || 0); const p0 = t.p0;
     if (first < 0 || held <= 0 || !p0) return null;
-    if (((tp && tp.length) || timeout) && !(candles && candles.length)) return null;
+    if (((tp && tp.length) || TOs.length || TSL) && !(candles && candles.length)) return null;
     const ratio = t.cp ? t.cp / p0 : 1;
     if (cost && t.cr) cost = {...cost, si: 0};
     const holdS = D.hold_h * 3600;
-    const mk = (ts, pe) => ({ts, pe, left: 1, pr: 0, lv: (tp || []).map(x => x.slice()), ntp: 0, to: false, toc: false, cl: null, sl: false});
-    const lots = [mk(t.fb, p0 * ratio)];
+    const mk = (ts, pe, st) => ({ts, pe, st, left: 1, pr: 0, lv: (tp || []).map(x => x.slice()), ntp: 0, to: false, ton: 0, toc: false, cl: null, sl: false,
+                                 tsl: TSL, pk: pe, on: !!(TSL && !(TSL.a > 0)), ts_: false});
+    const stOf = D.stakeOf || (() => D.stake);   // ставка лота: фикс (D.stake) или своя у «Своего бэктеста» (доля от его покупки)
+    const lots = [mk(t.fb, p0 * ratio, stOf(t.usd))];
     let tl = []; let j = 0;
     ev.forEach((e, k) => {
       if (k === first) return;
@@ -1464,7 +1477,7 @@ const SIM = (() => {
       if (kind === "buy"){ const inc = j < mask.length ? mask[j] : false; j++; tl.push([ts, 0, "buy", [amt, usd, inc]]); }
       else tl.push([ts, 0, "sell", [amt, usd]]);
     });
-    if (timeout) tl.push([t.fb + timeout[0], 1, "to", 0]);
+    for (const x of TOs) tl.push([t.fb + x[0], 1, "to", 0, x[1]]);
     const srt = (candles || []).slice().sort(cmpC);
     const cs = (candles || []).filter(c => c[0] >= t.fb);
     let ci = 0, lastPrice = null; const hits = [];
@@ -1474,11 +1487,13 @@ const SIM = (() => {
         for (const L of lots){
           if (L.left <= 1e-12 || tm < L.ts || (!follow && tm > L.ts + holdS)) continue;
           if (sl && o && o <= L.pe * (1 - sl / 100)){ L.pr += L.left * o / L.pe; L.left = 0; L.sl = true; L.cl = tm; continue; }
+          if (tslHit(L, o, L.pe)){ L.pr += L.left * o / L.pe; L.left = 0; L.ts_ = true; L.cl = tm; continue; }
           while (L.lv.length && L.left > 1e-12 && h >= L.pe * (1 + L.lv[0][0] / 100)){
             const [pct, frac] = L.lv.shift(); const sell = L.left * frac / 100;
             L.pr += sell * (1 + pct / 100); L.left -= sell; L.ntp++; hits.push([pct, tm]);
             if (L.left <= 1e-9) L.cl = tm;
           }
+          tslUpd(L, h, L.pe);
         }
         ci++;
       }
@@ -1487,32 +1502,33 @@ const SIM = (() => {
     tl.sort(tlCmp);
     let k = 0;
     while (k < tl.length){
-      const [ts, , kind, d] = tl[k]; k++;
+      const [ts, , kind, d, tpct] = tl[k]; k++;
       run(ts);
       if (kind === "to"){
         const L = lots[d]; if (L.left <= 1e-9) continue;
         const px = priceAt(srt, ts); if (!px) return null;
-        const sell = L.left * timeout[1] / 100; L.pr += sell * px / L.pe; L.left -= sell; L.to = true;
+        const sell = L.left * tpct / 100; L.pr += sell * px / L.pe; L.left -= sell; L.to = true; L.ton++;
         if (L.left <= 1e-9){ L.cl = ts; L.toc = true; }
         continue;
       }
       if (kind === "buy"){
         const [amt, usd, inc] = d; held += amt;
         if (inc && amt > 0 && usd > 0){
-          lots.push(mk(ts, usd / amt * ratio));
-          if (timeout){ tl.push([ts + timeout[0], 1, "to", lots.length - 1]); tl = tl.slice(0, k).concat(tl.slice(k).sort(tlCmp)); }
+          const st = stOf(usd);
+          if (st > 0) lots.push(mk(ts, usd / amt * ratio, st)); else continue;
+          if (TOs.length){ for (const x of TOs) tl.push([ts + x[0], 1, "to", lots.length - 1, x[1]]); tl = tl.slice(0, k).concat(tl.slice(k).sort(tlCmp)); }
         }
         continue;
       }
       const [amt, usd] = d;
       if (amt <= 0 || held <= 0) continue;
       const price = usd > 0 ? usd / amt : null; if (!price) continue;
-      const frac = Math.min(1, amt / held); held = Math.max(0, held - amt); lastPrice = price;
+      const frac = D.smode === "full" ? 1 : Math.min(1, amt / held); held = Math.max(0, held - amt); lastPrice = price;
       if (!follow) continue;
       for (const L of lots) if (L.left > 1e-12){ const sold = L.left * frac; L.pr += sold * price / L.pe; L.left -= sold; if (L.left <= 1e-9) L.cl = ts; }
     }
     if (!follow) run(Infinity);
-    let roi = 0, gross = 0, exitTs = null, mtm = false;
+    let roi = 0, gross = 0, exitTs = null, mtm = false, pnl = 0, inv = 0;
     for (const L of lots){
       if (L.left > 1e-9){
         if (follow){
@@ -1524,35 +1540,38 @@ const SIM = (() => {
           L.pr += L.left * win[win.length - 1][1] / L.pe; L.cl = L.ts + holdS;
         }
       }
-      const closed = ((tp && tp.length) && L.ntp === tp.length && tp[tp.length - 1][1] === 100) || L.toc || L.sl;
+      const closed = ((tp && tp.length) && L.ntp === tp.length && tp[tp.length - 1][1] === 100) || L.toc || L.sl || L.ts_;
       const g = L.pr - 1; gross += g;
-      roi += netRoi(g + 1, L.ntp + (L.to ? 1 : 0) + (L.sl ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
+      const r = netRoi(g + 1, L.ntp + L.ton + (L.sl ? 1 : 0) + (L.ts_ ? 1 : 0) + (closed ? 0 : 1), cost, L.st);
+      roi += r; pnl += r * L.st; inv += L.st;
       if (L.cl !== null) exitTs = exitTs === null ? L.cl : Math.max(exitTs, L.cl);
     }
-    return {roi, gross, exit_ts: exitTs, hits, lots: lots.length, mtm, to_used: lots.some(L => L.to),
-            tp_all: !!(tp && tp.length) && lots.every(L => L.ntp === tp.length), sl_used: lots.some(L => L.sl)};
+    return {roi, pnl, inv, gross, exit_ts: exitTs, hits, lots: lots.length, mtm, to_used: lots.some(L => L.to),
+            tp_all: !!(tp && tp.length) && lots.every(L => L.ntp === tp.length), sl_used: lots.some(L => L.sl), tsl_used: lots.some(L => L.ts_)};
   }
   // когда копия с Follow Sell продала всё (кошелёк продал всё, что держал) — = _follow_exit_ts бота
-  function followExitTs(t){
+  function followExitTs(t, full){
     const ev = (t.ev || []).filter(e => e[0] >= (t.fb || 0)).slice().sort(evCmp);
     let held = +(t.amt || 0); const fi = ev.findIndex(e => e[1] === "buy");
     if (fi < 0 || held <= 0) return null;
     let left = 1;
     for (const [ts, kind, amt] of ev.slice(0, fi).concat(ev.slice(fi + 1))){
       if (kind === "buy") held += amt;
-      else if (amt > 0 && held > 0){ left -= left * Math.min(1, amt / held); held = Math.max(0, held - amt); if (left <= 0.05) return ts; }
+      else if (amt > 0 && held > 0){ if (full) return ts; left -= left * Math.min(1, amt / held); held = Math.max(0, held - amt); if (left <= 0.05) return ts; }
     }
     return null;
   }
-  function followSim(t, p0, tp, candles, hits, timeout, info, sl){
+  function followSim(t, p0, tp, candles, hits, timeout, info, sl, full, tsl){
     const ev = (t.ev || []).filter(e => e[0] >= t.fb).slice().sort(evCmp);
     if (!ev.length) return null;
     let held = +(t.amt || 0);
     const fi = ev.findIndex(e => e[1] === "buy");
     if (fi < 0 || held <= 0) return null;
     let rest = ev.slice(0, fi).concat(ev.slice(fi + 1));
-    if (timeout) rest = rest.concat([[t.fb + timeout[0], "timeout", 0, 0]]).sort((a, b) => a[0] - b[0]);
+    const TOs = toList(timeout);
+    if (TOs.length) rest = rest.concat(TOs.map(x => [t.fb + x[0], "timeout", 0, 0, x[1]])).sort((a, b) => a[0] - b[0]);
     let left = 1, proceeds = 0; const levels = (tp || []).map(x => x.slice());
+    const S = {tsl, pk: p0, on: !!(tsl && !(tsl.a > 0))};
     const cs = (candles || []).filter(c => c[0] >= t.fb); let ci = 0;
     const sorted = (candles || []).slice().sort(cmpC);
     const runC = until => {
@@ -1560,27 +1579,29 @@ const SIM = (() => {
         const [tm, o, h] = cs[ci];
         // стоп-лосс по открытию свечи (= _follow_sim бота)
         if (sl && left > 1e-12 && o && o <= p0 * (1 - sl / 100)){ proceeds += left * o / p0; left = 0; if (info){ info.sl_used = true; info.sl_ts = tm; } break; }
+        if (left > 1e-12 && tslHit(S, o, p0)){ proceeds += left * o / p0; left = 0; if (info){ info.tsl_used = true; info.tsl_ts = tm; } break; }
         while (levels.length && left > 1e-12 && h >= p0 * (1 + levels[0][0] / 100)){
           const [pct, frac] = levels.shift(); const sell = left * frac / 100;
           proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
         }
+        tslUpd(S, h, p0);
         ci++;
       }
     };
     let last = null;
-    for (const [ts, kind, amt, usd] of rest){
+    for (const [ts, kind, amt, usd, tpct] of rest){
       runC(ts);
       if (left <= 1e-12) break;
       if (kind === "timeout"){
         const px = priceAt(sorted, ts); if (!px) return null;
-        const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell; last = px;
-        if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = ts; }
+        const sell = left * tpct / 100; proceeds += sell * px / p0; left -= sell; last = px;
+        if (info){ info.to_used = true; info.to_n = (info.to_n || 0) + 1; info.to_closed = left <= 1e-9; info.to_ts = ts; }
         continue;
       }
       if (kind === "buy"){ held += amt; continue; }
       if (amt <= 0 || held <= 0) continue;
       const price = usd > 0 ? usd / amt : null; if (!price) continue;
-      const frac = Math.min(1, amt / held), sold = left * frac;
+      const frac = full ? 1 : Math.min(1, amt / held), sold = left * frac;
       proceeds += sold * price / p0; left -= sold; held = Math.max(0, held - amt); last = price;
     }
     if (left > 1e-9){
@@ -1597,34 +1618,39 @@ const SIM = (() => {
     const soldPx = (t.sells && t.sold) ? t.earned / t.sold : null;
     if (!follow){
       const win = candles.filter(c => t.fb <= c[0] && c[0] <= t.fb + D.hold_h * 3600);
-      if (!win.length || !((tp && tp.length) || timeout)) return null;
+      const TOs = toList(timeout);
+      if (!win.length || !((tp && tp.length) || TOs.length || D.tsl)) return null;
       let left = 1, proceeds = 0; const levels = (tp || []).map(x => x.slice());
-      let toTs = timeout ? t.fb + timeout[0] : null; const sorted = candles.slice().sort(cmpC);
+      let qi = 0; const sorted = candles.slice().sort(cmpC);
+      const S = {tsl: D.tsl || null, pk: p0, on: !!(D.tsl && !(D.tsl.a > 0))};
+      const fireTo = () => {
+        const toTs = t.fb + TOs[qi][0];
+        const px = priceAt(sorted, toTs); if (!px) return false;
+        const sell = left * TOs[qi][1] / 100; proceeds += sell * px / p0; left -= sell; qi++;
+        if (info){ info.to_used = true; info.to_n = (info.to_n || 0) + 1; info.to_closed = left <= 1e-9; info.to_ts = toTs; }
+        return true;
+      };
       for (let k = 0; k < win.length; k++){
         const [tm, o, h] = win[k];
-        if (toTs !== null && tm + cdur(win, k) > toTs){
-          const px = priceAt(sorted, toTs); if (!px) return null;
-          const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell; toTs = null;
-          if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = t.fb + timeout[0]; }
-          if (left <= 1e-9) break;
-        }
-        if (sl && left > 1e-9 && o && o <= p0 * (1 - sl / 100)){ proceeds += left * o / p0; left = 0; toTs = null; if (info){ info.sl_used = true; info.sl_ts = tm; } break; }
+        // как у бота: первый таймер «срабатывает» и тогда, когда тейк уже всё продал (одна лишняя продажа в издержках)
+        let fired = false;
+        while (qi < TOs.length && (left > 1e-9 || qi === 0) && tm + cdur(win, k) > t.fb + TOs[qi][0]){ if (!fireTo()) return null; fired = true; }
+        if (fired && left <= 1e-9) break;
+        if (sl && left > 1e-9 && o && o <= p0 * (1 - sl / 100)){ proceeds += left * o / p0; left = 0; qi = TOs.length; if (info){ info.sl_used = true; info.sl_ts = tm; } break; }
+        if (left > 1e-9 && tslHit(S, o, p0)){ proceeds += left * o / p0; left = 0; qi = TOs.length; if (info){ info.tsl_used = true; info.tsl_ts = tm; } break; }
         while (levels.length && h >= p0 * (1 + levels[0][0] / 100)){
           const [pct, frac] = levels.shift(); const sell = left * frac / 100;
           proceeds += sell * (1 + pct / 100); left -= sell; if (hits) hits.push([pct, tm]);
         }
+        tslUpd(S, h, p0);
       }
-      if (toTs !== null && left > 1e-9){
-        const px = priceAt(sorted, toTs); if (!px) return null;
-        const sell = left * timeout[1] / 100; proceeds += sell * px / p0; left -= sell;
-        if (info){ info.to_used = true; info.to_closed = left <= 1e-9; info.to_ts = toTs; }
-      }
+      while (qi < TOs.length && left > 1e-9) if (!fireTo()) return null;
       if (left > 1e-9) proceeds += left * win[win.length - 1][1] / p0;
       return proceeds - 1;
     }
     if (t.ev && t.ev.length && t.amt){
-      if (((tp && tp.length) || timeout) && !candles.length) return null;
-      return followSim(t, p0, tp, candles, hits, timeout, info, sl);
+      if (((tp && tp.length) || timeout || D.tsl) && !candles.length) return null;
+      return followSim(t, p0, tp, candles, hits, timeout, info, sl, D.smode === "full", D.tsl || null);
     }
     if (timeout) return null;
     if (!tp || !tp.length) return soldPx ? soldPx / p0 - 1 : null;
@@ -1648,8 +1674,8 @@ const SIM = (() => {
     const g = simGross(t, tp, candles, follow, hits, timeout, info, D, sl);
     if (g === null || g === undefined) return null;
     const nTp = hits.length - before;
-    const closed = (tp && tp.length && nTp === tp.length && tp[tp.length - 1][1] === 100) || info.to_closed || info.sl_used;
-    return netRoi(g + 1, nTp + (info.to_used ? 1 : 0) + (info.sl_used ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
+    const closed = (tp && tp.length && nTp === tp.length && tp[tp.length - 1][1] === 100) || info.to_closed || info.sl_used || info.tsl_used;
+    return netRoi(g + 1, nTp + (info.to_n || 0) + (info.sl_used ? 1 : 0) + (info.tsl_used ? 1 : 0) + (closed ? 0 : 1), cost, D.stake);
   }
   // почему у сделки нет результата — понятными словами (раньше одна строка «открыта / нет свечей» на всё)
   function whyNone(t, v, cs){
@@ -1712,35 +1738,118 @@ const SIM = (() => {
     if (t.wr < (v.wr != null ? v.wr : t.wr) - 0.2) return ["🟡", "в плюсе, но винрейт заметно ниже, чем на подборе"];
     return ["✅", "держится на новых сделках"];
   }
+  // Паузы Blizz по поведению цели (anti-PvP fast_sell и buy_spam): окна, когда ордер не копирует покупки.
+  // Только по сделкам цели, наш результат на них не влияет. Бан не продлевается; пока он идёт, сделки цели
+  // не считаются; после — счёт с нуля (как в доках Blizz). Продажа «быстрая» — от его первой покупки токена.
+  function banWindows(D, v){
+    const fs = v.fs && v.fs.h > 0 && v.fs.b > 0 ? v.fs : null, bs = v.bsp && v.bsp.c >= 2 && v.bsp.w > 0 && v.bsp.b > 0 ? v.bsp : null;
+    if (!fs && !bs) return null;
+    const evs = [];
+    for (const t of D.tokens) for (const e of (t.ev || [])){
+      if (e[0] < t.fb) continue;
+      if (e[1] === "buy") evs.push([e[0], 1, t.a]);
+      else if (e[1] === "sell" && e[2] > 0) evs.push([e[0], 0, t.a, e[0] - t.fb]);
+    }
+    evs.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));   // в одну секунду — сначала продажи
+    const out = []; let until = -Infinity, buys = [];
+    for (const [ts, isBuy, a, held] of evs){
+      if (ts < until) continue;
+      if (!isBuy){
+        if (fs && held <= fs.h){ until = ts + fs.b; out.push([ts, until, "fast_sell"]); buys = []; }
+        continue;
+      }
+      if (!bs) continue;
+      buys = buys.filter(x => x[0] > ts - bs.w); buys.push([ts, a]);
+      if (new Set(buys.map(x => x[1])).size >= bs.c){ until = ts + bs.b; out.push([ts, until, "buy_spam"]); buys = []; }
+    }
+    return out;
+  }
+  const banAt = (W, ts) => { for (const w of W) if (ts >= w[0] && ts < w[1]) return w; return null; };
+  // Авто-пауза по убыткам (Blizz pause_rules total_loss / loss_streak / recent_loss): проверка при каждом закрытии
+  // нашей сделки; с момента паузы новые входы не копируются до конца периода (включить может только человек),
+  // уже открытые позиции доживают как обычно.
+  function pnlPause(items, pr, nat){
+    if (!pr || !nat || !(pr.tl > 0 || (pr.ls && pr.ls[0] >= 2 && pr.ls[1] > 0) || (pr.rl && pr.rl[0] >= 2 && pr.rl[1] > 0))) return null;
+    const ev = [];
+    items.forEach((x, i) => { ev.push([x.fb, 1, i]); if (x.ex != null) ev.push([x.ex, 0, i]); });
+    ev.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));   // в одну секунду — сначала закрытия
+    let paused = null, tot = 0; const closed = [], skip = new Set();
+    for (const [ts, isEntry, i] of ev){
+      if (isEntry){ if (paused) skip.add(i); continue; }
+      if (skip.has(i)) continue;
+      const pnl = items[i].pnl / nat; tot += pnl; closed.push(pnl);
+      if (paused) continue;
+      let why = null;
+      if (pr.tl > 0 && tot <= -pr.tl) why = `общий минус ${tot.toFixed(3)} SOL ≤ −${pr.tl}`;
+      else if (pr.ls && pr.ls[0] >= 2 && closed.length >= pr.ls[0]){ const l = closed.slice(-pr.ls[0]), s = l.reduce((a, b) => a + b, 0);
+        if (l.every(x => x < 0) && s <= -pr.ls[1]) why = `${pr.ls[0]} минуса подряд на ${s.toFixed(3)} SOL`; }
+      if (!why && pr.rl && pr.rl[0] >= 2 && closed.length >= pr.rl[0]){ const s = closed.slice(-pr.rl[0]).reduce((a, b) => a + b, 0);
+        if (s <= -pr.rl[1]) why = `последние ${pr.rl[0]} сделок: ${s.toFixed(3)} SOL`; }
+      if (why) paused = {ts, why};
+    }
+    return {paused, skip};
+  }
   function backtest(D, v){
-    const cost = D.cost, split = D.split, stake = D.stake, rows = [], trades = [];
+    let cost = D.cost; const split = D.split, stake = D.stake, rows = [], trades = [];
+    // «Свой бэктест» с настройками Blizz (Solana): сумма в SOL — фикс или % от его покупки (с потолком), свои tip/priority
+    // на покупку и продажу, Follow Sell «всё сразу». Без них (v.bsol нет) — расчёт как у бота, один в один.
+    const nat = D.native || (cost && cost.nat) || 0, own = !!(v.bsol > 0 && nat);
+    const stakeOf = !own ? null : usd => (v.bratio > 0 ? Math.min(v.bsol, (+usd || 0) / nat * v.bratio / 100) : v.bsol) * nat;
+    if (own && cost) cost = {...cost, gb: ((+v.tipb || 0) + (+v.prb || 0)) * nat, gs: ((+v.tips || 0) + (+v.prs || 0)) * nat};
+    const full = v.smode === "full", tsl = v.tsl && v.tsl.t > 0 ? v.tsl : null, timers = v.tos && v.tos.length ? v.tos : (v.to || null);
+    const BW = banWindows(D, v);
+    const DD = (own || full || tsl) ? Object.assign(Object.create(D), {smode: full ? "full" : null, stakeOf, tsl}) : D;
     for (const t of D.tokens){
       const why = check(t, v);
       if (why){ trades.push({t, ok: false, why}); continue; }
+      const bw = BW && banAt(BW, t.fb);
+      if (bw){ trades.push({t, ok: false, why: bw[2] === "fast_sell" ? `anti-PvP: он быстро продал токен — покупки на паузе ${Math.round(bw[1] - bw[0])} с`
+        : `buy spam: он скупал много токенов подряд — покупки на паузе ${Math.round(bw[1] - bw[0])} с`}); continue; }
+      const st = own ? stakeOf(t.usd) : stake;
+      if (own && !(st > 0)){ trades.push({t, ok: false, why: "доля от его покупки слишком мала — Blizz пропустит"}); continue; }
+      const Dt = own ? Object.assign(Object.create(DD), {stake: st}) : DD;
       const info = {}, hits = [], cs = D.candles[t.a] || [];
       let roi, mres = null;
-      if (v.once !== false) roi = simTp(t, v.tp || [], cs, v.follow !== false, hits, cost, v.to || null, info, D, v.stop || null);
-      else { mres = multiSim(t, v.tp || [], cs, v.follow !== false, v.to || null, lotMask(t, v), cost, D, v.stop || null); roi = mres ? mres.roi : null; }
+      if (v.once !== false) roi = simTp(t, v.tp || [], cs, v.follow !== false, hits, cost, timers, info, Dt, v.stop || null);
+      else { mres = multiSim(t, v.tp || [], cs, v.follow !== false, timers, lotMask(t, v, BW ? ts => !!banAt(BW, ts) : null), cost, Dt, v.stop || null); roi = mres ? mres.roi : null; }
       if (roi === null || roi === undefined){ trades.push({t, ok: false, why: whyNone(t, v, cs)}); continue; }
       if (mres){
         const ex = mres.exit_ts;
-        rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: ex, hold: ex ? ex - t.fb : null, tp_all: mres.tp_all, to_hit: mres.to_used});
-        trades.push({t, ok: true, roi, test: split != null && t.fb >= split, hold: ex ? ex - t.fb : null, tps: mres.hits.map(h => h[0]), to: mres.to_used, lots: mres.lots, mtm: mres.mtm, sl: mres.sl_used});
+        // сумма по лотам в $ → в долях общей ставки (итоги, просадка, график считают roi × stake); в таблице — свой % и $
+        // в таблице — % от всего вложенного во все покупки токена (раньше — сумма % по покупкам, отсюда «−179%»)
+        const rEff = own ? mres.pnl / stake : roi, rOwn = mres.inv ? mres.pnl / mres.inv : roi;
+        rows.push({t, roi: rEff, test: split != null && t.fb >= split, exit_ts: ex, hold: ex ? ex - t.fb : null, tp_all: mres.tp_all, to_hit: mres.to_used});
+        trades.push({t, ok: true, roi: rOwn, pnl: own ? mres.pnl : roi * stake, inv: mres.inv, test: split != null && t.fb >= split, hold: ex ? ex - t.fb : null, tps: mres.hits.map(h => h[0]), to: mres.to_used, lots: mres.lots, mtm: mres.mtm, sl: mres.sl_used, tsl: mres.tsl_used});
         continue;
       }
       const tp = v.tp || [];
       let exit = null;
       if (info.sl_used) exit = info.sl_ts;
+      else if (info.tsl_used) exit = info.tsl_ts;
       else if (info.to_closed) exit = info.to_ts;
       else if (tp.length && hits.length === tp.length && tp[tp.length - 1][1] === 100) exit = hits[hits.length - 1][1];
-      else if (v.follow !== false) exit = followExitTs(t) || t.ls || null;
+      else if (v.follow !== false) exit = followExitTs(t, full) || t.ls || null;
       else exit = t.fb + D.hold_h * 3600;
-      rows.push({t, roi, test: split != null && t.fb >= split, exit_ts: exit, hold: exit ? exit - t.fb : null,
+      rows.push({t, roi: own ? roi * st / stake : roi, test: split != null && t.fb >= split, exit_ts: exit, hold: exit ? exit - t.fb : null,
                  tp_all: tp.length > 0 && hits.length === tp.length, to_hit: !!info.to_used});
-      trades.push({t, ok: true, roi, test: split != null && t.fb >= split, hold: exit ? exit - t.fb : null,
-                   tps: hits.map(h => h[0]), to: !!info.to_used, mtm: !!info.mtm, sl: !!info.sl_used});
+      trades.push({t, ok: true, roi, pnl: roi * st, inv: own ? st : null, test: split != null && t.fb >= split, hold: exit ? exit - t.fb : null,
+                   tps: hits.map(h => h[0]), to: !!info.to_used, mtm: !!info.mtm, sl: !!info.sl_used, tsl: !!info.tsl_used});
+    }
+    const natP = D.native || (cost && cost.nat) || 0;
+    if (v.pr && rows.length){
+      const okT = trades.filter(x => x.ok), byT = new Map(okT.map(x => [x.t, x]));
+      const items = rows.map(r => ({fb: r.t.fb, ex: r.exit_ts, pnl: (byT.get(r.t) || {}).pnl != null ? byT.get(r.t).pnl : r.roi * stake}));
+      const pp = pnlPause(items, v.pr, natP);
+      if (pp && pp.paused){
+        const drop = new Set([...pp.skip].map(i => rows[i].t));
+        for (let i = rows.length - 1; i >= 0; i--) if (drop.has(rows[i].t)) rows.splice(i, 1);
+        for (const x of trades) if (x.ok && drop.has(x.t)){ x.ok = false; x.why = `авто-пауза ордера: ${pp.paused.why}`; delete x.roi; }
+      }
+      var PAUSED = pp && pp.paused;
     }
     const out = {...v, trades};
+    if (typeof PAUSED !== "undefined" && PAUSED) out.paused = PAUSED;
+    if (BW && BW.length) out.bans = BW.length;
     if (!rows.length) return Object.assign(out, {n: 0, wr: 0, full_total: 0, test: null, verdict: null, max_dd: 0, loss_streak: 0, equity: [], one_hit: null});
     const rois = rows.map(d => d.roi), test = rows.filter(d => d.test).map(d => d.roi), train = rows.filter(d => !d.test).map(d => d.roi);
     const wr = a => a.filter(r => r > 0).length / a.length, sum = a => a.reduce((s, x) => s + x, 0);
@@ -1748,6 +1857,10 @@ const SIM = (() => {
       test: test.length ? {n: test.length, wr: wr(test), total: sum(test) * stake} : null});
     out.verdict = split != null ? verdict({test: out.test, wr: train.length ? wr(train) : out.wr}) : null;
     Object.assign(out, riskStats(rows, stake));
+    if (own && out.one_hit){   // в «весь плюс — одна сделка» — её настоящий %, а не доля общей ставки
+      let b = null; for (const x of trades) if (x.ok && (b === null || x.pnl > b.pnl)) b = x;
+      if (b) out.one_hit.roi = b.roi;
+    }
     const holds = rows.filter(d => d.hold != null).map(d => d.hold);
     out.exits = {n: rows.length, tp: rows.filter(d => d.tp_all).length, to: rows.filter(d => d.to_hit && !d.tp_all).length, hold: holds.length ? med(holds) : null};
     out.mark = out.test && out.equity.length > 1 ? Math.max(0, out.equity.length - out.test.n) / (out.equity.length - 1) : null;
@@ -1789,10 +1902,10 @@ function xChart(eq, mk, color){
 const XEQ = {}; let xeqN = 0;
 // Точки графика из результата бэктеста: сделки в порядке выхода (как считается просадка), баланс нарастающим итогом
 function xEqPts(o, stake){
-  const rows = o.trades.filter(x => x.ok).map(x => ({s: x.t.sym, a: x.t.a, fb: x.t.fb, ex: x.hold != null ? x.t.fb + x.hold : x.t.fb, r: x.roi, te: !!x.test}));
+  const rows = o.trades.filter(x => x.ok).map(x => ({s: x.t.sym, a: x.t.a, fb: x.t.fb, ex: x.hold != null ? x.t.fb + x.hold : x.t.fb, r: x.roi, pn: x.pnl, te: !!x.test}));
   rows.sort((a, b) => a.ex - b.ex);
   let c = 0;
-  return rows.map(x => { c += x.r * stake; return Object.assign(x, {c, p: x.r * stake}); });
+  return rows.map(x => { const p = x.pn != null ? x.pn : x.r * stake; c += p; return Object.assign(x, {c, p}); });
 }
 function xEqBox(pts, mark, color){
   if (!pts || pts.length < 2) return `<div class="x-m" style="padding:30px 0;text-align:center">мало сделок для графика</div>`;
@@ -2002,7 +2115,7 @@ function stList(){
   let h = topHTML("Стратегия", true) + stJobHTML();
   const busy = ST.job && ST.job.state === "run";
   h += `<div class="x-card" style="margin-bottom:6px${busy ? ";opacity:.5;pointer-events:none" : ""}"><div class="x-mh" style="padding:0"><b>Новый поиск</b> · обычный и флипы сразу</div>
-    <div class="x-inw"><textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="адрес или ссылка GMGN" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea><button type="button" class="x-paste" data-xpaste="1">${svg("paste", 15)}Вставить</button></div>
+    <div class="x-inw"><textarea class="x-in x-ta" id="xaddr" rows="${Math.min(6, Math.max(1, ((ST.addr || "").match(/\n/g) || []).length + 1))}" placeholder="${X_TGPC ? "адрес или ссылка GMGN — Ctrl+V" : "адрес или ссылка GMGN"}" autocomplete="off" spellcheck="false">${esc(ST.addr)}</textarea>${X_TGPC ? "" : `<button type="button" class="x-paste" data-xpaste="1">${svg("paste", 15)}Вставить</button>`}</div>
     <div class="x-chips">${per.map(p => `<button class="x-chip${ST.per === p ? " on" : ""}" data-xper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
     <button class="x-btn x-solid" data-xrun="1" style="margin-top:10px">${svg("search", 17)}<span>${xRunLbl(xParseW(ST.addr).length)}</span></button>
     ${P.sa && P.sk ? `<button class="x-btn x-ghost" data-qopen="addr" style="margin-top:8px;height:44px">${svg("bolt", 17)}Быстро: сделки кошелька</button>` : ""}
@@ -2067,6 +2180,8 @@ function xTiles(v){
 function xSettings(rows){
   return `<div class="x-twz"><div class="x-card" style="padding:0">${rows.map((r, j) => {
     const off = /^(не ставить|выкл|ВЫКЛ|нет|не измерено|не указана)/.test(r[1]);
+    const ownBuy = ST.v === "bt" && ST.bt && xBzBuy(ST.bt).bsol;   // в «Своём бэктесте» сумма своя — без «изменить» общей
+    if (ownBuy && r[0] === "Buy Amount") return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v">${esc(r[1])}</span><span class="x-cp">⧉</span></button>`;
     if (r[0] === "Buy Amount" && /^не указана/.test(r[1])) return `<button class="x-s" data-xbuyed="1"><span class="x-k">${esc(r[0])}</span><span class="x-v x-off">${esc(r[1].replace(/ —.*/, ""))}</span><span class="x-cp" style="width:auto;padding:0 8px">✎</span></button>${xBuyEd()}`;
     if (r[0] === "Buy Amount") return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])} <span class="x-link" data-xbuyed="1" style="font-size:12px;margin-left:6px">изменить</span></span><span class="x-v">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>${xBuyEd()}`;
     return `<button class="x-s" data-xcp="${j}"><span class="x-k">${esc(r[0])}</span><span class="x-v${off ? " x-off" : ""}">${esc(xNice(r[1]))}</span><span class="x-cp">⧉</span></button>`;
@@ -2075,7 +2190,9 @@ function xSettings(rows){
 function xRawParams(r){
   r = r || [0, 0, 0, 0, 3, 0, 1, 1, [0, 0], []];
   return {cap: r[0], cap_min: r[1], age: r[2], age_min: r[3], min_usd: r[4], max_usd: r[5], once: !!r[6], follow: !!r[7],
-          to: r[8] && r[8][0] ? r[8] : null, tp: r[9] || [], lp_mode: r[10] || "all", lp: r[11] || null, stop: r[12] || null};
+          to: r[8] && r[8][0] ? r[8] : null, tp: r[9] || [], lp_mode: r[10] || "all", lp: r[11] || null, stop: r[12] || null,
+          tsl: Array.isArray(r[13]) && r[13][0] > 0 ? {t: r[13][0], a: r[13][1] || 0} : null, smode: r[14] ? "full" : null,
+          fs: Array.isArray(r[15]) && r[15][0] > 0 ? {h: r[15][0], b: r[15][1]} : null};
 }
 let xSort = "date", xDir = -1, xFlt = "all", xShowBad = false, xAll = false;
 function xPeak(sd, t){   // пик цены после входа (по свечам окна), во сколько раз от его входа
@@ -2094,7 +2211,21 @@ function xParamsToB(p){
   return {cap: p.cap || "", cm: p.cap_min || "", ag: p.age || "", am: p.age_min || "", mn: p.min_usd ? Math.round(p.min_usd * 100) / 100 : "", mx: p.max_usd ? Math.round(p.max_usd * 100) / 100 : "",
           o: p.once ? 1 : 0, f: p.follow ? 1 : 0, to: p.to ? p.to[0] : "", tp_: p.to ? p.to[1] : 100,
           t1: tp[0] ? tp[0][0] : "", s1: tp[0] ? tp[0][1] : "", t2: tp[1] ? tp[1][0] : "", s2: tp[1] ? tp[1][1] : "", sl: p.sl == null ? "" : p.sl,
-          stp: p.stop || ""};
+          stp: p.stop || "", ...xListsToB(p)};
+}
+function xListsToB(p){
+  const o = {}, tp = (p.tp || []).slice(0, 8), tos = (p.tos && p.tos.length ? p.tos : p.to ? [p.to] : []).slice(0, 8);
+  o.tpn = Math.max(1, tp.length); tp.forEach((x, i) => { o["r" + i] = x[0]; o["q" + i] = x[1]; });
+  o.ton = Math.max(1, tos.length); tos.forEach((x, i) => { o["w" + i] = x[0]; o["z" + i] = x[1]; });
+  if (!tp.length){ o.r0 = ""; o.q0 = ""; }
+  if (!tos.length){ o.w0 = ""; o.z0 = 100; }
+  o.tr = p.tsl ? p.tsl.t : ""; o.ta = p.tsl ? p.tsl.a || "" : "";
+  if (p.bsol){ o.bs = p.bsol; o.bro = p.bratio ? 1 : 0; o.brp = p.bratio || ""; o.tb = p.tipb; o.pb = p.prb; o.ts = p.tips; o.ps = p.prs; }
+  if (p.smode === "full") o.sf = 1;
+  if (p.fs){ o.fh = p.fs.h; o.fb = p.fs.b; }
+  if (p.bsp){ o.sc = p.bsp.c; o.sw = p.bsp.w; o.sb = p.bsp.b; }
+  if (p.pr){ o.lt = p.pr.tl || ""; if (p.pr.ls){ o.lsn = p.pr.ls[0]; o.lss = p.pr.ls[1]; } if (p.pr.rl){ o.lrn = p.pr.rl[0]; o.lrs = p.pr.rl[1]; } }
+  return o;
 }
 function xExCands(sd, P, E, keep){
   // одна настройка, которая отсекает ВСЕ отмеченные токены; считаем бэктестом, сколько ещё сделок уйдёт
@@ -2129,7 +2260,7 @@ function xTrades(D, o, color, P){
   let ok = all.filter(x => xFlt === "all" || (xFlt === "win" && x.roi > 0) || (xFlt === "loss" && x.roi <= 0) || (xFlt === "new" && x.test));
   const key = {date: x => x.t.fb, roi: x => x.roi, mc: x => x.t.mc || 0, pk: x => x.pk || 0, hold: x => x.hold || 0, usd: x => x.t.usd, age: x => x.t.age || 0};
   ok.sort((a, b) => (key[xSort](a) - key[xSort](b)) * xDir);
-  const sum = a => a.reduce((s, x) => s + x.roi, 0) * stake;
+  const sum = a => a.reduce((s, x) => s + (x.pnl != null ? x.pnl : x.roi * stake), 0);
   const dt = ts => new Date(ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}).replace(",", "");
   const mc = x => x == null ? "—" : x >= 1e6 ? "$" + (x / 1e6).toFixed(1) + "M" : x >= 1000 ? "$" + (x / 1000).toFixed(x >= 10000 ? 0 : 1) + "K" : "$" + Math.round(x);
   const hd = (k, l) => `<th data-xsort="${k}" class="${xSort === k ? "on" : ""}">${l}${xSort === k ? (xDir < 0 ? " ↓" : " ↑") : ""}</th>`;
@@ -2143,8 +2274,8 @@ function xTrades(D, o, color, P){
       <td class="x-st"><div class="x-tk">${P ? `<input type="checkbox" class="x-chk" data-xex="${esc(x.t.a)}" ${EX.has(x.t.a) ? "" : "checked"} aria-label="оставить токен">` : ""}<button data-xtok="${esc(x.t.a)}" class="x-tl" title="${esc(x.t.sym)} — график в GMGN">${esc(x.t.sym)}</button>${x.test ? '<i class="x-nd" title="новая сделка (проверка)"></i>' : ""}<button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button></div></td>
       <td>${dt(x.t.fb)}</td><td>${x.t.age != null ? (xDur(x.t.age) || "<1 мин") : "—"}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td>
       <td>${x.pk ? "x" + x.pk.toFixed(x.pk >= 10 ? 0 : 1) : "—"}</td><td>${x.hold != null ? (xDur(x.hold) || "<1 мин") : "—"}</td>
-      <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * stake)}</span></td>
-      <td class="x-m">${x.sl ? (x.tps && x.tps.length ? "TP " + x.tps.join("/") + "% + " : "") + "стоп-лосс" : x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}${x.mtm ? " · ещё держит — по последней цене" : ""}${x.lots > 1 ? " · " + x.lots + " покупки" : ""}</td></tr>`).join("");
+      <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.pnl != null ? x.pnl : x.roi * stake)}</span></td>
+      <td class="x-m">${x.sl || x.tsl ? (x.tps && x.tps.length ? "TP " + x.tps.join("/") + "% + " : "") + (x.tsl ? "trailing" : "стоп-лосс") : x.tps && x.tps.length ? "TP " + x.tps.join("/") + "%" + (x.to ? " + тайм." : "") : x.to ? "таймаут" : "за кошельком"}${x.mtm ? " · ещё держит — по последней цене" : ""}${x.lots > 1 ? " · " + x.lots + " покупки" : ""}</td></tr>`).join("");
   h += `</tbody></table></div>`;
   if (ok.length > 30) h += `<button class="x-link" data-xall="1" style="margin:12px 4px 0;font-size:13.5px">${xAll ? "Свернуть" : `Показать все ${ok.length}`}</button>`;
   if (bad.length){
@@ -2196,10 +2327,54 @@ function stDetail(D){
 }
 function btParams(){
   const B = ST.bt, n = x => +String(x || "").replace(",", ".") || 0;
-  const tp = [[n(B.t1), n(B.s1)], [n(B.t2), n(B.s2)]].filter(([a]) => a > 0).map(([a, b]) => [a, b > 0 ? Math.min(100, b) : 100]);
+  xBtMigrate(B);
+  // тейки и таймеры — списки до 8 строк (как sell.auto / sell.timed в Blizz), по возрастанию
+  const tp = [...Array(B.tpn || 0).keys()].map(i => [n(B["r" + i]), n(B["q" + i])]).filter(([a]) => a > 0)
+    .map(([a, b]) => [a, b > 0 ? Math.min(100, b) : 100]).sort((x, y) => x[0] - y[0]);
+  const tos = [...Array(B.ton || 0).keys()].map(i => [n(B["w" + i]), n(B["z" + i])]).filter(([a]) => a > 0)
+    .map(([a, b]) => [Math.round(a), b > 0 ? Math.min(100, b) : 100]).sort((x, y) => x[0] - y[0]);
   return {cap: n(B.cap), cap_min: n(B.cm), age: n(B.ag), age_min: n(B.am), min_usd: n(B.mn), max_usd: n(B.mx),
-          once: !!B.o, follow: !!B.f, to: n(B.to) ? [n(B.to), Math.min(100, n(B.tp_) || 100)] : null, tp, lp_mode: "all", lp: null,
-          sl: String(B.sl ?? "").trim() === "" ? null : n(B.sl), stop: n(B.stp) > 0 ? Math.min(99, n(B.stp)) : null};
+          once: !!B.o, follow: !!B.f, to: tos.length ? tos[0] : null, tos: tos.length > 1 ? tos : null, tp, lp_mode: "all", lp: null,
+          tsl: n(B.tr) > 0 ? {t: Math.min(99, n(B.tr)), a: n(B.ta)} : null,
+          sl: String(B.sl ?? "").trim() === "" ? null : n(B.sl), stop: n(B.stp) > 0 ? Math.min(99, n(B.stp)) : null,
+          ...xBzBuy(B)};
+}
+// старые сохранённые бэктесты (TP1/TP2 и один таймаут) → списки строк
+function xBtMigrate(B){
+  if (!B) return;
+  if (B.tpn === undefined){ B.tpn = 2; B.r0 = B.t1 ?? ""; B.q0 = B.s1 ?? ""; B.r1 = B.t2 ?? ""; B.q1 = B.s2 ?? ""; }
+  if (B.ton === undefined){ B.ton = 1; B.w0 = B.to ?? ""; B.z0 = B.tp_ ?? 100; }
+}
+// Покупка и комиссии как в Blizz — только Solana: сумма (фикс или % от его покупки с потолком), tip/priority на покупку
+// и продажу, Follow Sell «всё сразу». Пустая сумма — как раньше (сумма и газ из «Ещё → Покупка и газ»).
+function xBzBuy(B){
+  const D = xD(), n = x => +String(x || "").replace(",", ".") || 0;
+  if (!D || D.c !== "sol") return B && B.f && B.sf ? {smode: "full"} : {};
+  const pz = xBzPause(B, n);
+  if (!(n(B.bs) > 0)) return Object.assign(B.f && B.sf ? {smode: "full"} : {}, pz);
+  return {...pz, bsol: n(B.bs), bratio: B.bro && n(B.brp) > 0 ? Math.min(1000, n(B.brp)) : null,
+          tipb: n(B.tb), prb: n(B.pb), tips: n(B.ts), prs: n(B.ps), smode: B.f && B.sf ? "full" : null};
+}
+// паузы Blizz: anti-PvP (fast_sell), buy spam, авто-пауза по убыткам — пустые поля = правило выключено
+function xBzPause(B, n){
+  const o = {};
+  if (n(B.fh) > 0 && n(B.fb) > 0) o.fs = {h: Math.min(3600, n(B.fh)), b: Math.min(3600, n(B.fb))};
+  if (n(B.sc) >= 2 && n(B.sw) > 0 && n(B.sb) > 0) o.bsp = {c: Math.min(50, Math.round(n(B.sc))), w: Math.min(3600, Math.max(10, n(B.sw))), b: Math.min(3600, n(B.sb))};
+  const pr = {};
+  if (n(B.lt) > 0) pr.tl = n(B.lt);
+  if (n(B.lsn) >= 2 && n(B.lss) > 0) pr.ls = [Math.min(50, Math.round(n(B.lsn))), n(B.lss)];
+  if (n(B.lrn) >= 2 && n(B.lrs) > 0) pr.rl = [Math.min(50, Math.round(n(B.lrn))), n(B.lrs)];
+  if (Object.keys(pr).length) o.pr = pr;
+  return o;
+}
+function xBzDefaults(B, sd){
+  // первое открытие «Своего бэктеста» на Solana — подставляем то, что сейчас в «Покупка и газ»
+  const c = (sd && sd.cost) || {};
+  if (B.bs === undefined && c.buy){ B.bs = c.buy; B.tb = c.tip; B.ts = c.tip; B.pb = c.prio; B.ps = c.prio; }
+}
+function xBtRowsAll(D, base){
+  const v = btParams(), rows = btRows(D, v, base);
+  return v.bsol ? rows : xWithBuy(D, rows);
 }
 function btRows(D, v, base){
   const sd = ST.sd[D.api] || {}, nat = sd.native, sym = {bsc: "BNB", sol: "SOL", robinhood: "ETH", elysium: "HYPE"}[D.c] || "";
@@ -2208,8 +2383,17 @@ function btRows(D, v, base){
   const rows = [["Max MC", money(v.cap)], ["Min MC", money(v.cap_min)], ["Max Token Age", v.age ? v.age + " мин" : "не ставить"],
     ["Min Token Age", v.age_min ? v.age_min + " мин" : "не ставить"], ["Min Trigger Buy", native(v.min_usd)], ["Max Trigger Buy", native(v.max_usd)],
     ["Buy Once Only", v.once ? "вкл" : "выкл"], ["Take Profit", v.tp.length ? v.tp.map(([a, b]) => `${a}% → продажа ${b}%`).join(", ") : "нет"],
-    ["Таймаут", v.to ? `${v.to[0]} сек → продажа ${v.to[1]}%` : "выкл"], ["Stop Loss", v.stop ? `−${v.stop}% → продажа 100%` : "не ставить"],
-    ["Follow Sell", v.follow ? "вкл" : "ВЫКЛ"], ["Лаунчпады", "все"]];
+    ["Таймаут", (v.tos || (v.to ? [v.to] : [])).length ? (v.tos || [v.to]).map(([a, b]) => `${a} сек → продажа ${b}%`).join(", ") : "выкл"],
+    ...(v.tsl ? [["Trailing Stop", `−${v.tsl.t}% от максимума${v.tsl.a ? `, после +${v.tsl.a}%` : ""}`]] : []),
+    ...(v.fs ? [["Anti-PvP (Blizz)", `продал быстрее ${v.fs.h} с → пауза покупок ${v.fs.b} с`]] : []),
+    ...(v.bsp ? [["Buy Spam (Blizz)", `${v.bsp.c} токенов за ${v.bsp.w} с → пауза ${v.bsp.b} с`]] : []),
+    ...(v.pr ? [["Авто-пауза (Blizz)", [v.pr.tl ? `общий минус ${v.pr.tl} SOL` : "", v.pr.ls ? `${v.pr.ls[0]} минуса подряд на ${v.pr.ls[1]} SOL` : "", v.pr.rl ? `последние ${v.pr.rl[0]} сделок −${v.pr.rl[1]} SOL` : ""].filter(Boolean).join(" · ")]] : []), ["Stop Loss", v.stop ? `−${v.stop}% → продажа 100%` : "не ставить"],
+    ["Follow Sell", v.follow ? (v.smode === "full" ? "вкл · продавать всё сразу" : "вкл · ту же долю, что он") : "ВЫКЛ"], ["Лаунчпады", "все"]];
+  if (v.bsol){
+    const s = x => (+x).toFixed(6).replace(/\.?0+$/, "");
+    return [["Buy Amount", v.bratio ? `${v.bratio}% от его покупки, макс ${s(v.bsol)} SOL` : `${s(v.bsol)} SOL`]].concat(rows,
+      [["Tip покупки", s(v.tipb) + " SOL"], ["Priority Fee покупки", s(v.prb) + " SOL"], ["Tip продажи", s(v.tips) + " SOL"], ["Priority Fee продажи", s(v.prs) + " SOL"]]);
+  }
   return rows.concat((base.s || []).filter(r => /Fee|Tip|Газ/.test(r[0])));
 }
 // Запоминаем, где ты был и что настроил в «Своём бэктесте» — по кошельку и периоду. После обновления страницы
@@ -2255,7 +2439,9 @@ function stBt(D){
     ST.bt = {cap: r[0] || "", cm: r[1] || "", ag: r[2] || "", am: r[3] || "", mn: r[4] || "", mx: r[5] || "", o: r[6], f: r[7],
              to: r[8][0] || "", tp_: r[8][1] || 100, t1: (r[9][0] || [])[0] || "", s1: (r[9][0] || [])[1] || "", t2: (r[9][1] || [])[0] || "", s2: (r[9][1] || [])[1] || "",
              stp: r[12] || ""};
+    { const P0 = xRawParams(r); Object.assign(ST.bt, xListsToB({tp: P0.tp, to: P0.to, tsl: P0.tsl, smode: P0.smode, fs: P0.fs})); }
   }
+  xBtMigrate(ST.bt);
   let h = xHead("Свой бэктест", M.t, "detail") + `<div class="x-note" style="margin:-4px 2px 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Настройки сохраняются сами — после обновления страницы будут те же.</span><button class="x-link" data-xbtreset="1">вернуть как в варианте «${esc(base.nm)}»</button></div><div class="x-2 x-btl"><div class="x-r x-btres">`;
   const sd = ST.sd[D.api];
   if (!D.api) h += `<div class="x-card x-m">Этот поиск сделан до подключения сервера — запусти поиск заново, тогда бэктест заработает здесь.</div>`;
@@ -2264,24 +2450,40 @@ function stBt(D){
     const v = btParams(), o = SIM.backtest(sd, v);
     const view = {tot: o.full_total, te: o.test ? o.test.total : null, dd: o.max_dd, n: o.n, wr: o.wr, ls: o.loss_streak};
     h += `<div id="xres">${xTiles(view)}${xVdNote(o.verdict)}
+      ${o.paused ? `<div class="x-tag" style="margin:8px 2px 0">⏸ ордер встал ${new Date(o.paused.ts * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})}: ${esc(o.paused.why)} — дальше сделок нет</div>` : ""}${o.bans ? `<div class="x-tag" style="margin:8px 2px 0">пауз покупок (anti-PvP / buy spam): ${o.bans}</div>` : ""}
       ${o.one_hit ? `<div class="x-tag" style="margin:8px 2px 0">${XW}весь плюс — одна сделка (${esc(o.one_hit.sym)} ${o.one_hit.roi > 0 ? "+" : ""}${Math.round(o.one_hit.roi * 100)}%); без неё ${xUsd(o.one_hit.ex)}</div>` : ""}
       <div class="x-card" style="margin-top:10px;padding:12px 14px 8px"><div class="x-mh" style="padding:0"><b style="font-size:13px">Баланс копии</b> · было «${esc(base.nm)}» ${xUsd(base.tot)}</div>${xEqBox(xEqPts(o, sd.stake || 100), o.mark, M.c)}</div>${xCalHTML(xEqPts(o, sd.stake || 100), D.p)}</div>`;
     ST.btTrades = o;
   }
   h += `</div><div class="x-l x-btform">`;
+  if (D.c === "sol") xBzDefaults(ST.bt, sd);
   const B = ST.bt, inp = (id, label, ph) => `<label class="x-fl">${label}<input inputmode="decimal" data-xf="${id}" value="${esc(B[id] == null ? "" : B[id])}" placeholder="${ph}"></label>`;
   h += `<div class="x-sec">Вход</div><div class="x-f">${inp("cap", "Max MC, $", "любая")}${inp("cm", "Min MC, $", "нет")}${inp("ag", "Max возраст, мин", "любой")}${inp("am", "Min возраст, мин", "нет")}${inp("mn", "Вход от, $", "любой")}${inp("mx", "Вход до, $", "любой")}${inp("sl", "Макс. проскальзывание, %", "не ограничивать")}</div>
     <div class="x-note" style="margin:6px 2px 0">Пусто — копия берёт все сделки (по цене, замеренной по блокчейну). Число — не брать сделки, где копия дороже его входа больше чем на столько %.</div>
     <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="o"><span>Только 1-я покупка (Buy Once)</span><span class="x-sw${B.o ? " on" : ""}"></span></button>
       <button class="x-tg" data-xsw="f"><span>Follow Sell — продавать за кошельком</span><span class="x-sw${B.f ? " on" : ""}"></span></button></div>
     ${B.o ? "" : `<div class="x-note" style="margin:6px 2px 0">Buy Once выкл: копия покупает на каждую его покупку (если та проходит фильтры: сумма, капа и возраст в момент покупки) по ${stakeLbl(sd)} — у каждой свои тейки и таймаут, Follow Sell продаёт у всех ту же долю.</div>`}
-    ${!B.f && !(+B.t1 > 0 || +B.t2 > 0) && !(+B.to > 0) ? `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">${XW}<b>У копии нет выхода:</b> Follow Sell выключен, а тейков и таймаута нет — копия так и держит, итог не посчитать (поэтому 0 сделок). Поставь тейк (TP1) или таймаут, или включи Follow Sell.</div></div>` : ""}
-    <div class="x-sec">Тейки</div><div class="x-f">${inp("t1", "TP1: рост, %", "нет")}${inp("s1", "TP1: продать, %", "100")}${inp("t2", "TP2: рост, %", "нет")}${inp("s2", "TP2: продать, %", "100")}</div>
-    <div class="x-sec">Таймаут</div><div class="x-f">${inp("to", "Через, сек", "выкл")}${inp("tp_", "Продать, %", "100")}</div>
+    ${!B.f && ![...Array(B.tpn || 0).keys()].some(i => +B["r" + i] > 0) && ![...Array(B.ton || 0).keys()].some(i => +B["w" + i] > 0) && !(+B.tr > 0) ? `<div class="x-card x-vd x-w" style="margin-top:8px"><div class="x-vs" style="margin:0">${XW}<b>У копии нет выхода:</b> Follow Sell выключен, а тейков и таймаута нет — копия так и держит, итог не посчитать (поэтому 0 сделок). Поставь тейк (TP1) или таймаут, или включи Follow Sell.</div></div>` : ""}
+    ${B.f ? `<div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="sf"><span>Follow Sell: продавать всё сразу<span class="x-m" style="display:block;font-size:12px;font-weight:400">выкл — ту же долю, что продал он (Blizz «ratio»)</span></span><span class="x-sw${B.sf ? " on" : ""}"></span></button></div>` : ""}
+    ${D.c === "sol" ? `<div class="x-sec">Покупка и комиссии (Blizz)</div><div class="x-f">${inp("bs", B.bro ? "Макс. покупка, SOL" : "Сумма покупки, SOL", "как в настройках")}${B.bro ? inp("brp", "Доля от его покупки, %", "50") : ""}${inp("tb", "Tip покупки, SOL", "0.001")}${inp("pb", "Priority покупки, SOL", "0.0005")}${inp("ts", "Tip продажи, SOL", "0.001")}${inp("ps", "Priority продажи, SOL", "0.0005")}</div>
+    <div class="x-card" style="padding:0;margin-top:8px"><button class="x-tg" data-xsw="bro"><span>Сумма — % от его покупки<span class="x-m" style="display:block;font-size:12px;font-weight:400">как «ratio» в Blizz: он купил на 2 SOL, 30% → 0.6 SOL, но не больше макс. покупки</span></span><span class="x-sw${B.bro ? " on" : ""}"></span></button></div>
+    <div class="x-note" style="margin:6px 2px 0">Итог считается в $ по курсу SOL; комиссии — tip + priority на каждую покупку и каждую продажу${+(B.bs || 0) > 0 ? "" : ". Пустая сумма — берётся из «Ещё → Покупка и газ»"}.</div>
+    <div class="x-sec">Паузы (Blizz)</div>
+    <div class="x-f">${inp("fh", "Anti-PvP: он продал быстрее, сек", "выкл")}${inp("fb", "→ пауза покупок, сек", "600")}</div>
+    <div class="x-f" style="margin-top:8px">${inp("sc", "Buy spam: токенов", "выкл")}${inp("sw", "за, сек", "60")}${inp("sb", "→ пауза, сек", "600")}</div>
+    <div class="x-f" style="margin-top:8px">${inp("lt", "Стоп ордера: общий минус, SOL", "выкл")}<span></span>${inp("lsn", "Минусов подряд", "выкл")}${inp("lss", "…и вместе ≥, SOL", "0.3")}${inp("lrn", "Последних сделок", "выкл")}${inp("lrs", "…в сумме минус ≥, SOL", "0.3")}</div>
+    <div class="x-note" style="margin:6px 2px 0">Anti-PvP и buy spam — по сделкам кошелька: пока пауза, его покупки не копируются. Стоп ордера — по нашим сделкам: сработал — новых входов больше нет (в Blizz включаешь сам), открытые доживают.${ST.btTrades && ST.btTrades.paused ? ` <b class="x-bad">В этом бэктесте ордер встал: ${esc(ST.btTrades.paused.why)}.</b>` : ""}${ST.btTrades && ST.btTrades.bans ? ` Пауз покупок: ${ST.btTrades.bans}.` : ""}</div>` : ""}
+    <div class="x-sec">Тейки</div><div class="x-f">${[...Array(B.tpn || 1).keys()].map(i => inp("r" + i, `TP${i + 1}: рост, %`, "нет") + inp("q" + i, `TP${i + 1}: продать, %`, "100")).join("")}</div>
+    <div class="x-chips" style="margin-top:6px">${(B.tpn || 1) < 8 ? `<button class="x-chip" data-xbtadd="tp">+ тейк</button>` : ""}${(B.tpn || 1) > 1 ? `<button class="x-chip" data-xbtdel="tp">− убрать последний</button>` : ""}</div>
+    <div class="x-note" style="margin:6px 2px 0">«Продать, %» — доля от того, что ещё осталось (как в Blizz). Последний тейк на 100% закрывает позицию.</div>
+    <div class="x-sec">Trailing stop</div><div class="x-f">${inp("tr", "Откат от максимума, %", "выкл")}${inp("ta", "Включить после роста, %", "сразу")}</div>
+    <div class="x-note" style="margin:6px 2px 0">Когда цена выросла на «включить после» от входа — продать всё, если она упадёт на «откат» от максимума с покупки. Считается по открытию свечей, как стоп-лосс.</div>
+    <div class="x-sec">Таймеры продажи</div><div class="x-f">${[...Array(B.ton || 1).keys()].map(i => inp("w" + i, `${(B.ton || 1) > 1 ? i + 1 + ": " : ""}через, сек`, "выкл") + inp("z" + i, "продать, %", "100")).join("")}</div>
+    <div class="x-chips" style="margin-top:6px">${(B.ton || 1) < 8 ? `<button class="x-chip" data-xbtadd="to">+ таймер</button>` : ""}${(B.ton || 1) > 1 ? `<button class="x-chip" data-xbtdel="to">− убрать последний</button>` : ""}</div>
     <div class="x-sec">Стоп-лосс</div><div class="x-f">${inp("stp", "Падение от входа, %", "нет")}</div>
     <div class="x-note" style="margin:6px 2px 0">Цена упала на столько % от входа копии — продать всё. Считается по открытию свечей: проколы внутри свечи не видны, в жизни стоп может срабатывать чаще.</div>
     <div class="x-note">Без Follow Sell и без таймаута копия может висеть часами, если тейк не дошёл. Расчёт — тот же, что у бота, с твоими издержками.</div>`;
-  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(xWithBuy(D, btRows(D, btParams(), base))) + xBlizzBox(D, "bt");
+  if (sd) h += `<div class="x-sec">Эти настройки для TradeWiz</div>` + xSettings(xBtRowsAll(D, base)) + xBlizzBox(D, "bt");
   h += `</div><div class="x-r x-bttab">`;
   if (sd && ST.btTrades) h += `<div id="xbtt">${xTrades(D, ST.btTrades, M.c, btParams())}</div>`;
   return h + `</div></div>`;
@@ -2480,7 +2682,7 @@ const xWithBuy = (D, rows) => { const b = xBuyRow(D); return b ? [b].concat(rows
 function stCurRows(){
   const D = xD(); if (!D) return [];
   const base = D.m[ST.m].v[ST.k];
-  return xWithBuy(D, ST.v === "bt" ? btRows(D, btParams(), base) : base.s);
+  return ST.v === "bt" ? xBtRowsAll(D, base) : xWithBuy(D, base.s);
 }
 async function xCopy(text){
   try { await navigator.clipboard.writeText(text); }
@@ -2679,6 +2881,14 @@ document.addEventListener("click", async e => {
     else { const pk = D0.pk || {}; ST.m = pk.m === "flip" && D0.m.f ? "f" : "n"; ST.k = (D0.m[ST.m] && D0.m[ST.m].r) || 0; ST.bt = null; }
     ST.v = "bt"; render(); window.scrollTo(0, 0); return; }
   if (t.closest("[data-xbtreset]")){ ST.bt = null; render(true); return; }
+  const ba = t.closest("[data-xbtadd]"), bdl = t.closest("[data-xbtdel]");
+  if ((ba || bdl) && ST.bt){
+    const k = (ba || bdl).dataset[ba ? "xbtadd" : "xbtdel"], cnt = k === "tp" ? "tpn" : "ton", B = ST.bt;
+    xBtMigrate(B);
+    if (ba) B[cnt] = Math.min(8, (B[cnt] || 1) + 1);
+    else { const i = (B[cnt] || 1) - 1; B[cnt] = Math.max(1, i); if (k === "tp"){ B["r" + i] = ""; B["q" + i] = ""; } else { B["w" + i] = ""; B["z" + i] = ""; } }
+    xMemSave(); render(true); return;
+  }
   const sw = t.closest("[data-xsw]"); if (sw && ST.bt){ ST.bt[sw.dataset.xsw] = ST.bt[sw.dataset.xsw] ? 0 : 1; render(true); return; }
   const cp = t.closest("[data-xcp]"); if (cp){ const r = stCurRows()[+cp.dataset.xcp]; if (r){ await xCopy(r[1].replace(/\s*\(~\$[^)]*\)/, "").replace(/\s*\(только Jito\)/, "")); cp.classList.add("done"); xToast("Скопировано: " + r[0]); } return; }
   if (t.closest("[data-xcpall]")){ await xCopy(stCurRows().map(r => r[0] + ": " + r[1]).join("\n")); xToast("Все настройки скопированы"); }
