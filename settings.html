@@ -205,7 +205,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .abar{display:none;gap:8px}
 .abar.on{display:flex}
 .abar .cta{height:50px;white-space:nowrap;font-size:15px}
-.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;padding:5px}
+.nav{height:62px;border-radius:22px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;padding:5px}
 .nav button{position:relative;height:50px;border-radius:17px;border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px}
 .nav button.on{background:var(--chip);color:var(--acc-l);font-weight:600}
 .nav .n{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;padding:0 4px;background:var(--acc);color:var(--acc-ink);font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
@@ -280,6 +280,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .hero .glow,.hero .dots{display:none}
 .hero .mark{opacity:.13}
 .glass{background:rgba(16,16,20,.72);-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.35)}
+/* «Слежка» — на тех же строках, что «Мои поиски» */
+.wt-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 4px 4px}
+.wt-st{font-weight:600}
+.wt-x{border:0;background:none;color:var(--dim);font-size:13px;padding:6px}
+.wt-sub{padding-left:40px!important}
+.wt-sub .x-dot{margin-left:11px}
+.x-btn.wt-go{height:32px;width:auto;padding:0 12px;border-radius:10px;font-size:12.5px}
+.wt-add{display:flex;gap:8px;margin:8px 0 0}
+.wt-add .ti{height:40px;font-size:13.5px}
+.wt-add .btn{height:40px;flex:none}
+@media (max-width:460px){.nav{padding:5px 3px}.nav button{font-size:9.2px;letter-spacing:-.25px;padding:0;white-space:nowrap}}
+@media (max-width:385px){.nav button{font-size:8.4px;letter-spacing:-.3px}}
 .nav{border-radius:24px}
 .nav button{border-radius:18px}
 .nav button.on{background:rgba(255,255,255,.08);color:var(--text);box-shadow:none}
@@ -577,6 +589,7 @@ const IC = {
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
   coins: '<circle cx="9" cy="9" r="5"/><path d="M14.5 6.5A5 5 0 1 1 9 18" stroke-linecap="round"/>',
   back: '<path d="M15 5l-7 7 7 7" stroke-linecap="round"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/>',
   pulse: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
   belloff: '<path d="M9 18h6M6 16V11a6 6 0 0 1 9.5-4.9M18 11v5l1.5 2H8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3l18 18" stroke-linecap="round"/>',
   check: '<path d="M4 12.5l5.5 5.5L20 7" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -939,8 +952,88 @@ function onchainHTML(){
   h += `<div class="foot">DefiLlama + GMGN${when ? " · обновлено " + when : ""}${o.e ? `<br><span style="color:var(--bad-l)">${esc(o.e)}</span>` : ""}</div>`;
   return h;
 }
+// ───────── «Слежка»: не переехал ли копируемый кошелёк (данные — бот, проверка раз в 3 ч) ─────────
+const WT = {d: null, loading: false, err: "", add: "", poll: 0};
+const wtAgo = t => { if (!t) return "—"; const m = Math.max(0, (Date.now() / 1000 - t) / 60); return m < 60 ? Math.round(m) + " мин" : m < 2880 ? Math.round(m / 60) + " ч" : Math.round(m / 1440) + " дн"; };
+const wtShort = a => a ? a.slice(0, 4) + "…" + a.slice(-4) : "";
+const wtSol = x => x === null || x === undefined ? "—" : (+x >= 100 ? Math.round(x) : (+x).toFixed(+x >= 10 ? 1 : 2)) + " SOL";
+async function wtLoad(){
+  if (!P.sa){ WT.err = "Нужен сервер бота (STRAT_API_URL в .env)"; return; }
+  WT.loading = true; WT.err = "";
+  try {
+    const init = (tg && tg.initData) || "";
+    const r = await fetch(P.sa + "/api/moved?init=" + encodeURIComponent(init) + "&k=" + encodeURIComponent(P.sk || ""), {cache: "no-store"});
+    if (r.status === 403) throw new Error("Ключ устарел — открой окно заново (/app)");
+    if (!r.ok) throw new Error("сервер ответил " + r.status);
+    WT.d = await r.json();
+  } catch (e) { WT.err = e.message || "нет связи с ботом"; }
+  WT.loading = false;
+  clearTimeout(WT.poll);
+  if (WT.d && WT.d.run) WT.poll = setTimeout(() => { if (screen === "watch") wtLoad(); }, 8000);   // идёт проверка — обновляем сами
+  if (screen === "watch") render(true);
+}
+async function wtPost(body){
+  try {
+    const r = await fetch(P.sa + "/api/moved?k=" + encodeURIComponent(P.sk || ""), {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const j = await r.json();
+    if (!j.ok) asToast(j.err || "Не получилось", null, 2400, true);
+  } catch (e) { asToast("Нет связи с ботом", null, 2400, true); }
+  wtLoad();
+}
+const WT_ST = {moved: ["переехал", "var(--x-acc)"], maybe: ["похоже на переезд", "var(--x-warn)"], dead: ["не торгует", "var(--x-bad)"],
+  routine: ["торгует", "var(--x-acc)"], ok: ["торгует", "var(--x-acc)"], silent: ["замолчал", "var(--x-warn)"]};
+function wtRow(a, w){
+  const k = w ? (w.v === "ok" && w.st === "silent" ? "silent" : w.v) : "";
+  const [lbl, col] = WT_ST[k] || ["не проверен", "var(--dim)"];
+  const nm = w && w.nm || (ST.bm || {})[a] && ST.bm[a].nm || (w && w.extra ? "свой" : "");
+  const hot = w && (w.v === "moved" || w.v === "maybe");
+  const m1 = w && w.last ? "покупал " + wtAgo(w.last) + " назад" : "";
+  const m2 = hot && w.out_n ? "вывел " + wtSol(w.out_sol) + (hot ? " · осталось " + wtSol(w.bal) : "") : "";
+  return `<div class="x-it x-iw">${xIdent(a, col)}<div style="min-width:0">${xGmS(a, "sol")}${nm ? ` <span class="x-m">· ${esc(nm)}</span>` : ""}
+    <div class="x-m"><span class="wt-st" style="color:${col}">${lbl}</span>${m1 ? " · " + esc(m1) : ""}</div>${m2 ? `<div class="x-m">${esc(m2)}</div>` : ""}</div>
+    <span></span>${w && w.extra ? `<button class="wt-x" data-wtdel="${esc(a)}" aria-label="убрать из слежки">✕</button>` : "<span></span>"}</div>`;
+}
+function wtSubs(a, w){
+  const c = (w.cands || []).slice(0, 2).map(c => `<div class="x-it wt-sub"><span class="x-dot" style="background:${c.sc >= 4 ? "var(--x-acc)" : "var(--x-warn)"}"></span>
+    <div>→ ${xGmS(c.a, "sol")}<div class="x-m">${esc([c.r ? "вход ×" + c.r : "", c.nb + " покуп.", c.farm ? "похоже на ферму" : ""].filter(Boolean).join(" · "))}</div></div>
+    <span></span><button class="x-btn x-ghost wt-go" data-wtq="${esc(c.a)}">Стратегия</button></div>`).join("");
+  const p = !c ? (w.parked || []).slice(0, 1).map(x => `<div class="x-it wt-sub"><span class="x-dot" style="background:var(--dim)"></span>
+    <div>деньги на ${xGmS(x.a, "sol")}<div class="x-m">${esc(wtSol(x.sol))} · жду, куда пойдут</div></div><span></span><span></span></div>`).join("") : "";
+  return c + p;
+}
+function watchHTML(){
+  if (!WT.d && !WT.loading && !WT.err) setTimeout(wtLoad, 0);
+  const d = WT.d;
+  let h = topHTML("Слежка", true) + `<div class="wt-bar"><span class="x-m">${d && d.run ? "проверяю…" : d && d.t ? "обновлено " + wtAgo(d.t) + " назад" : ""}</span>
+    <span style="display:flex;gap:6px;flex:none"><button class="ocref" data-wtplus="1" aria-label="Добавить кошелёк">＋</button><button class="ocref" data-wtrun="1"${d && d.run ? " disabled" : ""}>${d && d.run ? "Проверяю…" : "↻ Проверить"}</button></span></div>`;
+  if (WT.open) h += `<div class="wt-add"><input class="ti" id="wtin" placeholder="адрес Solana" value="${esc(WT.add)}" autocomplete="off" spellcheck="false"><button class="btn pri" data-wtadd="1">Добавить</button></div>`;
+  if (WT.err) return h + `<div class="x"><div class="x-card x-m" style="margin-top:10px">${esc(WT.err)}</div></div>`;
+  if (!d) return h + `<div class="x"><div class="x-card x-m" style="margin-top:10px">Загружаю…</div></div>`;
+  const all = [...new Set([...(d.bz || []), ...(d.extra || []), ...Object.keys(d.w || {})])];
+  if (!all.length) return h + `<div class="x"><div class="x-card x-m" style="margin-top:10px">Пусто. Кошелёк появится здесь, когда отправишь стратегию «В Blizz».</div></div>`;
+  const hot = all.filter(a => d.w[a] && (["moved", "maybe"].includes(d.w[a].v) || d.w[a].st === "silent"))
+    .sort((x, y) => (d.w[x].v === "moved" ? 0 : 1) - (d.w[y].v === "moved" ? 0 : 1));
+  const calm = all.filter(a => !hot.includes(a));
+  let b = "";
+  if (hot.length) b += `<div class="x-sec">Посмотреть</div>` + hot.map(a => `<div class="x-card x-list" style="margin-bottom:8px">${wtRow(a, d.w[a])}${wtSubs(a, d.w[a])}</div>`).join("");
+  if (calm.length) b += `<div class="x-sec">${hot.length ? "Остальные" : "Все кошельки"}</div><div class="x-card x-list">${calm.map(a => wtRow(a, d.w[a])).join("")}</div>`;
+  if (!d.ok) b += `<div class="x-m" style="margin:10px 4px;color:var(--x-bad)">Нет ключа Solscan в .env — переводы не видно.</div>`;
+  return h + `<div class="x">${b}</div>`;
+}
+document.addEventListener("input", e => { if (e.target.id === "wtin") WT.add = e.target.value.trim(); });
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-wtplus]")){ WT.open = !WT.open; render(true); if (WT.open) setTimeout(() => { const i = document.getElementById("wtin"); if (i) i.focus(); }, 0); return; }
+  if (e.target.closest("[data-wtrun]")){ if (WT.d) WT.d.run = true; render(true); wtPost({act: "run"}); return; }
+  if (e.target.closest("[data-wtadd]")){
+    const m = (WT.add || "").match(/[1-9A-HJ-NP-Za-km-z]{32,44}/);
+    if (!m){ asToast("Вставь адрес Solana-кошелька", null, 2200, true); return; }
+    WT.add = ""; WT.open = false; if (WT.d) WT.d.run = true; render(true); wtPost({act: "add", addr: m[0]}); return;
+  }
+  const dl = e.target.closest("[data-wtdel]"); if (dl){ wtPost({act: "del", addr: dl.dataset.wtdel}); return; }
+  const q = e.target.closest("[data-wtq]"); if (q){ screen = "strat"; stLoad(); qOpen(q.dataset.wtq, "sol", "30d", "list"); return; }
+});
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 15:00 · стратегия: trailing, anti-PvP";
+const BUILD = "26.11 · 16:50 · слежка за кошельками";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -971,7 +1064,7 @@ function presetsHTML(){
   return h + `</div></div></div>`;
 }
 function navHTML(){
-  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["strat", "strat", "Стратегия"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
+  const it = [["home", "home", "Главная"], ["filters", "filt", "Фильтры"], ["onchain", "pulse", "Ончейн"], ["strat", "strat", "Стратегия"], ["watch", "eye", "Слежка"], ["presets", "layers", "Пресеты"], ["more", "more", "Ещё"]];
   return it.map(([s, i, l]) => { const n = scrCount(s);
     return `<button class="${screen === s ? "on" : ""}" data-go="${s}">${svg(i, 20)}${l}${n ? `<span class="n">${n}</span>` : ""}</button>`; }).join("");
 }
@@ -1032,7 +1125,7 @@ function render(keepScroll){
   document.body.classList.add("wide"); document.body.dataset.scr = screen;
   applyTheme();
   const y = window.scrollY, twx = [...document.querySelectorAll(".x-tw")].map(e => e.scrollLeft);
-  const html = screen === "strat" ? stratHTML() : screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : homeHTML();
+  const html = screen === "strat" ? stratHTML() : screen === "onchain" ? onchainHTML() : screen === "filters" ? filtersHTML() : screen === "more" ? moreHTML() : screen === "presets" ? presetsHTML() : screen === "watch" ? watchHTML() : homeHTML();
   document.getElementById("app").innerHTML = html;
   fitHollow();
   try { xEqDraw(); } catch (e) {}
@@ -1166,6 +1259,7 @@ function pickPreset(name){
 }
 function go(s, to){
   screen = s; render(); window.scrollTo(0, 0);
+  if (s === "watch" && typeof wtLoad === "function" && !WT.loading) wtLoad();
   if (to){ const el = document.querySelector(`[data-row="${to}"]`); if (el) el.scrollIntoView({block: "center"}); }
 }
 document.addEventListener("click", e => {
