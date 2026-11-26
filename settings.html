@@ -936,7 +936,7 @@ function onchainHTML(){
   return h;
 }
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "25.11 · 13:40 · стоп-лосс";
+const BUILD = "26.11 · 09:00 · что стоит в Blizz";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -1883,6 +1883,7 @@ async function stLoad(force){
     if (r.status === 403) throw new Error("auth");
     if (!r.ok) throw new Error("http " + r.status);
     ST.list = await r.json();
+    try { const rb = await fetch(P.sa + "/api/blizzmap?init=" + encodeURIComponent(init) + "&k=" + encodeURIComponent(P.sk || ""), {cache: "no-store"}); ST.bm = rb.ok ? await rb.json() : (ST.bm || {}); } catch (e) { ST.bm = ST.bm || {}; }
     if (EXT && EXT.addr && !EXT.done){   // открыто из расширения по кошельку: есть готовый поиск — сразу он, нет — адрес в поле
       EXT.done = true;
       const i = ST.list.findIndex(d => d.a === EXT.addr);
@@ -2018,7 +2019,7 @@ function stList(){
     const gl = g ? [`место ${g.pl}`, g.ns ? `первым в ${g.fi} из ${g.ns}` + (g.lg != null ? (g.lg <= 0 ? " · обычно первый" : ` · отстаёт ${xDur(g.lg)}`) : "") : "",
                     g.bd != null ? `плохих ${Math.round(g.bd * 100)}%` : ""].filter(Boolean).join(" · ") : "";
     return `<button class="x-it x-iw" data-xi="${i}">${xIdent(d.a, col)}<div>${xGmS(d.a, d.c)} <span class="x-m">· ${esc(xCH[d.c] || d.c)} · ${String(d.p).replace("d", " дн")}</span>
-      <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}${gl ? " · " + esc(gl) : ""}</div></div>
+      <div class="x-m">${when} · ${pk.w ? "надёжной нет" : !pk.m ? "не копировать" : pk.m === "flip" ? "флипы" : "обычный"}${gl ? " · " + esc(gl) : ""}</div>${xBz(d) ? `<div class="x-m" style="color:var(--x-acc)">${svg("send", 12)} в Blizz: ${esc(xBz(d).nm || "—")}${xBz(d).api && xBz(d).api !== d.api ? " (из др. поиска)" : ""}</div>` : ""}</div>
       <span></span><span class="x-num ${xCls(rep && rep.tot)}">${rep ? xUsd(rep.tot) : "—"}</span></button>`;
   };
   // Пачки — одной рамкой своего цвета, по местам из сравнения; одиночные поиски — обычным списком
@@ -2043,11 +2044,11 @@ function stList(){
 function stHome(D){
   let h = xHead("Стратегия", `${xGmA(D.a, D.c)} · ${esc(xCH[D.c] || D.c)} · ${String(D.p).replace("d", " дн")}`, "list");
   h += `<div class="x-2"><div class="x-l">` + xVerdict(D) + (P.sa && P.sk ? `<div class="x-chips" style="margin-top:10px"><button class="x-btn x-ghost" data-xexcel="1" style="height:44px;flex:1">${svg("table", 17)}Excel в чат</button><button class="x-btn x-ghost" data-qopen="${esc(D.a)}" style="height:44px;flex:1">${svg("bolt", 17)}Сделки кошелька</button></div>` : "")
-    + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">${svg("flask", 17)}Свой бэктест</button>`
+    + `<button class="x-btn x-ghost" data-xbthome="1" style="height:44px;margin-top:8px">${svg("flask", 17)}Свой бэктест</button>` + xBzCard(D)
     + `<div class="x-sec">Лучшее в каждом режиме</div><div class="x-modes">` + xModeCard(D, "n") + xModeCard(D, "f") + `</div></div><div class="x-r">`;
   const rows = [];
   for (const k of ["n", "f"]) (D.m[k] ? D.m[k].v : []).forEach((v, i) => rows.push(`<button class="x-it" data-xo="${k}:${i}">
-    <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}<div class="x-m">${esc(xBot(v.ex))} · ${v.n} сд.</div></div>
+    <span class="x-dot" style="background:${X_MODES[k].c}"></span><div>${esc(v.nm)}${xBzSame(D, k, i) ? ` <b style="color:var(--x-acc)">${svg("send", 12)} Blizz</b>` : ""}<div class="x-m">${esc(xBot(v.ex))} · ${v.n} сд.</div></div>
     <span class="x-m ${xCls(v.te)}">${v.te != null ? (v.vd && v.vd[0] === "✅" ? "✓ " : "") + xUsd(v.te) : "—"}</span><span class="x-num ${xCls(v.tot)}">${xUsd(v.tot)}</span></button>`));
   if (rows.length) h += `<div class="x-sec">Все варианты</div><div class="x-card x-list">${rows.join("")}</div><div class="x-note">Справа — итог за период (${stakeLbl(D.api && ST.sd[D.api])} на сделку), рядом — на новых сделках.</div>`;
   return h + `</div></div>`;
@@ -2170,7 +2171,7 @@ function stDetail(D){
   const k = ST.m, md = D.m[k], M = X_MODES[k], v = md.v[ST.k];
   let h = xHead(M.t, `${xGmA(D.a, D.c)} · ${String(D.p).replace("d", " дн")}`, "home");
   h += `<div class="x-2"><div class="x-l">`;
-  h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}</button>`).join("")}</div>`;
+  h += `<div class="x-tabs">${md.v.map((x, i) => `<button class="x-tab${i === ST.k ? " on" : ""}" style="--mc:${M.c};--mrgb:${M.rgb}" data-xo="${k}:${i}">${esc(x.nm)}${xBzSame(D, k, i) ? " 📤" : ""}</button>`).join("")}</div>`;
   h += xTiles(v);
   if (v.vd) h += `${xVdNote(v.vd)}`;
   if (D.api && !ST.sd[D.api] && !ST.sdErr) stLoadSim(D);
@@ -2487,8 +2488,24 @@ async function xCopy(text){
 let xToastT;
 // ===== 📤 В Blizz: копи-ордер с этими настройками (на паузе) — через сервер бота, ключ Blizz лежит только там =====
 function xBlizzKey(D, where){ return [D.api, D.a, where, ST.m, ST.k].join("|"); }
+// Что стоит в Blizz по кошельку: запись сервера (поиск · режим · вариант · параметры), сохраняется при «📤 В Blizz»
+const xBz = D => (ST.bm && D && ST.bm[D.a]) || null;
+const xBzSame = (D, m, k) => { const r = xBz(D); return !!(r && r.src === "var" && r.api === D.api && r.m === m && r.k === k); };
+const xBzWhen = r => new Date(r.t * 1000).toLocaleString("ru-RU", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
+function xBzCard(D){
+  const r = xBz(D); if (!r) return "";
+  const same = r.src === "var" && r.api === D.api && D.m[r.m] && D.m[r.m].v[r.k];
+  const old = r.api && r.api !== D.api;
+  return `<div class="x-card" style="margin-top:10px;border-color:var(--x-acc);font-size:13px">${svg("send", 15)} <b>В Blizz стоит:</b> ${esc(r.nm || "—")}
+    <div class="x-m" style="margin-top:3px">${r.act === "upd" ? "настройки обновлены" : "ордер создан"} ${xBzWhen(r)}${r.per ? " · поиск за " + esc(String(r.per).replace("d", " дн")) : ""}${old ? " · из другого (более старого) поиска" : ""}</div>
+    ${same ? `<button class="x-btn x-ghost" data-xo="${r.m}:${r.k}" style="height:40px;margin-top:8px">Открыть этот вариант</button>`
+      : r.p ? `<button class="x-btn x-ghost" data-xbzbt="1" style="height:40px;margin-top:8px">${svg("flask", 16)}Открыть его настройки в бэктесте</button>` : ""}</div>`;
+}
 function xBlizzBox(D, where){
   if (!(P.sa && P.sk) || D.c !== "sol") return "";
+  const rr = xBz(D);
+  const cur = rr && (where === "bt" ? rr.src === "bt" : xBzSame(D, ST.m, ST.k));
+  const note = rr ? `<div class="x-note" style="margin:10px 2px 0">${svg("send", 13)} ${cur ? "<b>Этот вариант стоит в Blizz</b>" : "В Blizz сейчас: <b>" + esc(rr.nm || "—") + "</b>"} · ${xBzWhen(rr)}</div>` : "";
   const st = ST.blz && ST.blz.key === xBlizzKey(D, where) ? ST.blz : null;
   let msg = "";
   if (st){
@@ -2500,19 +2517,20 @@ function xBlizzBox(D, where){
       : `<div class="x-bad">✗ ${esc(st.err || "не получилось")}</div>`;
     msg = `<div class="x-card" style="margin-top:8px;font-size:13px">${msg}${warn}</div>`;
   }
-  return `<button class="x-btn x-ghost" data-xblz="${where}" style="margin-top:10px"${st && st.s === "send" ? " disabled" : ""}>${svg("send", 17)}В Blizz — создать копи-ордер (на паузе)</button>${msg}`;
+  return note + `<button class="x-btn x-ghost" data-xblz="${where}" style="margin-top:10px"${st && st.s === "send" ? " disabled" : ""}>${svg("send", 17)}В Blizz — создать копи-ордер (на паузе)</button>${msg}`;
 }
 async function xBlizzSend(where, upd){
   const D = xD(); if (!D) return;
-  let p;
-  if (where === "bt") p = btParams();
-  else { const v = D.m[ST.m].v[ST.k]; p = xRawParams(v.raw); }
+  let p, meta;
+  if (where === "bt"){ p = btParams(); meta = {api: D.api, m: ST.m, k: ST.k, nm: "Свой бэктест", src: "bt", per: D.p}; }
+  else { const v = D.m[ST.m].v[ST.k]; p = xRawParams(v.raw); meta = {api: D.api, m: ST.m, k: ST.k, nm: X_MODES[ST.m].t + " · " + v.nm, src: "var", per: D.p}; }
   ST.blz = {key: xBlizzKey(D, where), s: "send"}; render(true);
   try {
     const r = await fetch(`${P.sa}/api/blizz?k=${encodeURIComponent(P.sk)}`, {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({addr: D.a, chain: D.c, p, update: !!upd})});
+      body: JSON.stringify({addr: D.a, chain: D.c, p, meta, update: !!upd})});
     const j = r.ok ? await r.json() : {ok: 0, err: r.status === 403 ? "ключ окна устарел — отправь боту /app" : "сервер ответил " + r.status};
     ST.blz = Object.assign({key: xBlizzKey(D, where)}, j.ok ? {s: j.created ? "created" : j.updated ? "updated" : "existing", warn: j.warn} : {s: "err", err: j.err, warn: j.warn});
+    if (j.ok && j.rec){ ST.bm = ST.bm || {}; ST.bm[D.a] = j.rec; }
     if (j.ok) try { inTG && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
   } catch (e) { ST.blz = {key: xBlizzKey(D, where), s: "err", err: "сервер бота не отвечает"}; }
   render(true);
@@ -2626,6 +2644,7 @@ document.addEventListener("click", async e => {
   if (t.closest("[data-xbuyed]")){ e.preventDefault(); e.stopPropagation(); xBuyOpen = !xBuyOpen; render(true); setTimeout(() => { const i = document.getElementById("xbuyin"); if (i) i.focus(); }, 50); return; }
   if (t.closest("[data-xbuysave]")){ xBuySave(); return; }
   if (t.closest("#xbuyf")) return;
+  const bzb = t.closest("[data-xbzbt]"); if (bzb){ const D1 = xD(), r1 = xBz(D1); if (r1 && r1.p){ ST.bt = xParamsToB(r1.p); ST.v = "bt"; render(); window.scrollTo(0, 0); xToast("Настройки из Blizz → бэктест"); } return; }
   const bz = t.closest("[data-xblz]"); if (bz){ xBlizzSend(bz.dataset.xblz, !!bz.dataset.xblzupd); return; }
   const xe = t.closest("[data-xex]"); if (xe){ const D0 = xD(); if (D0){ const S = xExSet(D0), a = xe.dataset.xex; S.has(a) ? S.delete(a) : S.add(a); render(true); } return; }
   if (t.closest("[data-xexclr]")){ if (ST.ex) ST.ex.set.clear(); render(true); return; }
