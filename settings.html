@@ -400,8 +400,10 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-tb tr.w .x-st{box-shadow:inset 3px 0 0 rgba(var(--x-rgb),.7),1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.l .x-st{box-shadow:inset 3px 0 0 rgba(255,107,107,.6),1px 0 0 rgba(255,255,255,.06)}
 .x-tb tr.o td{opacity:.65}
-.x-tk{display:flex;align-items:center;gap:8px}
-.x-chk{width:20px;height:20px;flex:0 0 auto;margin:0;accent-color:var(--acc);cursor:pointer}
+.x-tk{display:flex;align-items:center;gap:5px}
+.x-tb td.x-st{padding-left:8px!important;padding-right:6px!important}
+.x-nd{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--x-acc);box-shadow:0 0 0 3px rgba(var(--x-rgb),.18)}
+.x-chk{width:16px;height:16px;flex:0 0 auto;margin:0;accent-color:var(--acc);cursor:pointer}
 .x-tb tr.xx td{opacity:.38}
 .x-tb tr.xx td.x-st{opacity:1}
 .x-tb tr.xx .x-tl{text-decoration:line-through;opacity:.5}
@@ -410,8 +412,8 @@ body.ext .dock{display:none!important}body.ext #app{padding-bottom:40px!importan
 .x-exh .x-link{font-size:12.5px}
 .x-exr{margin-top:4px}
 .x-exc{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.06)}
-.x-tl{color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
-.x-ca{width:30px;height:30px;border-radius:9px;border:1px solid var(--x-line)!important;color:var(--hint)!important;text-align:center!important;font-size:12px}
+.x-tl{max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)!important;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+.x-ca{width:20px;height:22px;flex:0 0 auto;border-radius:6px;border:0!important;opacity:.7;color:var(--hint)!important;text-align:center!important;font-size:12px}
 .xq-tip{position:absolute;z-index:3;background:#16141d;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:7px 9px;font-size:11.5px;line-height:1.45;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5);white-space:nowrap;color:var(--text)}
 .xq-tip b{font-size:12px}
 .xq-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--hint);margin-top:6px;flex-wrap:wrap}.xq-row b{color:var(--text)}
@@ -936,7 +938,7 @@ function onchainHTML(){
   return h;
 }
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 09:20 · кнопка «Вставить»";
+const BUILD = "26.11 · 09:35 · узкая колонка токенов";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -2138,7 +2140,7 @@ function xTrades(D, o, color, P){
     <div class="x-card x-tw"><table class="x-tb"><thead><tr><th class="x-st">Токен</th>${hd("date", "Вход")}${hd("age", "Возраст")}${hd("mc", "Капа")}${hd("usd", "Сумма")}${hd("pk", "Пик")}${hd("hold", "Холд")}${hd("roi", "Копия")}<th>Выход</th></tr></thead><tbody>`;
   const shown = xAll ? ok : ok.slice(0, 30);
   h += shown.map(x => `<tr class="${x.roi > 0 ? "w" : "l"}${EX.has(x.t.a) ? " xx" : ""}">
-      <td class="x-st"><div class="x-tk">${P ? `<input type="checkbox" class="x-chk" data-xex="${esc(x.t.a)}" ${EX.has(x.t.a) ? "" : "checked"} aria-label="оставить токен">` : ""}<button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button><button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button>${x.test ? '<i class="x-new">нов.</i>' : ""}</div></td>
+      <td class="x-st"><div class="x-tk">${P ? `<input type="checkbox" class="x-chk" data-xex="${esc(x.t.a)}" ${EX.has(x.t.a) ? "" : "checked"} aria-label="оставить токен">` : ""}<button data-xtok="${esc(x.t.a)}" class="x-tl" title="${esc(x.t.sym)} — график в GMGN">${esc(x.t.sym)}</button>${x.test ? '<i class="x-nd" title="новая сделка (проверка)"></i>' : ""}<button data-xca="${esc(x.t.a)}" class="x-ca" aria-label="Скопировать адрес">⧉</button></div></td>
       <td>${dt(x.t.fb)}</td><td>${x.t.age != null ? (xDur(x.t.age) || "<1 мин") : "—"}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td>
       <td>${x.pk ? "x" + x.pk.toFixed(x.pk >= 10 ? 0 : 1) : "—"}</td><td>${x.hold != null ? (xDur(x.hold) || "<1 мин") : "—"}</td>
       <td class="${xCls(x.roi)}"><b>${x.roi > 0 ? "+" : ""}${Math.round(x.roi * 100)}%</b> <span class="x-m">${xUsd(x.roi * stake)}</span></td>
@@ -2150,7 +2152,7 @@ function xTrades(D, o, color, P){
     if (xShowBad) h += `<div class="x-card x-tw" style="margin-top:8px"><table class="x-tb"><thead><tr><th class="x-st">Токен</th><th>Вход</th><th>Капа</th><th>Сумма</th><th>Почему нет</th></tr></thead><tbody>${bad.map(x => `<tr class="o">
       <td class="x-st"><div class="x-tk"><button data-xtok="${esc(x.t.a)}" class="x-tl">${esc(x.t.sym)} ↗</button></div></td><td>${dt(x.t.fb)}</td><td>${mc(x.t.mc)}</td><td>$${Math.round(x.t.usd)}</td><td class="x-m">✗ ${esc(x.why)}</td></tr>`).join("")}</tbody></table></div>`;
   }
-  return h + `<div class="x-note">Таблица листается вбок. Тап по названию — график в GMGN с его сделками, ⧉ — скопировать адрес токена. Тап по заголовку — сортировка.${P ? " Сними галочку у токена — увидишь итог без него и какая настройка его уберёт." : ""}</div>`;
+  return h + `<div class="x-note">Таблица листается вбок. Тап по названию — график в GMGN с его сделками, ⧉ — скопировать адрес токена, зелёная точка — новая сделка (проверка). Тап по заголовку — сортировка.${P ? " Сними галочку у токена — увидишь итог без него и какая настройка его уберёт." : ""}</div>`;
 }
 function xExBox(D, sd, P, all, EX, sum){
   if (!P || !EX.size) return "";
