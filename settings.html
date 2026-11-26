@@ -1124,7 +1124,7 @@ document.addEventListener("click", e => {
     bootEmpty("Ты вышел на этом устройстве.<br><br>Войти снова — кнопка «🌐 Web App» в боте (или /web)."); }
 });
 // метка сборки: видно внизу «Ещё» и в консоли — сразу понятно, открылась ли новая версия, а не старая из кэша
-const BUILD = "26.11 · 22:00 · вход в веб по одноразовой ссылке";
+const BUILD = "26.11 · 22:30 · защита от XSS";
 try { console.log("LUPA build", BUILD); } catch (e) {}
 function moreHTML(){ const z = zoomGet(); return topHTML("Ещё", true) + (WEBMODE ? `<div class="sec">Веб-версия</div><div class="card" style="margin-bottom:4px"><div class="pc"><button class="btn" data-weblogout="1" style="width:100%;height:44px">Выйти на этом устройстве</button><div class="sm">Браузер забудет вход. Снова войти — кнопка «🌐 Web App» в боте.</div></div></div>` : "") + (isPC() ? `<div class="sec">Размер текста на ПК</div><div class="card" style="margin-bottom:4px"><div class="row"><div class="rh"><div class="rl"><b>Весь интерфейс</b><span>только на компьютере — на телефоне всегда обычный</span></div></div>
     <div class="seg">${ZOOMS.map(([v, l]) => `<button data-zoom="${v}" class="${Math.abs(z - v) < .01 ? "on" : ""}">${l}</button>`).join("")}</div></div></div>` : "") + `<div class="dkg">` + MORE_GROUPS.map(g => `<div class="dgi">${groupHTML(g, "")}</div>`).join("") + `</div><div class="foot">сборка ${esc(BUILD)}</div>`; }
@@ -2806,7 +2806,7 @@ function stQuick(){
   const have = (ST.list || []).findIndex(d => d.a === QK.addr);
   const busy = ST.job && ST.job.state === "run";
   const inp = (k, label, ph) => `<label class="x-fl">${label}<input data-qf="${k}" value="${esc(f[k] == null ? "" : f[k])}" placeholder="${ph}" ${k === "q" ? 'spellcheck="false"' : 'inputmode="decimal"'}></label>`;
-  const chip = (k, v, l) => `<button class="x-chip${(f[k] || "all") === v ? " on" : ""}" data-qset="${k}:${v}" style="flex:0 0 auto;padding:0 12px;height:32px;font-size:12.5px">${l}</button>`;
+  const chip = (k, v, l) => `<button class="x-chip${(f[k] || "all") === v ? " on" : ""}" data-qset="${esc(k)}:${esc(v)}" style="flex:0 0 auto;padding:0 12px;height:32px;font-size:12.5px">${l}</button>`;
   const lps = QK.data ? [...new Set(QK.data.rows.map(r => r.lp).filter(Boolean))] : [];
   const left = `<div class="x-chips" style="margin:0 0 10px">${per.map(p => `<button class="x-chip${QK.per === p ? " on" : ""}" data-qper="${p}">${p.replace("d", " дн")}</button>`).join("")}</div>
     <div class="x-chips" style="margin:0 0 4px;flex-wrap:wrap">${have >= 0 ? `<button class="x-btn x-ghost" data-xi="${have}" style="height:42px;flex:1">${svg("strat", 16)}Открыть стратегию</button>` : ""}
